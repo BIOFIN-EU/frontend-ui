@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "./globals.css";
+import "ol/ol.css";
 
 import { Inter } from "next/font/google";
 import Image from "next/image";
@@ -55,6 +56,7 @@ export default function RootLayout({
                     <Link href="/risk-model" className="navLink">Risk Model</Link>
                     <Link href="/about" className="navLink">About</Link>
                     <Link href="/support" className="navLink">Support</Link>
+                    <Link href="/workflow" className="navLink">Workflow</Link>
                   </nav>
 
                 </div>
