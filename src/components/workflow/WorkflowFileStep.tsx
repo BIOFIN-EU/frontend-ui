@@ -10,23 +10,51 @@ type Props = {
   onStateUpdated: (state: WorkflowState) => void;
 };
 
-export function WorkflowFileStep({ state, onStateUpdated }: Props) {
-  const step = state.step!;
-  const fileField = step.fields.find((f) => f.type === "file");
+function prettifyLabel(name: string) {
+  return name
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
-  const [submitting, setSubmitting] = useState(false);
+export function WorkflowFileStep({ state, onStateUpdated }: Props) {
+  const step = state.step;
+
+  if (!step) {
+    return <p className="text-sm text-white/70">No step available.</p>;
+  }
+
+  const fileField = step.fields.find((f) => f.type === "file");
   const [error, setError] = useState("");
 
-  const initialValues = useMemo(() => {
-    const v: Record<string, unknown> = {};
-    step.fields.forEach((f) => {
-      v[f.name] = f.type === "file" ? null : f.default ?? "";
-    });
-    return v;
-  }, [step.fields]);
+  const stepSchema = useMemo(
+    () => ({
+      title: step.title,
+      fields: step.fields.map((f) => ({
+        id: f.name,
+        label: prettifyLabel(f.name),
+        type: f.type as any,
+        required: !!f.required,
+        options: Array.isArray(f.options) ? f.options : [],
+      })),
+    }),
+    [step]
+  );
 
-  async function handleSubmit(values: Record<string, unknown>) {
-    if (!fileField) return;
+  const defaultValues = useMemo(() => {
+    const values: Record<string, any> = {};
+
+    step.fields.forEach((f) => {
+      values[f.name] = f.type === "file" ? null : (f.default ?? "");
+    });
+
+    return values;
+  }, [step]);
+
+  async function handleNext(values: Record<string, any>) {
+    if (!fileField) {
+      setError("No file field configured for this step");
+      return;
+    }
 
     const file = values[fileField.name];
 
@@ -35,31 +63,30 @@ export function WorkflowFileStep({ state, onStateUpdated }: Props) {
       return;
     }
 
-    try {
-      setSubmitting(true);
-      setError("");
+    setError("");
 
-      const updated = await workflowService.submitFileStep({
-        caseId: state.case_id,
-        fieldName: fileField.name,
-        file,
-      });
+    const updated = await workflowService.submitFileStep({
+      caseId: state.case_id,
+      fieldName: fileField.name,
+      file,
+    });
 
-      onStateUpdated(updated);
-    } catch (err) {
-      setError(workflowService.extractErrorMessage(err));
-    } finally {
-      setSubmitting(false);
-    }
+    onStateUpdated(updated);
+  }
+
+  async function handleSaveDraft(_values: Record<string, any>) {
+    return;
   }
 
   return (
     <div>
       <FormRenderer
-        fields={step.fields}
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        submitLabel={submitting ? "Uploading..." : "Continue"}
+        stepSchema={stepSchema}
+        defaultValues={defaultValues}
+        onNext={handleNext}
+        onSaveDraft={handleSaveDraft}
+        isFirst={false}
+        isLast={!step.next}
       />
 
       {error && (

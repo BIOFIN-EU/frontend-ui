@@ -110,23 +110,26 @@ function Field({
         </label>
       );
 
-    case "file":
-      return (
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-white">
-            {field.label}
-          </label>
-          <input
-            type="file"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              setValue(field.id, file);
-            }}
-            className="text-white"
-          />
-        </div>
-      );
+      case "file":
+  return (
+    <div className="space-y-2">
+      <label htmlFor={field.id} className="text-sm font-semibold text-white">
+        {field.label}
+      </label>
 
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
+        <input
+          id={field.id}
+          type="file"
+          onChange={(e) => {
+            const file = e.target.files?.[0] ?? null;
+            setValue(field.id, file, { shouldValidate: true, shouldDirty: true });
+          }}
+          className="block w-full text-sm text-white file:mr-4 file:rounded-xl file:border-0 file:bg-emerald-400/15 file:px-4 file:py-2 file:font-semibold file:text-emerald-100 hover:file:bg-emerald-400/20"
+        />
+      </div>
+    </div>
+  );
     default:
       return null;
   }
