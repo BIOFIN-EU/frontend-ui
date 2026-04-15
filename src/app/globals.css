@@ -1,0 +1,428 @@
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+
+/* =========================
+   GLOBAL RESET + FONT
+   ========================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- DESIGN TOKENS ---- */
+:root {
+  /* If --font-main isn't defined, the browser falls back to system-ui etc. */
+  --font-main: system-ui;
+
+  --font: var(--font-main), system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --bg0: #061a20;
+  --bg1: #0e2f38;
+
+  --cardSolid: #ffffff;
+  --text: #0a1f26;
+  --muted: rgba(10, 31, 38, 0.62);
+
+  --border: rgba(0, 0, 0, 0.06);
+
+  --accent: #4fb89f;
+  --accent2: #79d7c1;
+
+  --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.18);
+
+  --radius-xl: 18px;
+  --container: 1120px;
+}
+
+html,
+body {
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,h2,h3,h4,h5,h6,
+p,span,a,button,input,textarea,select,label,div {
+  font-family: var(--font);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Improve keyboard accessibility without changing your look */
+:focus-visible {
+  outline: 2px solid rgba(121, 215, 193, 0.55);
+  outline-offset: 2px;
+}
+
+/* =========================
+   BACKGROUND
+   ========================= */
+
+body {
+  color: var(--text);
+  /* Deeper + more dimensional background */
+  background:
+    radial-gradient(900px 520px at 15% -10%, rgba(79, 184, 159, 0.16), transparent 55%),
+    radial-gradient(900px 520px at 90% 0%, rgba(121, 215, 193, 0.10), transparent 55%),
+    radial-gradient(1000px 650px at 60% 120%, rgba(40, 120, 255, 0.06), transparent 60%),
+    linear-gradient(180deg, #071a20 0%, #0b2730 55%, #071a20 100%);
+}
+
+/* Subtle noise overlay (premium feel, very light) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  /* No external image required */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.018),
+      rgba(255,255,255,0.018) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+/* Ensure app content sits above background overlay */
+.appShell {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   LAYOUT
+   ========================= */
+
+.appShell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  background: linear-gradient(
+    180deg,
+    rgba(6, 26, 32, 0.92),
+    rgba(6, 26, 32, 0.72)
+  );
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.headerInner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.brandTitle {
+  color: rgba(255, 255, 255, 0.94);
+  font-weight: 650;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.brandSubtitle {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 520;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  transition: background 160ms ease, transform 160ms ease, opacity 160ms ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.085);
+  transform: translateY(-1px);
+}
+
+/* Optional: if you can add an active class in your templates */
+.navLinkActive {
+  background: rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(121, 215, 193, 0.22);
+}
+
+.navCta {
+  color: #062126;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  font-weight: 650;
+  padding: 10px 14px;
+  border-radius: 999px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.navCta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+/* =========================
+   MAIN
+   ========================= */
+
+.main {
+  flex: 1;
+  padding: 44px 18px 72px; /* slightly more breathing room */
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    180deg,
+    rgba(7, 31, 38, 0.30),
+    rgba(7, 31, 38, 0.72)
+  );
+  padding: 26px 16px;
+}
+
+.footerText,
+.footerMeta {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12.5px;
+  line-height: 1.55;
+  max-width: var(--container);
+  margin: 0 auto;
+}
+
+.link {
+  color: var(--accent2);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.authHint {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: left;
+  margin-top: 16px;
+}
+
+/* =========================
+   HOME LANDING GRID
+   ========================= */
+
+.homeGrid {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.tile {
+  border-radius: 14px;
+  padding: 30px;
+
+  /* More “glass” depth */
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.22);
+
+  transition:
+    transform 170ms ease,
+    box-shadow 170ms ease,
+    background 170ms ease,
+    border-color 170ms ease;
+}
+
+.tile:hover {
+  transform: translateY(-4px);
+
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(121, 215, 193, 0.22);
+
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.42),
+    0 0 22px rgba(87, 191, 165, 0.16);
+}
+
+/* Nice pressed state */
+.tile:active {
+  transform: translateY(-2px);
+}
+
+.tileTitle {
+  font-weight: 680;
+  font-size: 16px;
+  letter-spacing: -0.012em;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.tileText {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .homeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Brand: keep it tight */
+.brandText .brandSubtitle { display: none; } /* optional */
+
+/* Header right alignment (kept) */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* User dropdown: minimal */
+.userDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 180px;
+  border-radius: 14px;
+  background: rgba(7, 31, 38, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.dropdownItem {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 650;
+  cursor: pointer;
+  display: block;
+  transition: background 160ms ease;
+}
+
+.dropdownItem:hover {
+  background: rgba(255, 255, 255, 0.085);
+}
+
+.logout {
+  color: #ffb4b4;
+}
+
+/* =====================
+   AVATAR BUTTON
+   ===================== */
+
+.avatarButton {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.avatarButton:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+  border-color: rgba(121, 215, 193, 0.22);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.avatarButton svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.7;
+}

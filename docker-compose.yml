@@ -1,0 +1,26 @@
+services:
+  frontend-ui:
+    container_name: frontend-ui
+    build: .
+    ports:
+      - "3000:3000"
+
+    env_file:
+      - .env.dev
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+    command: npm run dev -- --hostname 0.0.0.0 --port 3000
+
+    networks:
+      - biofin_network
+
+networks:
+  biofin_network:
+    external: true
