@@ -132,18 +132,18 @@ function TileGraphic({ type }: { type: string }) {
 
 export default function HomePage() {
   return (
-    <div className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.14),transparent_30%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_28%),radial-gradient(circle_at_bottom,rgba(168,85,247,0.12),transparent_30%)]" />
+    <div className="relative isolate overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.14),transparent_30%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_28%),radial-gradient(circle_at_bottom,rgba(168,85,247,0.12),transparent_30%)]" />
 
-      <div className="relative mx-auto max-w-7xl space-y-10 px-6 py-10 sm:px-8 lg:px-10">
+      <div className="relative mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
         <section className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="space-y-6">
-            <div className="inline-flex items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
+          <div className="min-w-0 space-y-6">
+            <div className="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-500/12 px-3 py-1 text-xs font-semibold text-emerald-200 shadow-[0_8px_24px_rgba(0,0,0,0.18)] ring-1 ring-emerald-400/15">
               Nature-based finance platform
             </div>
 
             <div className="space-y-4">
-              <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              <h1 className="max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Finance, assess, and report on biodiversity with confidence.
               </h1>
               <p className="max-w-2xl text-sm leading-6 text-white/70 sm:text-base">
@@ -156,24 +156,24 @@ export default function HomePage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/support"
-                className="inline-flex items-center justify-center rounded-xl bg-emerald-400/15 px-5 py-3 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-300/30 shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition hover:bg-emerald-400/20 hover:ring-emerald-200/40 active:translate-y-[1px]"
+                className="inline-flex items-center justify-center rounded-xl border border-emerald-300/20 bg-emerald-400/15 px-5 py-3 text-sm font-semibold text-emerald-100 shadow-[0_10px_30px_rgba(0,0,0,0.25)] ring-1 ring-emerald-300/20 transition duration-200 hover:bg-emerald-400/20 hover:ring-emerald-200/35 active:translate-y-[1px]"
               >
                 Get support
               </Link>
 
               <Link
                 href="/about"
-                className="inline-flex items-center justify-center rounded-xl bg-white/8 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/12 hover:ring-white/25 active:translate-y-[1px]"
+                className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/8 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/10 transition duration-200 hover:bg-white/12 hover:ring-white/20 active:translate-y-[1px]"
               >
                 Learn more
               </Link>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+          <div className="min-w-0 rounded-3xl border border-white/10 bg-white/[0.05] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
             <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
                     Platform overview
                   </p>
@@ -181,13 +181,13 @@ export default function HomePage() {
                     Biodiversity finance workflow
                   </p>
                 </div>
-                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-300/20 to-cyan-300/10 ring-1 ring-white/10">
+                <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-300/20 to-cyan-300/10 ring-1 ring-white/10">
                   <span className="text-sm font-semibold text-white">NBS</span>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid gap-3 sm:grid-cols-3">
                   <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
                     <p className="text-sm font-semibold text-emerald-100">Classify</p>
                     <p className="mt-1 text-xs leading-5 text-emerald-50/75">
@@ -255,7 +255,7 @@ export default function HomePage() {
             {pillars.map((pillar) => (
               <div
                 key={pillar.key}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md"
+                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md transition duration-200 hover:-translate-y-0.5 hover:border-white/15"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-80 transition group-hover:opacity-100" />
                 <div className="relative">
@@ -276,13 +276,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-md">
+        <section className="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-md sm:p-6">
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100/60">
                 Call to action
               </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white">
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 Are you looking to fund, build, or support Nature-Based Solutions?
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/75">
@@ -294,13 +294,13 @@ export default function HomePage() {
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/support"
-                  className="inline-flex items-center justify-center rounded-xl bg-emerald-400/20 px-5 py-3 text-sm font-semibold text-emerald-50 ring-1 ring-emerald-200/30 transition hover:bg-emerald-400/25"
+                  className="inline-flex items-center justify-center rounded-xl border border-emerald-200/20 bg-emerald-400/20 px-5 py-3 text-sm font-semibold text-emerald-50 ring-1 ring-emerald-200/20 transition duration-200 hover:bg-emerald-400/25"
                 >
                   Contact support
                 </Link>
                 <Link
                   href="/risk-model"
-                  className="inline-flex items-center justify-center rounded-xl bg-white/8 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/12"
+                  className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/8 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/10 transition duration-200 hover:bg-white/12"
                 >
                   Explore the risk model
                 </Link>
@@ -312,13 +312,13 @@ export default function HomePage() {
                 <Link
                   key={item.key}
                   href={item.href}
-                  className="group rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5 transition hover:border-emerald-300/25 hover:bg-black/30"
+                  className="group rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5 transition duration-200 hover:border-emerald-300/25 hover:bg-black/30"
                 >
                   <p className="text-sm font-semibold text-white">{item.title}</p>
                   <p className="mt-2 text-sm leading-6 text-white/65">
                     {item.text}
                   </p>
-                  <p className="mt-3 text-xs font-semibold text-emerald-200/0 transition group-hover:text-emerald-200">
+                  <p className="mt-3 text-xs font-semibold text-emerald-200/70 transition group-hover:text-emerald-200">
                     {item.cta} →
                   </p>
                 </Link>
