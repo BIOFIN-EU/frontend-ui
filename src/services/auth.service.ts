@@ -1,5 +1,11 @@
 // src/services/auth.service.ts
-import { apiFetch, clearTokens, setTokens, TokenResponse } from "@/lib/api";
+import {
+  apiFetch,
+  clearTokens,
+  getRefreshToken,
+  setTokens,
+  TokenResponse,
+} from "@/lib/api";
 
 export type MeResponse = {
   id: string;
@@ -30,9 +36,26 @@ export async function me() {
   });
 }
 
+export async function changePassword(currentPassword: string, newPassword: string) {
+  return apiFetch("/api/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify({
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+  });
+}
+
 export async function logout() {
+  const refreshToken = getRefreshToken();
+
   try {
-    await apiFetch("/api/auth/logout", { method: "POST" });
+    if (refreshToken) {
+      await apiFetch("/api/auth/logout", {
+        method: "POST",
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+    }
   } finally {
     clearTokens();
   }

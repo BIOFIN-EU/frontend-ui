@@ -11,7 +11,7 @@ export default function UserMenu({
 }: {
   name: string;
   email?: string;
-  onLogout: () => void;
+  onLogout: () => void | Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -27,12 +27,17 @@ export default function UserMenu({
     return () => window.removeEventListener("click", onClick);
   }, []);
 
+  const handleLogout = async () => {
+    setOpen(false);
+    await onLogout();
+  };
+
   return (
     <div className="userMenu" ref={ref}>
-      {/* ICON BUTTON */}
       <button
+        type="button"
         className="avatarButton"
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
         aria-label="User menu"
       >
         <User size={20} strokeWidth={1.8} />
@@ -44,9 +49,13 @@ export default function UserMenu({
             Profile
           </Link>
 
-          <Link href="/" className="dropdownItem">
+          <button
+            type="button"
+            className="dropdownItem"
+            onClick={handleLogout}
+          >
             Log out
-          </Link>
+          </button>
         </div>
       )}
     </div>

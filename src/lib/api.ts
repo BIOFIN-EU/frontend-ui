@@ -76,6 +76,65 @@ async function parseJsonSafe(res: Response) {
   }
 }
 
+function extractErrorMessage(data: any, status: number): string {
+  const detail = data?.detail;
+
+  if (typeof detail === "string") return detail;
+  if (typeof data?.message === "string") return data.message;
+  if (typeof detail?.message === "string") return detail.message;
+
+  if (Array.isArray(detail)) {
+    const msgs = detail
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (typeof item?.msg === "string") return item.msg;
+        return null;
+      })
+      .filter(Boolean);
+
+    if (msgs.length > 0) {
+      return msgs.join(", ");
+    }
+  }
+
+  return `Request failed (${status})`;
+}
+
+function extractFieldErrors(data: any): Record<string, string> {
+  const explicitFieldErrors =
+    data?.detail?.field_errors || data?.field_errors;
+
+  if (
+    explicitFieldErrors &&
+    typeof explicitFieldErrors === "object" &&
+    !Array.isArray(explicitFieldErrors)
+  ) {
+    return explicitFieldErrors;
+  }
+
+  const detail = data?.detail;
+
+  if (Array.isArray(detail)) {
+    const result: Record<string, string> = {};
+
+    for (const item of detail) {
+      const loc = Array.isArray(item?.loc) ? item.loc : [];
+      const msg = typeof item?.msg === "string" ? item.msg : "Invalid value";
+
+      const fieldName =
+        loc.length > 0 ? String(loc[loc.length - 1]) : "form";
+
+      if (!result[fieldName]) {
+        result[fieldName] = msg;
+      }
+    }
+
+    return result;
+  }
+
+  return {};
+}
+
 let refreshPromise: Promise<void> | null = null;
 
 async function refreshAccessToken() {
@@ -96,11 +155,7 @@ async function refreshAccessToken() {
   if (!res.ok) {
     clearTokens();
 
-    const message =
-      (data as any)?.detail?.message ||
-      (data as any)?.detail ||
-      (data as any)?.message ||
-      "Refresh failed";
+    const message = extractErrorMessage(data, res.status);
 
     throw new ApiError(message, res.status, {}, data);
   }
@@ -154,16 +209,8 @@ export async function apiFetch<T>(
   const data = await parseJsonSafe(res);
 
   if (!res.ok) {
-    const message =
-      (data as any)?.detail?.message ||
-      (data as any)?.detail ||
-      (data as any)?.message ||
-      `Request failed (${res.status})`;
-
-    const fieldErrors =
-      (data as any)?.detail?.field_errors ||
-      (data as any)?.field_errors ||
-      {};
+    const message = extractErrorMessage(data, res.status);
+    const fieldErrors = extractFieldErrors(data);
 
     const error = new ApiError(message, res.status, fieldErrors, data);
 
