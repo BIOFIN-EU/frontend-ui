@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // 👈 merged
 import { useAuth } from "@/context/auth.context";
 import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams(); // ✅ HERE
+  const reason = searchParams.get("reason"); // ✅ HERE
+
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -45,6 +48,14 @@ export default function LoginPage() {
       </header>
 
       <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+
+        {/* ✅ SUCCESS MESSAGE GOES HERE */}
+        {reason === "password-changed" && (
+          <div className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-400/20">
+            Password updated. Please log in again.
+          </div>
+        )}
+
         <div className="mb-4">
           <p className="text-xs text-white/50">
             <span className="font-semibold text-red-300">*</span> Required fields

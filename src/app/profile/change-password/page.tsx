@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import * as auth from "@/services/auth.service";
+import { useAuth } from "@/context/auth.context";
 import { ApiError } from "@/lib/api";
 
 export default function ChangePasswordPage() {
@@ -15,13 +16,12 @@ export default function ChangePasswordPage() {
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [err, setErr] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { logout } = useAuth();
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
-    setSuccess(null);
     setFieldErrors({});
 
     if (newPassword !== confirmPassword) {
@@ -34,18 +34,12 @@ export default function ChangePasswordPage() {
     setLoading(true);
 
     try {
-      await auth.changePassword(currentPassword, newPassword);
+        await auth.changePassword(currentPassword, newPassword);
 
-      setSuccess("Password changed successfully. Please log in again.");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+        await logout(); // 🔥 CRITICAL FIX
 
-      setTimeout(async () => {
-        await auth.logout();
-        router.replace("/login");
-      }, 1200);
-    } catch (e: unknown) {
+        router.replace("/login?reason=password-changed");
+      } catch (e: unknown) {
       if (e instanceof ApiError) {
         setErr(e.message || "Could not change password");
         setFieldErrors(e.fieldErrors ?? {});
@@ -157,11 +151,6 @@ export default function ChangePasswordPage() {
             </div>
           ) : null}
 
-          {success ? (
-            <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-400/20">
-              {success}
-            </div>
-          ) : null}
 
           <button
             type="submit"
