@@ -13,10 +13,12 @@ export type WorkflowFieldOption = {
 
 export type WorkflowField = {
   name: string;
+  display_name: any;
   type: WorkflowFieldType;
   required: boolean;
   default?: string | number | boolean | null;
   options?: WorkflowFieldOption[];
+  options_source?: string;
   widget?: string;
 };
 
@@ -30,7 +32,7 @@ export type WorkflowStep = {
 };
 
 export type WorkflowDocument = {
-  case_document_id: number;
+  id: number;
   case_id: number;
   step_code: string;
   field_name: string;

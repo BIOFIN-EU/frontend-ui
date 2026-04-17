@@ -8,6 +8,7 @@ import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import Providers from "./providers";
+import ApiErrorBridge from "@/components/ApiErrorBridge";
 import HeaderAuthClient from "@/components/HeaderAuthClient";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body>
         <Providers>
+          <ApiErrorBridge />
           <div className="appShell">
             <header className="header">
               <div className="headerInner">

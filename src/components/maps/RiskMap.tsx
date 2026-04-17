@@ -17,23 +17,40 @@ import type Feature from "ol/Feature";
 import type Geometry from "ol/geom/Geometry";
 
 type Props = {
+  polygonWkt: string;
   onPolygonWktChange?: (wkt: string) => void;
 };
 
+const wktFormat = new WKT();
+
 function featureToWkt(feature: Feature<Geometry>) {
-  const wktFormat = new WKT();
   const cloned = feature.clone();
   cloned.getGeometry()?.transform("EPSG:3857", "EPSG:4326");
   return wktFormat.writeFeature(cloned);
 }
 
-export default function RiskMap({ onPolygonWktChange }: Props) {
+function wktToFeature(wkt: string) {
+  const feature = wktFormat.readFeature(wkt, {
+    dataProjection: "EPSG:4326",
+    featureProjection: "EPSG:3857",
+  });
+
+  return feature as Feature<Geometry>;
+}
+
+export default function RiskMap({ polygonWkt, onPolygonWktChange }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null);
 
+  const mapInstanceRef = useRef<Map | null>(null);
+  const vectorSourceRef = useRef<VectorSource | null>(null);
+  const selectRef = useRef<Select | null>(null);
+  const isSyncingFromPropRef = useRef(false);
+
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || mapInstanceRef.current) return;
 
     const vectorSource = new VectorSource();
+    vectorSourceRef.current = vectorSource;
 
     const vectorLayer = new VectorLayer({
       source: vectorSource,
@@ -50,15 +67,14 @@ export default function RiskMap({ onPolygonWktChange }: Props) {
 
     const map = new Map({
       target: mapRef.current,
-      layers: [
-        new TileLayer({ source: new OSM() }),
-        vectorLayer,
-      ],
+      layers: [new TileLayer({ source: new OSM() }), vectorLayer],
       view: new View({
         center: [0, 0],
         zoom: 2,
       }),
     });
+
+    mapInstanceRef.current = map;
 
     const draw = new Draw({
       source: vectorSource,
@@ -73,12 +89,18 @@ export default function RiskMap({ onPolygonWktChange }: Props) {
       condition: click,
     });
 
+    selectRef.current = select;
+
     map.addInteraction(draw);
     map.addInteraction(modify);
     map.addInteraction(select);
 
     draw.on("drawstart", () => {
+      isSyncingFromPropRef.current = true;
       vectorSource.clear();
+      select.getFeatures().clear();
+      isSyncingFromPropRef.current = false;
+
       onPolygonWktChange?.("");
     });
 
@@ -99,12 +121,12 @@ export default function RiskMap({ onPolygonWktChange }: Props) {
     });
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Delete") {
-        const selected = select.getFeatures();
-        selected.forEach((feature) => vectorSource.removeFeature(feature));
-        selected.clear();
-        onPolygonWktChange?.("");
-      }
+      if (e.key !== "Delete") return;
+
+      const selected = select.getFeatures();
+      selected.forEach((feature) => vectorSource.removeFeature(feature));
+      selected.clear();
+      onPolygonWktChange?.("");
     }
 
     window.addEventListener("keydown", handleKeyDown);
@@ -112,8 +134,56 @@ export default function RiskMap({ onPolygonWktChange }: Props) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       map.setTarget(undefined);
+      mapInstanceRef.current = null;
+      vectorSourceRef.current = null;
+      selectRef.current = null;
     };
   }, [onPolygonWktChange]);
+
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const vectorSource = vectorSourceRef.current;
+    const select = selectRef.current;
+
+    if (!map || !vectorSource) return;
+    if (isSyncingFromPropRef.current) return;
+
+    const existingFeatures = vectorSource.getFeatures();
+    const existingWkt =
+      existingFeatures.length > 0 ? featureToWkt(existingFeatures[0]) : "";
+
+    if ((polygonWkt || "") === existingWkt) {
+      return;
+    }
+
+    isSyncingFromPropRef.current = true;
+
+    try {
+      vectorSource.clear();
+      select?.getFeatures().clear();
+
+      if (!polygonWkt.trim()) {
+        return;
+      }
+
+      const feature = wktToFeature(polygonWkt);
+      vectorSource.addFeature(feature);
+
+      const geometry = feature.getGeometry();
+      if (geometry) {
+        map.getView().fit(geometry, {
+          padding: [40, 40, 40, 40],
+          maxZoom: 16,
+          duration: 250,
+        });
+      }
+    } catch {
+      // Ignore invalid/incomplete WKT while the user is typing.
+      // The textarea can temporarily contain invalid text.
+    } finally {
+      isSyncingFromPropRef.current = false;
+    }
+  }, [polygonWkt]);
 
   return (
     <div className="relative h-[460px] w-full overflow-hidden rounded-2xl border border-white/10">
@@ -122,7 +192,8 @@ export default function RiskMap({ onPolygonWktChange }: Props) {
       <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-md">
         <p className="text-sm font-semibold text-white">Draw area</p>
         <p className="mt-1 text-xs text-white/70">
-          Draw a polygon. Press Delete to remove it.
+          Draw a polygon. Edit the WKT to update the map. Press Delete to remove
+          it.
         </p>
       </div>
     </div>

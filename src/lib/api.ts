@@ -11,6 +11,31 @@ type TokenResponse = {
   expires_in_hours: number;
 };
 
+export class ApiError extends Error {
+  status: number;
+  fieldErrors: Record<string, string>;
+  raw: unknown;
+
+  constructor(
+    message: string,
+    status: number,
+    fieldErrors: Record<string, string> = {},
+    raw: unknown = null
+  ) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.fieldErrors = fieldErrors;
+    this.raw = raw;
+  }
+}
+
+let globalErrorHandler: ((message: string) => void) | null = null;
+
+export function registerGlobalApiErrorHandler(handler: (message: string) => void) {
+  globalErrorHandler = handler;
+}
+
 function getAccessToken() {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("access_token");
@@ -38,14 +63,14 @@ export function clearTokens() {
 async function parseJsonSafe(res: Response) {
   const text = await res.text();
   if (!text) return null;
+
   try {
     return JSON.parse(text);
   } catch {
-    return text; // sometimes servers return plain text
+    return text;
   }
 }
 
-// Prevent multiple simultaneous refresh calls
 let refreshPromise: Promise<void> | null = null;
 
 async function refreshAccessToken() {
@@ -63,8 +88,12 @@ async function refreshAccessToken() {
   if (!res.ok) {
     clearTokens();
     const message =
-      (data as any)?.detail || (data as any)?.message || "Refresh failed";
-    throw new Error(message);
+      (data as any)?.detail?.message ||
+      (data as any)?.detail ||
+      (data as any)?.message ||
+      "Refresh failed";
+
+    throw new ApiError(message, res.status, {}, data);
   }
 
   setTokens(data as TokenResponse);
@@ -87,10 +116,9 @@ export async function apiFetch<T>(
   const token = getAccessToken();
   const url = `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
 
-  // Build headers safely (options.headers may be Headers, array tuples, or object)
   const headers = new Headers(options.headers);
   if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
-  headers.set("Content-Type", "application/json");
+    headers.set("Content-Type", "application/json");
   }
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
@@ -99,7 +127,6 @@ export async function apiFetch<T>(
     headers,
   });
 
-  // If unauthorized, attempt refresh once and retry
   if (res.status === 401 && retry) {
     await ensureRefreshedOnce();
     return apiFetch<T>(path, options, false);
@@ -109,10 +136,21 @@ export async function apiFetch<T>(
 
   if (!res.ok) {
     const message =
+      (data as any)?.detail?.message ||
       (data as any)?.detail ||
       (data as any)?.message ||
       `Request failed (${res.status})`;
-    throw new Error(message);
+
+    const fieldErrors =
+      (data as any)?.detail?.field_errors ||
+      (data as any)?.field_errors ||
+      {};
+
+    const error = new ApiError(message, res.status, fieldErrors, data);
+
+    globalErrorHandler?.(message);
+
+    throw error;
   }
 
   return data as T;

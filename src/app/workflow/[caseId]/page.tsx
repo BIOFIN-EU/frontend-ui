@@ -56,16 +56,7 @@ export default function WorkflowCasePage() {
     <div className="space-y-8">
       <header className="space-y-4">
         <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-          Workflow case
-        </div>
-
-        <div className="space-y-2">
-          <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            Case #{caseId}
-          </h1>
-          <p className="max-w-3xl text-sm leading-6 text-white/70 sm:text-base">
-            Complete the workflow steps to progress this case.
-          </p>
+          Case #{caseId}
         </div>
       </header>
 
@@ -83,25 +74,6 @@ export default function WorkflowCasePage() {
 
       {!loading && state && (
         <>
-          <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                <p className="text-xs uppercase text-white/50">Status</p>
-                <p className="mt-1 text-sm text-white">{state.status}</p>
-              </div>
-
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                <p className="text-xs uppercase text-white/50">Current step</p>
-                <p className="mt-1 text-sm text-white">{state.current_step}</p>
-              </div>
-
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                <p className="text-xs uppercase text-white/50">Workflow</p>
-                <p className="mt-1 text-sm text-white">{state.workflow_code}</p>
-              </div>
-            </div>
-          </section>
-
           <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
             <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
               <p className="text-xs font-semibold uppercase tracking-wider text-white/50">

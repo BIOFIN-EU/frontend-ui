@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
+import { getLookupOptions, type LookupOption } from "@/services/lookups.service";
 import type { WorkflowState } from "@/types/workflow";
 import { FormRenderer } from "@/components/FormRenderer";
 
@@ -10,14 +11,49 @@ type Props = {
   onStateUpdated: (state: WorkflowState) => void;
 };
 
-function prettifyLabel(name: string) {
-  return name
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
 
 export function WorkflowFormStep({ state, onStateUpdated }: Props) {
   const step = state.step;
+  const [lookupOptions, setLookupOptions] = useState<Record<string, LookupOption[]>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!step) return;
+
+    let cancelled = false;
+
+    async function loadLookups() {
+      const selectFields = step.fields.filter(
+        (f) => f.type === "select" && f.options_source
+      );
+
+      if (selectFields.length === 0) {
+        setLookupOptions({});
+        return;
+      }
+
+      const results = await Promise.all(
+        selectFields.map(async (f) => {
+          try {
+            const options = await getLookupOptions(f.options_source!);
+            return [f.name, options] as const;
+          } catch {
+            return [f.name, []] as const;
+          }
+        })
+      );
+
+      if (!cancelled) {
+        setLookupOptions(Object.fromEntries(results));
+      }
+    }
+
+    loadLookups();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [step]);
 
   if (!step) {
     return <p className="text-sm text-white/70">No step available.</p>;
@@ -28,13 +64,16 @@ export function WorkflowFormStep({ state, onStateUpdated }: Props) {
       title: step.title,
       fields: step.fields.map((f) => ({
         id: f.name,
-        label: prettifyLabel(f.name),
+        label: f.display_name,
         type: f.type as any,
         required: !!f.required,
-        options: Array.isArray(f.options) ? f.options : [],
+        options:
+          f.type === "select" && f.options_source
+            ? (lookupOptions[f.name] ?? [])
+            : (Array.isArray(f.options) ? f.options : []),
       })),
     }),
-    [step]
+    [step, lookupOptions]
   );
 
   const defaultValues = useMemo(() => {
@@ -48,9 +87,36 @@ export function WorkflowFormStep({ state, onStateUpdated }: Props) {
   }, [step]);
 
   async function handleNext(values: Record<string, any>) {
-    const updated = await workflowService.submitJsonStep(state.case_id, values);
-    onStateUpdated(updated);
+  setFieldErrors({});
+
+  try {
+    const payload = { ...values };
+
+    step.fields.forEach((f) => {
+      const value = payload[f.name];
+
+      if (value === "" || value == null) {
+        payload[f.name] = null;
+        return;
+      }
+
+      if (f.type === "number") {
+        payload[f.name] = Number(value);
+        return;
+      }
+
+      if (f.type === "select" && f.name.endsWith("_id")) {
+        payload[f.name] = Number(value);
+        return;
+      }
+    });
+
+    const updated = await workflowService.submitJsonStep(state.case_id, payload);
+    onStateUpdated(updated.state ?? updated);
+  } catch (err: any) {
+    setFieldErrors(err.fieldErrors || {});
   }
+}
 
   async function handleSaveDraft(_values: Record<string, any>) {
     return;
@@ -64,6 +130,7 @@ export function WorkflowFormStep({ state, onStateUpdated }: Props) {
       onSaveDraft={handleSaveDraft}
       isFirst={false}
       isLast={!step.next}
+      fieldErrors={fieldErrors}
     />
   );
 }

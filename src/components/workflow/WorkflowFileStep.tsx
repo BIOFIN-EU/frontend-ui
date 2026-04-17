@@ -10,12 +10,6 @@ type Props = {
   onStateUpdated: (state: WorkflowState) => void;
 };
 
-function prettifyLabel(name: string) {
-  return name
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 export function WorkflowFileStep({ state, onStateUpdated }: Props) {
   const step = state.step;
 
@@ -31,7 +25,7 @@ export function WorkflowFileStep({ state, onStateUpdated }: Props) {
       title: step.title,
       fields: step.fields.map((f) => ({
         id: f.name,
-        label: prettifyLabel(f.name),
+        label: f.display_name,
         type: f.type as any,
         required: !!f.required,
         options: Array.isArray(f.options) ? f.options : [],

@@ -16,11 +16,13 @@ function Field({
   register,
   setValue,
   values,
+  error,
 }: {
   field: FieldSchema;
   register: any;
   setValue: any;
   values: Record<string, any>;
+  error?: string;
 }) {
   if (!isVisible(field, values)) return null;
 
@@ -29,8 +31,9 @@ function Field({
     ...register(field.id, { required: !!field.required }),
   };
 
-  const inputClass =
-    "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-white ring-1 ring-white/5";
+  const inputClass = `w-full rounded-xl border bg-black/20 px-3 py-2 text-white ring-1 ring-white/5 ${
+    error ? "border-red-400/60" : "border-white/10"
+  }`;
 
   switch (field.type) {
     case "text":
@@ -40,6 +43,7 @@ function Field({
             {field.label}
           </label>
           <input {...common} type="text" className={inputClass} />
+          {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );
 
@@ -50,6 +54,7 @@ function Field({
             {field.label}
           </label>
           <input {...common} type="number" className={inputClass} />
+          {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );
 
@@ -60,6 +65,7 @@ function Field({
             {field.label}
           </label>
           <textarea {...common} rows={4} className={inputClass} />
+          {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );
 
@@ -77,15 +83,14 @@ function Field({
               </option>
             ))}
           </select>
+          {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );
 
     case "radio":
       return (
         <div className="space-y-2">
-          <div className="text-sm font-semibold text-white">
-            {field.label}
-          </div>
+          <div className="text-sm font-semibold text-white">{field.label}</div>
           {(field.options || []).map((o) => (
             <label key={o.value} className="flex items-center gap-2 text-white/80">
               <input
@@ -96,40 +101,51 @@ function Field({
               {o.label}
             </label>
           ))}
+          {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );
 
     case "checkbox":
       return (
-        <label className="flex items-center gap-2 text-white">
-          <input
-            type="checkbox"
-            {...register(field.id, { required: !!field.required })}
-          />
-          <span className="text-sm font-semibold">{field.label}</span>
-        </label>
+        <div className="space-y-1">
+          <label className="flex items-center gap-2 text-white">
+            <input
+              type="checkbox"
+              {...register(field.id, { required: !!field.required })}
+            />
+            <span className="text-sm font-semibold">{field.label}</span>
+          </label>
+          {error && <p className="text-sm text-red-300">{error}</p>}
+        </div>
       );
 
-      case "file":
-  return (
-    <div className="space-y-2">
-      <label htmlFor={field.id} className="text-sm font-semibold text-white">
-        {field.label}
-      </label>
+    case "file":
+      return (
+        <div className="space-y-2">
+          <label htmlFor={field.id} className="text-sm font-semibold text-white">
+            {field.label}
+          </label>
 
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-        <input
-          id={field.id}
-          type="file"
-          onChange={(e) => {
-            const file = e.target.files?.[0] ?? null;
-            setValue(field.id, file, { shouldValidate: true, shouldDirty: true });
-          }}
-          className="block w-full text-sm text-white file:mr-4 file:rounded-xl file:border-0 file:bg-emerald-400/15 file:px-4 file:py-2 file:font-semibold file:text-emerald-100 hover:file:bg-emerald-400/20"
-        />
-      </div>
-    </div>
-  );
+          <div
+            className={`rounded-2xl border bg-black/20 p-4 ring-1 ring-white/5 ${
+              error ? "border-red-400/60" : "border-white/10"
+            }`}
+          >
+            <input
+              id={field.id}
+              type="file"
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null;
+                setValue(field.id, file, { shouldValidate: true, shouldDirty: true });
+              }}
+              className="block w-full text-sm text-white file:mr-4 file:rounded-xl file:border-0 file:bg-emerald-400/15 file:px-4 file:py-2 file:font-semibold file:text-emerald-100 hover:file:bg-emerald-400/20"
+            />
+          </div>
+
+          {error && <p className="text-sm text-red-300">{error}</p>}
+        </div>
+      );
+
     default:
       return null;
   }
@@ -143,6 +159,7 @@ export function FormRenderer({
   onPrev,
   isFirst,
   isLast,
+  fieldErrors = {},
 }: {
   stepSchema: StepSchema;
   defaultValues: Record<string, any>;
@@ -151,6 +168,7 @@ export function FormRenderer({
   onPrev?: () => void;
   isFirst: boolean;
   isLast: boolean;
+  fieldErrors?: Record<string, string>;
 }) {
   const form = useForm({ defaultValues, mode: "onChange" });
   const values = form.watch();
@@ -170,16 +188,17 @@ export function FormRenderer({
       className="space-y-4"
     >
       <h2 className="text-xl font-semibold text-white">
-          {stepSchema?.title ?? "Step"}
+        {stepSchema?.title ?? "Step"}
       </h2>
 
-        {(stepSchema?.fields ?? []).map((f) => (
+      {(stepSchema?.fields ?? []).map((f) => (
         <Field
           key={f.id}
           field={f}
           register={form.register}
           setValue={form.setValue}
           values={values}
+          error={fieldErrors[f.id]}
         />
       ))}
 
