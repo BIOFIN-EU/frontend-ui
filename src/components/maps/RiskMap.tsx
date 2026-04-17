@@ -45,6 +45,11 @@ export default function RiskMap({ polygonWkt, onPolygonWktChange }: Props) {
   const vectorSourceRef = useRef<VectorSource | null>(null);
   const selectRef = useRef<Select | null>(null);
   const isSyncingFromPropRef = useRef(false);
+  const onPolygonWktChangeRef = useRef<Props["onPolygonWktChange"]>(onPolygonWktChange);
+
+  useEffect(() => {
+    onPolygonWktChangeRef.current = onPolygonWktChange;
+  }, [onPolygonWktChange]);
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
@@ -101,23 +106,23 @@ export default function RiskMap({ polygonWkt, onPolygonWktChange }: Props) {
       select.getFeatures().clear();
       isSyncingFromPropRef.current = false;
 
-      onPolygonWktChange?.("");
+      onPolygonWktChangeRef.current?.("");
     });
 
     draw.on("drawend", (event: DrawEvent) => {
       const wkt = featureToWkt(event.feature);
-      onPolygonWktChange?.(wkt);
+      onPolygonWktChangeRef.current?.(wkt);
     });
 
     modify.on("modifyend", (event) => {
       const features = event.features.getArray();
       if (!features.length) {
-        onPolygonWktChange?.("");
+        onPolygonWktChangeRef.current?.("");
         return;
       }
 
       const wkt = featureToWkt(features[0]);
-      onPolygonWktChange?.(wkt);
+      onPolygonWktChangeRef.current?.(wkt);
     });
 
     function handleKeyDown(e: KeyboardEvent) {
@@ -126,7 +131,7 @@ export default function RiskMap({ polygonWkt, onPolygonWktChange }: Props) {
       const selected = select.getFeatures();
       selected.forEach((feature) => vectorSource.removeFeature(feature));
       selected.clear();
-      onPolygonWktChange?.("");
+      onPolygonWktChangeRef.current?.("");
     }
 
     window.addEventListener("keydown", handleKeyDown);
@@ -138,7 +143,7 @@ export default function RiskMap({ polygonWkt, onPolygonWktChange }: Props) {
       vectorSourceRef.current = null;
       selectRef.current = null;
     };
-  }, [onPolygonWktChange]);
+  }, []);
 
   useEffect(() => {
     const map = mapInstanceRef.current;

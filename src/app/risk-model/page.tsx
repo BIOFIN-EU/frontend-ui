@@ -4,6 +4,8 @@ import React, { useMemo, useState } from "react";
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import { Info, MapPin, Pentagon, ShieldAlert, Leaf, ThermometerSun, Waves, Bird, Trees } from "lucide-react";
 import dynamic from "next/dynamic";
+import RiskMap from "@/components/maps/RiskMap";
+
 
 type Mode = "point" | "polygon";
 
@@ -188,14 +190,11 @@ function pointsToString(points: Point[]) {
   return points.map((p) => `${p.x},${p.y}`).join(" ");
 }
 
-const RiskLeafletMap = dynamic(() => import("@/components/RiskLeafletMap"), {
-  ssr: false,
-});
 
 export default function RiskModelPage() {
   const [mode, setMode] = useState<Mode>("point");
   const [points, setPoints] = useState<Point[]>([{ x: 308, y: 190 }]);
-
+  const [polygonWkt, setPolygonWkt] = useState("");
   const metrics = useMemo(() => computeSelectionMetrics(points, mode), [points, mode]);
 
   function resetSelection(nextMode: Mode) {
@@ -271,7 +270,10 @@ export default function RiskModelPage() {
             </div>
 
             <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#07121d] ring-1 ring-white/5">
-              <RiskLeafletMap mode={mode} points={points} setPoints={setPoints} />
+              <RiskMap
+                polygonWkt={polygonWkt}
+                onPolygonWktChange={setPolygonWkt}
+              />
             </div>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
