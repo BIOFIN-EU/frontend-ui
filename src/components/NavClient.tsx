@@ -15,6 +15,11 @@ export default function NavClient() {
 
       {isAuthed && (
         <Link href="/workflow" className="navLink">Workflow</Link>
+
+      )}
+      {isAuthed && (
+        <Link href="/cases" className="navLink">Cases</Link>
+
       )}
     </nav>
   );
