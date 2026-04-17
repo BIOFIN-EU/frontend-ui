@@ -5,7 +5,7 @@ if (!baseUrl) {
   throw new Error("NEXT_PUBLIC_API_BASE_URL is not set");
 }
 
-type TokenResponse = {
+export type TokenResponse = {
   access_token: string;
   refresh_token: string;
   expires_in_hours: number;
@@ -31,22 +31,27 @@ export class ApiError extends Error {
 }
 
 let globalErrorHandler: ((message: string) => void) | null = null;
+let authFailureHandler: (() => void) | null = null;
 
 export function registerGlobalApiErrorHandler(handler: (message: string) => void) {
   globalErrorHandler = handler;
 }
 
-function getAccessToken() {
+export function registerAuthFailureHandler(handler: () => void) {
+  authFailureHandler = handler;
+}
+
+export function getAccessToken() {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("access_token");
 }
 
-function getRefreshToken() {
+export function getRefreshToken() {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("refresh_token");
 }
 
-function setTokens(data: TokenResponse) {
+export function setTokens(data: TokenResponse) {
   if (typeof window === "undefined") return;
   localStorage.setItem("access_token", data.access_token);
   localStorage.setItem("refresh_token", data.refresh_token);
@@ -75,7 +80,10 @@ let refreshPromise: Promise<void> | null = null;
 
 async function refreshAccessToken() {
   const rt = getRefreshToken();
-  if (!rt) throw new Error("No refresh token");
+  if (!rt) {
+    clearTokens();
+    throw new Error("No refresh token");
+  }
 
   const res = await fetch(`${baseUrl}/api/auth/refresh`, {
     method: "POST",
@@ -87,6 +95,7 @@ async function refreshAccessToken() {
 
   if (!res.ok) {
     clearTokens();
+
     const message =
       (data as any)?.detail?.message ||
       (data as any)?.detail ||
@@ -105,6 +114,7 @@ async function ensureRefreshedOnce() {
       refreshPromise = null;
     });
   }
+
   await refreshPromise;
 }
 
@@ -117,19 +127,28 @@ export async function apiFetch<T>(
   const url = `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
 
   const headers = new Headers(options.headers);
+
   if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
 
   const res = await fetch(url, {
     ...options,
     headers,
   });
 
-  if (res.status === 401 && retry) {
-    await ensureRefreshedOnce();
-    return apiFetch<T>(path, options, false);
+  if (res.status === 401 && retry && getRefreshToken()) {
+    try {
+      await ensureRefreshedOnce();
+      return apiFetch<T>(path, options, false);
+    } catch (err) {
+      authFailureHandler?.();
+      throw err;
+    }
   }
 
   const data = await parseJsonSafe(res);
@@ -148,7 +167,9 @@ export async function apiFetch<T>(
 
     const error = new ApiError(message, res.status, fieldErrors, data);
 
-    globalErrorHandler?.(message);
+    if (res.status !== 401) {
+      globalErrorHandler?.(message);
+    }
 
     throw error;
   }
