@@ -10,6 +10,7 @@ import Link from "next/link";
 import Providers from "./providers";
 import ApiErrorBridge from "@/components/ApiErrorBridge";
 import HeaderAuthClient from "@/components/HeaderAuthClient";
+import NavClient from "@/components/NavClient";
 
 export const metadata: Metadata = {
   title: "BIOFIN Dashboard",
@@ -53,13 +54,7 @@ export default function RootLayout({
                     </div>
                   </Link>
 
-                  <nav className="nav">
-                    <Link href="/" className="navLink">Home</Link>
-                    <Link href="/risk-model" className="navLink">Risk Model</Link>
-                    <Link href="/about" className="navLink">About</Link>
-                    <Link href="/support" className="navLink">Support</Link>
-                    <Link href="/workflow" className="navLink">Workflow</Link>
-                  </nav>
+                  <NavClient />
 
                 </div>
 
