@@ -173,7 +173,7 @@ export function CaseListScreen({ cases }: Props) {
                   </div>
 
                   <h2 className="mt-3 text-xl font-semibold tracking-tight text-white">
-                    {item.caseType}
+                    {item.name}
                   </h2>
 
                 </div>
@@ -186,9 +186,28 @@ export function CaseListScreen({ cases }: Props) {
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+
                 <div className="rounded-xl border border-white/10 bg-black/20 p-4">
                   <p className="text-xs uppercase tracking-wider text-white/50">
-                    Created at
+                    Case Description
+                  </p>
+                  <p className="mt-2 break-all text-sm text-white/90">
+                    {item.description}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                  <p className="text-xs uppercase tracking-wider text-white/50">
+                    Case Type
+                  </p>
+                  <p className="mt-2 break-all text-sm text-white/90">
+                    {item.caseType}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                  <p className="text-xs uppercase tracking-wider text-white/50">
+                    Created
                   </p>
                   <p className="mt-2 text-sm text-white/90">
                     {formatDate(item.createdAt)}
@@ -197,30 +216,13 @@ export function CaseListScreen({ cases }: Props) {
 
                 <div className="rounded-xl border border-white/10 bg-black/20 p-4">
                   <p className="text-xs uppercase tracking-wider text-white/50">
-                    Updated at
+                    Updated
                   </p>
                   <p className="mt-2 text-sm text-white/90">
                     {formatDate(item.updatedAt)}
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                  <p className="text-xs uppercase tracking-wider text-white/50">
-                    Created by
-                  </p>
-                  <p className="mt-2 break-all text-sm text-white/90">
-                    {item.createdBy}
-                  </p>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-                  <p className="text-xs uppercase tracking-wider text-white/50">
-                    Updated by
-                  </p>
-                  <p className="mt-2 break-all text-sm text-white/90">
-                    {item.updatedBy}
-                  </p>
-                </div>
               </div>
             </Link>
           ))
