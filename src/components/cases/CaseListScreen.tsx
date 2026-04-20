@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { formatDate } from "@/lib/format";
 import type { CaseListItem } from "@/types/case-list";
+import { Select } from "@/components/ui/Select";
 
 type Props = {
   cases: CaseListItem[];
@@ -17,9 +18,15 @@ function getStatusClasses(status: string) {
       return "bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-400/25";
     case "submitted":
       return "bg-sky-500/15 text-sky-200 ring-1 ring-sky-400/25";
+    case "in_progress":
+      return "bg-white/10 text-white/80 ring-1 ring-white/10";
     default:
       return "bg-white/10 text-white/70 ring-1 ring-white/10";
   }
+}
+
+function formatStatusLabel(status: string) {
+  return status.replaceAll("_", " ");
 }
 
 export function CaseListScreen({ cases }: Props) {
@@ -60,7 +67,7 @@ export function CaseListScreen({ cases }: Props) {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <section className="relative z-30 overflow-visible rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
@@ -115,41 +122,39 @@ export function CaseListScreen({ cases }: Props) {
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/50">
               Case type
             </label>
-            <select
+            <Select
               value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none"
-            >
-              <option value="all">All</option>
-              {caseTypes.map((caseType) => (
-                <option key={caseType} value={caseType}>
-                  {caseType}
-                </option>
-              ))}
-            </select>
+              onChange={setTypeFilter}
+              options={[
+                { label: "All", value: "all" },
+                ...caseTypes.map((ct) => ({
+                  label: ct,
+                  value: ct,
+                })),
+              ]}
+            />
           </div>
 
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/50">
               Status
             </label>
-            <select
+            <Select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none"
-            >
-              <option value="all">All</option>
-              {statuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
+              onChange={setStatusFilter}
+              options={[
+                { label: "All", value: "all" },
+                ...statuses.map((s) => ({
+                  label: s.replaceAll("_", " "),
+                  value: s,
+                })),
+              ]}
+            />
           </div>
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section className="relative z-0 space-y-4">
         {filteredCases.length === 0 ? (
           <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-sm text-white/60">
             No cases found.
@@ -171,15 +176,12 @@ export function CaseListScreen({ cases }: Props) {
                     {item.caseType}
                   </h2>
 
-                  <p className="mt-2 text-sm text-white/50">
-                    Open case dashboard
-                  </p>
                 </div>
 
                 <div
                   className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${getStatusClasses(item.status)}`}
                 >
-                  {item.status}
+                  {formatStatusLabel(item.status)}
                 </div>
               </div>
 

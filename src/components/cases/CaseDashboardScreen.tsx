@@ -172,10 +172,6 @@ function StandardFieldCard({
       <p className="mt-3 break-words text-sm text-white/70">
         {formatValue(value)}
       </p>
-
-      <div className="mt-3 text-[11px] uppercase tracking-wider text-white/35">
-        {field.type}
-      </div>
     </div>
   );
 }
@@ -288,19 +284,10 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
-            Active step
-          </p>
 
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
             {activeStep.step.title}
           </h2>
-
-          {"ui_mode" in activeStep.step && activeStep.step.ui_mode && (
-            <p className="mt-2 text-xs uppercase tracking-wider text-white/40">
-              UI mode: {activeStep.step.ui_mode}
-            </p>
-          )}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {(activeStep.step.fields || []).map((field) => {

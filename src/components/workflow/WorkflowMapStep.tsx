@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import type { WorkflowState } from "@/types/workflow";
+import { getLookupOptions, type LookupOption } from "@/services/lookups.service";
+// import type { WorkflowState } from "@/types/workflow";
 import { FormRenderer } from "@/components/FormRenderer";
 import RiskMap from "@/components/maps/RiskMap";
-import { AdaptWorkflowStepToForm } from "@/components/workflow/WorkflowFormAdapter";
 
 type Props = {
   state: WorkflowState;
@@ -17,6 +17,7 @@ export function WorkflowMapStep({ state, onStateUpdated }: Props) {
   const [polygonWkt, setPolygonWkt] = useState("");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [lookupOptions, setLookupOptions] = useState<Record<string, LookupOption[]>>({});
 
   useEffect(() => {
     const field = step.fields.find((f) => f.name === "polygon_wkt");
@@ -28,13 +29,57 @@ export function WorkflowMapStep({ state, onStateUpdated }: Props) {
     [step]
   );
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadLookups() {
+      const selectFields = nonPolygonFields.filter(
+        (f) => f.type === "select" && f.options_source
+      );
+
+      if (selectFields.length === 0) {
+        setLookupOptions({});
+        return;
+      }
+
+      const results = await Promise.all(
+        selectFields.map(async (f) => {
+          try {
+            const options = await getLookupOptions(f.options_source!);
+            return [f.name, options] as const;
+          } catch {
+            return [f.name, []] as const;
+          }
+        })
+      );
+
+      if (!cancelled) {
+        setLookupOptions(Object.fromEntries(results));
+      }
+    }
+
+    loadLookups();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [nonPolygonFields]);
+
   const stepSchema = useMemo(
-    () =>
-      AdaptWorkflowStepToForm({
-        ...step,
-        fields: nonPolygonFields,
-      }),
-    [step, nonPolygonFields]
+    () => ({
+      title: step.title,
+      fields: nonPolygonFields.map((f) => ({
+        id: f.name,
+        label: f.display_name,
+        type: f.type as any,
+        required: !!f.required,
+        options:
+          f.type === "select" && f.options_source
+            ? (lookupOptions[f.name] ?? [])
+            : (Array.isArray(f.options) ? f.options : []),
+      })),
+    }),
+    [step, nonPolygonFields, lookupOptions]
   );
 
   const defaultValues = useMemo(() => {
@@ -58,27 +103,47 @@ export function WorkflowMapStep({ state, onStateUpdated }: Props) {
   }, [polygonWkt]);
 
   async function handleNext(values: Record<string, any>) {
-  const finalPolygonWkt = polygonWkt || values.polygon_wkt || "";
+    const finalPolygonWkt = polygonWkt || values.polygon_wkt || "";
 
-  if (!finalPolygonWkt.trim()) {
-    setError("Please draw a polygon on the map or enter polygon WKT");
-    return;
+    if (!finalPolygonWkt.trim()) {
+      setError("Please draw a polygon on the map or enter polygon WKT");
+      return;
+    }
+
+    setError("");
+    setFieldErrors({});
+
+    try {
+      const payload = {
+        ...values,
+        polygon_wkt: finalPolygonWkt,
+      };
+
+      nonPolygonFields.forEach((f) => {
+        const value = payload[f.name];
+
+        if (value === "" || value == null) {
+          payload[f.name] = null;
+          return;
+        }
+
+        if (f.type === "number") {
+          payload[f.name] = Number(value);
+          return;
+        }
+
+        if (f.type === "select" && f.name.endsWith("_id")) {
+          payload[f.name] = Number(value);
+          return;
+        }
+      });
+
+      const updated = await workflowService.submitJsonStep(state.case_id, payload);
+      onStateUpdated(updated.state ?? updated);
+    } catch (err: any) {
+      setFieldErrors(err.fieldErrors || {});
+    }
   }
-
-  setError("");
-  setFieldErrors({});
-
-  try {
-    const updated = await workflowService.submitJsonStep(state.case_id, {
-      ...values,
-      polygon_wkt: finalPolygonWkt,
-    });
-
-    onStateUpdated(updated.state ?? updated);
-  } catch (err: any) {
-    setFieldErrors(err.fieldErrors || {});
-  }
-}
 
   async function handleSaveDraft(_values: Record<string, any>) {
     return;

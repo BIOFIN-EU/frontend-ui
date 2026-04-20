@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import type { FieldSchema, StepSchema } from "@/types/forms";
+import { Select } from "@/components/ui/Select";
 
 function isVisible(field: FieldSchema, values: Record<string, any>) {
   if (!field.visible_if) return true;
@@ -36,16 +37,25 @@ function Field({
   }`;
 
   switch (field.type) {
-    case "text":
+    case "text": {
+      const autoComplete =
+        field.id === "region" ? "new-password" : "off";
+
       return (
         <div className="space-y-1">
           <label htmlFor={field.id} className="text-sm font-semibold text-white">
             {field.label}
           </label>
-          <input {...common} type="text" className={inputClass} />
+          <input
+            {...common}
+            type="text"
+            autoComplete={autoComplete}
+            className={inputClass}
+          />
           {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );
+}
 
     case "number":
       return (
@@ -75,14 +85,27 @@ function Field({
           <label htmlFor={field.id} className="text-sm font-semibold text-white">
             {field.label}
           </label>
-          <select {...common} className={inputClass}>
-            <option value="">Select...</option>
-            {(field.options || []).map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
+
+          <input type="hidden" {...common} />
+
+          <Select
+            value={String(values?.[field.id] ?? "")}
+            onChange={(nextValue) => {
+              setValue(field.id, nextValue, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true,
+              });
+            }}
+            options={[
+              { label: "Select...", value: "" },
+              ...((field.options || []).map((o) => ({
+                label: o.label,
+                value: String(o.value),
+              }))),
+            ]}
+          />
+
           {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );

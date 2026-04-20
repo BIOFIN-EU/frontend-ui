@@ -15,7 +15,7 @@ const workflows = [
     code: "private_lending_with_document_v1",
     title: "Private Lending (with document)",
     description: "Includes supporting document upload step.",
-  },
+  }
 ];
 
 export default function WorkflowPage() {
