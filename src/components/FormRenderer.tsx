@@ -210,10 +210,6 @@ export function FormRenderer({
       })}
       className="space-y-4"
     >
-      <h2 className="text-xl font-semibold text-white">
-        {stepSchema?.title ?? "Step"}
-      </h2>
-
       {(stepSchema?.fields ?? []).map((f) => (
         <Field
           key={f.id}
