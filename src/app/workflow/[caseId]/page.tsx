@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/context/auth.context";
 import { workflowService } from "@/services/workflow.service";
-import type { WorkflowState } from "@/types/workflow";
+import type { WorkflowState } from "@/types/case-dashboard";
 import { WorkflowStepScreen } from "@/components/workflow/WorkflowStepScreen";
 
 export default function WorkflowCasePage() {

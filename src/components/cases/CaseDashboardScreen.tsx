@@ -6,7 +6,7 @@ import type {
   CaseDashboardState,
   DashboardField,
   DashboardStep,
-} from "@/types/case-dashboard";
+} from "@/types/workflow";
 import { formatDate } from "@/lib/format";
 
 type OrderedStep = {
@@ -52,22 +52,35 @@ function getStepData(
 }
 
 function getFieldValue(
+  state: CaseDashboardState,
   stepData: Record<string, unknown> | null,
-  field: DashboardField
+  field: DashboardField,
+  stepCode: string
 ): unknown {
-  if (!stepData) return null;
-
-  if (field.name in stepData) {
-    return stepData[field.name];
+  if (stepData && field.name in stepData) {
+    return stepData[field.name] ?? null;
   }
 
-  if (field.name.endsWith("_id")) {
+  if (stepData && field.name.endsWith("_id")) {
     const baseName = field.name.replace(/_id$/, "");
     const nested = stepData[baseName];
 
     if (nested && typeof nested === "object" && !Array.isArray(nested)) {
       const nestedRecord = nested as Record<string, unknown>;
       return nestedRecord.name ?? nestedRecord.code ?? nestedRecord.id ?? null;
+    }
+  }
+
+  if (field.type === "file" && Array.isArray(state.documents)) {
+    const matchingDoc = state.documents.find((doc) => {
+      return (
+        doc.field_name === field.name &&
+        doc.step_code === stepCode
+      );
+    });
+
+    if (matchingDoc) {
+      return matchingDoc.original_filename ?? matchingDoc.upload_token ?? null;
     }
   }
 
@@ -103,9 +116,10 @@ function isStepComplete(state: CaseDashboardState, orderedStep: OrderedStep): bo
   if (!requiredFields.length) return true;
 
   const stepData = getStepData(state, orderedStep.code);
-  if (!stepData) return false;
 
-  return requiredFields.every((field) => isFilled(getFieldValue(stepData, field)));
+  return requiredFields.every((field) =>
+    isFilled(getFieldValue(state, stepData, field, orderedStep.code))
+  );
 }
 
 function PolygonFieldCard({
@@ -206,7 +220,7 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
               Case summary
             </p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-              Case #{state.caseId}
+              #{state.caseId}
             </h1>
           </div>
 
@@ -284,14 +298,13 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
             {activeStep.step.title}
           </h2>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {(activeStep.step.fields || []).map((field) => {
-              const value = getFieldValue(activeStepData, field);
+              const value = getFieldValue(state, activeStepData, field, activeStep.code);
 
               if (field.name === "polygon_wkt") {
                 return (
@@ -302,7 +315,7 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
                     mapKey={`${state.caseId}-${activeStep.code}-${field.name}`}
                   />
                 );
-}
+              }
 
               return (
                 <StandardFieldCard
