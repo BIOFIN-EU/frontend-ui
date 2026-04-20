@@ -336,8 +336,7 @@ export default function RiskModelPage() {
                 Biodiversity Risk Explorer
               </h1>
               <p className="max-w-3xl text-sm leading-6 text-white/70 sm:text-base">
-                Dynamic case-driven biodiversity dashboard based only on values
-                present in the returned JSON.
+                Example case loaded with hardcoded data.
               </p>
             </div>
 
