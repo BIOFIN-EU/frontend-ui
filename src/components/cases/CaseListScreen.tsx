@@ -10,8 +10,12 @@ type Props = {
   cases: CaseListItem[];
 };
 
+function safeLower(value: unknown) {
+  return typeof value === "string" ? value.toLowerCase() : "";
+}
+
 function getStatusClasses(status: string) {
-  switch (status.toLowerCase()) {
+  switch (safeLower(status)) {
     case "draft":
       return "border-amber-400/25 bg-amber-500/10 text-amber-200";
     case "completed":
@@ -52,12 +56,18 @@ export function CaseListScreen({ cases }: Props) {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const caseTypes = useMemo(
-    () => Array.from(new Set(cases.map((item) => item.caseType))).sort(),
+    () =>
+      Array.from(
+        new Set(cases.map((item) => item.caseType).filter(Boolean))
+      ).sort(),
     [cases]
   );
 
   const statuses = useMemo(
-    () => Array.from(new Set(cases.map((item) => item.status))).sort(),
+    () =>
+      Array.from(
+        new Set(cases.map((item) => item.status).filter(Boolean))
+      ).sort(),
     [cases]
   );
 
@@ -72,13 +82,13 @@ export function CaseListScreen({ cases }: Props) {
         if (!q) return true;
 
         return (
-          String(item.caseId).includes(q) ||
-          item.name.toLowerCase().includes(q) ||
-          item.caseType.toLowerCase().includes(q) ||
-          item.status.toLowerCase().includes(q) ||
-          item.createdBy.toLowerCase().includes(q) ||
-          item.updatedBy.toLowerCase().includes(q) ||
-          item.description?.toLowerCase().includes(q)
+          String(item.caseId ?? "").includes(q) ||
+          safeLower(item.name).includes(q) ||
+          safeLower(item.caseType).includes(q) ||
+          safeLower(item.status).includes(q) ||
+          safeLower(item.createdBy).includes(q) ||
+          safeLower(item.updatedBy).includes(q) ||
+          safeLower(item.description).includes(q)
         );
       })
       .sort((a, b) => b.caseId - a.caseId);
@@ -208,14 +218,16 @@ export function CaseListScreen({ cases }: Props) {
                       </span>
 
                       <span
-                        className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${getStatusClasses(item.status)}`}
+                        className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${getStatusClasses(
+                          item.status
+                        )}`}
                       >
                         {formatStatusLabel(item.status)}
                       </span>
                     </div>
 
                     <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white transition group-hover:text-emerald-100">
-                      {item.name}
+                      {item.name || "Untitled case"}
                     </h2>
 
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-white/60 line-clamp-2">
@@ -232,7 +244,7 @@ export function CaseListScreen({ cases }: Props) {
                 </div>
 
                 <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  <InfoBlock label="Case type" value={item.caseType} />
+                  <InfoBlock label="Case type" value={item.caseType || "Unknown"} />
                   <InfoBlock
                     label="Created"
                     value={formatDate(item.createdAt)}
