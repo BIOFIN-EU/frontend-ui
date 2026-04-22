@@ -1,7 +1,10 @@
 services:
   frontend-ui:
     container_name: frontend-ui
-    build: .
+    build:
+        context: .
+        dockerfile: Dockerfile
+        target: dev
     ports:
       - "3000:3000"
 

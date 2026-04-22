@@ -1,6 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { buttonBase, buttonPrimary, buttonSecondary } from "@/lib/ui";
+import {
+  Users,
+  Globe,
+  Map,
+  LayoutDashboard,
+} from "lucide-react";
 
 const objectives = [
   "Create and test solutions to quickly and effectively gather and share valuable biodiversity and ecosystem services data.",
@@ -31,10 +38,10 @@ const highlights = [
 ];
 
 const stats = [
-  { value: "13", label: "Partners" },
-  { value: "10", label: "Countries" },
-  { value: "10", label: "Learning sites" },
-  { value: "3", label: "Core dashboard tools" },
+  { value: "13", label: "Partners", icon: Users },
+  { value: "10", label: "Countries", icon: Globe },
+  { value: "10", label: "Learning sites", icon: Map },
+  { value: "3", label: "Core dashboard tools", icon: LayoutDashboard },
 ];
 
 export default function AboutPage() {
@@ -59,17 +66,30 @@ export default function AboutPage() {
 
       <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5"
-            >
-              <p className="text-2xl font-semibold text-white">{stat.value}</p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-white/50">
-                {stat.label}
-              </p>
-            </div>
-          ))}
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+
+            return (
+              <div
+                key={stat.label}
+                className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-2xl font-semibold text-white">
+                    {stat.value}
+                  </p>
+
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-400/5 ring-1 ring-white/10">
+                    <Icon className="h-5 w-5 text-emerald-300" />
+                  </div>
+                </div>
+
+                <p className="mt-2 text-xs uppercase tracking-wider text-white/50">
+                  {stat.label}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -102,17 +122,14 @@ export default function AboutPage() {
             Quick links
           </p>
           <div className="mt-4 flex flex-col gap-3">
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-xl bg-white/8 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/12 hover:ring-white/25 active:translate-y-[1px]"
-            >
+            <Link href="/" className={`${buttonBase} ${buttonPrimary}`}>
               Home Page
             </Link>
             <a
               href="https://biofin-project.eu/"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-xl bg-emerald-400/15 px-5 py-2.5 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-300/30 shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition hover:bg-emerald-400/20 hover:ring-emerald-200/40 active:translate-y-[1px]"
+              className={`${buttonBase} ${buttonSecondary}`}
             >
               Visit official project site
             </a>
@@ -129,7 +146,9 @@ export default function AboutPage() {
             <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
               {item.title}
             </p>
-            <p className="mt-3 text-sm leading-6 text-white/75">{item.text}</p>
+            <p className="mt-3 text-sm leading-6 text-white/75">
+              {item.text}
+            </p>
           </div>
         ))}
       </section>

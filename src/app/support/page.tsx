@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import { Select } from "@/components/ui/Select";
 type ContactReason =
   | "I am an NBS Funder"
   | "NBS Policy Maker"
@@ -77,7 +77,7 @@ export default function SupportPage() {
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
             <p className="text-sm font-semibold text-white">
-              NBS Funders
+              NbS Funders
             </p>
             <p className="mt-2 text-sm text-white/70">
               Looking for investment opportunities or tools to assess biodiversity impact? Reach out and we’ll guide you.
@@ -86,16 +86,16 @@ export default function SupportPage() {
 
           <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
             <p className="text-sm font-semibold text-white">
-              Policy Makers
+              NbS Intermediaries
             </p>
             <p className="mt-2 text-sm text-white/70">
-              Explore governance frameworks, reporting standards, and policy insights to support biodiversity finance.
+              Certify, guide, and verify nature-based solutions that deliver real impact.
             </p>
           </div>
 
           <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
             <p className="text-sm font-semibold text-white">
-              NBS Providers
+              NbS Providers
             </p>
             <p className="mt-2 text-sm text-white/70">
               Need funding or visibility for your nature-based solution? We can help connect you with the right tools and partners.
@@ -140,27 +140,22 @@ export default function SupportPage() {
               placeholder="you@example.com"
             />
           </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-white/70">
+                I am contacting you as
+              </label>
 
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-white/70">
-              I am contacting you as
-            </label>
-            <select
-              value={reason}
-              onChange={(e) => setReason(e.target.value as ContactReason)}
-              required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20"
-            >
-              <option value="" disabled className="bg-slate-900">
-                Select an option
-              </option>
-              <option value="I am an NBS Funder">I am an NBS Funder</option>
-              <option value="NBS Policy Maker">NBS Policy Maker</option>
-              <option value="I want to get funding for my NBS">
-                I want to get funding for my NBS
-              </option>
-            </select>
-          </div>
+              <Select
+                value={String(reason ?? "")}
+                onChange={(nextValue) => setReason(nextValue as ContactReason)}
+                options={[
+                  { label: "Select an option", value: "" },
+                  { label: "NbS Funder", value: "I am an NBS Funder" },
+                  { label: "NbS Intermediary", value: "I am an NbS Intermediary" },
+                  { label: "NbS Provider", value: "I want to get funding for my NBS" },
+                ]}
+              />
+            </div>
 
           <div className="space-y-2">
             <label className="text-xs font-medium text-white/70">

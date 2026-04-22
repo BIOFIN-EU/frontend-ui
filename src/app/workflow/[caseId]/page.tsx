@@ -74,7 +74,7 @@ export default function WorkflowCasePage() {
 
       {!loading && state && (
         <>
-          <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
+          <section className="grid gap-6">
             <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
               <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
                 Current step
@@ -93,51 +93,6 @@ export default function WorkflowCasePage() {
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-                <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
-                  Documents
-                </p>
-
-                <div className="mt-4 space-y-2">
-                  {state.documents?.length ? (
-                    state.documents.map((doc) => (
-                      <div
-                        key={doc.case_document_id}
-                        className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-white/80"
-                      >
-                        {doc.original_filename}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-white/50">
-                      No documents uploaded
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {Object.keys(state.validation_errors || {}).length > 0 && (
-                <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-sm text-red-200">
-                  <p className="text-xs font-semibold uppercase tracking-wider">
-                    Validation errors
-                  </p>
-
-                  <ul className="mt-3 space-y-1">
-                    {Object.entries(state.validation_errors).map(
-                      ([field, message]) => (
-                        <li key={field}>
-                          <strong>{field}:</strong>{" "}
-                          {Array.isArray(message)
-                            ? message.join(", ")
-                            : message}
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </div>
-              )}
-            </div>
           </section>
         </>
       )}

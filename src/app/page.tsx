@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buttonBase, buttonPrimary, buttonSecondary } from "@/lib/ui";
 
 const pillars = [
   {
@@ -132,47 +133,47 @@ function TileGraphic({ type }: { type: string }) {
 
 export default function HomePage() {
   return (
-    <div className="relative isolate overflow-hidden">
+    <div className="relative isolate overflow-hidden bg-slate-950">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.14),transparent_30%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_28%),radial-gradient(circle_at_bottom,rgba(168,85,247,0.12),transparent_30%)]" />
 
-      <div className="relative mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
-        <section className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="min-w-0 space-y-6">
-            <div className="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-500/12 px-3 py-1 text-xs font-semibold text-emerald-200 shadow-[0_8px_24px_rgba(0,0,0,0.18)] ring-1 ring-emerald-400/15">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        <section className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+          <div className="flex min-w-0 flex-col justify-center space-y-6 lg:pr-4">
+            <div className="inline-flex w-fit items-center rounded-full border border-emerald-300/25 bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-100 shadow-[0_8px_24px_rgba(0,0,0,0.18)] ring-1 ring-emerald-300/15">
               Nature-based finance platform
             </div>
 
             <div className="space-y-4">
-              <h1 className="max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Finance, assess, and report on biodiversity with confidence.
               </h1>
-              <p className="max-w-2xl text-sm leading-6 text-white/70 sm:text-base">
+              <p className="max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
                 A modern platform for biodiversity classification, risk appraisal,
                 and regulatory reporting that helps investors, providers, and
                 policy stakeholders work with Nature-Based Solutions more effectively.
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 pt-2 sm:flex-row">
               <Link
                 href="/support"
-                className="inline-flex items-center justify-center rounded-xl border border-emerald-300/20 bg-emerald-400/15 px-5 py-3 text-sm font-semibold text-emerald-100 shadow-[0_10px_30px_rgba(0,0,0,0.25)] ring-1 ring-emerald-300/20 transition duration-200 hover:bg-emerald-400/20 hover:ring-emerald-200/35 active:translate-y-[1px]"
+                className={`${buttonBase} ${buttonPrimary}`}
               >
                 Get support
               </Link>
 
               <Link
                 href="/about"
-                className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/8 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/10 transition duration-200 hover:bg-white/12 hover:ring-white/20 active:translate-y-[1px]"
+                className={`${buttonBase} ${buttonSecondary}`}
               >
                 Learn more
               </Link>
             </div>
           </div>
 
-          <div className="min-w-0 rounded-3xl border border-white/10 bg-white/[0.05] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-              <div className="mb-4 flex items-center justify-between gap-4">
+          <div className="min-w-0 self-stretch rounded-3xl border border-white/10 bg-white/[0.05] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
+            <div className="flex h-full flex-col rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
+              <div className="mb-4 flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
                     Platform overview
@@ -186,38 +187,38 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="flex flex-1 flex-col justify-between space-y-4">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
                     <p className="text-sm font-semibold text-emerald-100">Classify</p>
-                    <p className="mt-1 text-xs leading-5 text-emerald-50/75">
+                    <p className="mt-1 text-xs leading-5 text-emerald-50/80">
                       Align projects with biodiversity frameworks.
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
                     <p className="text-sm font-semibold text-white">Assess</p>
-                    <p className="mt-1 text-xs leading-5 text-white/65">
+                    <p className="mt-1 text-xs leading-5 text-white/75">
                       Evaluate biodiversity risk and ecosystem services.
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
                     <p className="text-sm font-semibold text-white">Report</p>
-                    <p className="mt-1 text-xs leading-5 text-white/65">
+                    <p className="mt-1 text-xs leading-5 text-white/75">
                       Support disclosure and decision-ready outputs.
                     </p>
                   </div>
                 </div>
 
-                <div className="h-36 overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]">
+                <div className="h-40 overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]">
                   <svg viewBox="0 0 500 140" className="h-full w-full">
                     <defs>
                       <linearGradient id="heroA" x1="0" x2="1">
-                        <stop offset="0%" stopColor="rgba(52,211,153,0.1)" />
-                        <stop offset="100%" stopColor="rgba(59,130,246,0.5)" />
+                        <stop offset="0%" stopColor="rgba(52,211,153,0.18)" />
+                        <stop offset="100%" stopColor="rgba(59,130,246,0.65)" />
                       </linearGradient>
                       <linearGradient id="heroB" x1="0" x2="1">
-                        <stop offset="0%" stopColor="rgba(168,85,247,0.08)" />
-                        <stop offset="100%" stopColor="rgba(52,211,153,0.45)" />
+                        <stop offset="0%" stopColor="rgba(168,85,247,0.14)" />
+                        <stop offset="100%" stopColor="rgba(52,211,153,0.5)" />
                       </linearGradient>
                     </defs>
                     <path
@@ -232,8 +233,8 @@ export default function HomePage() {
                       stroke="url(#heroB)"
                       strokeWidth="3"
                     />
-                    <circle cx="315" cy="48" r="5" fill="rgba(52,211,153,0.9)" />
-                    <circle cx="425" cy="36" r="5" fill="rgba(96,165,250,0.9)" />
+                    <circle cx="315" cy="48" r="5" fill="rgba(52,211,153,0.95)" />
+                    <circle cx="425" cy="36" r="5" fill="rgba(96,165,250,0.95)" />
                   </svg>
                 </div>
               </div>
@@ -241,66 +242,33 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Core capabilities
-            </p>
-            <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-              A platform built around three essential pillars
-            </h2>
-          </div>
+        {/* Optional pillar section can be re-enabled later if needed */}
 
-          <div className="grid gap-4 lg:grid-cols-3">
-            {pillars.map((pillar) => (
-              <div
-                key={pillar.key}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md transition duration-200 hover:-translate-y-0.5 hover:border-white/15"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-80 transition group-hover:opacity-100" />
-                <div className="relative">
-                  <div className="mb-5 h-28 overflow-hidden rounded-2xl border border-white/10 bg-black/20 ring-1 ring-white/5">
-                    <TileGraphic type={pillar.key} />
-                  </div>
-
-                  <h3 className="text-2xl font-semibold tracking-tight text-white">
-                    <span className="font-bold">{pillar.title}</span>
-                  </h3>
-                  <p className="mt-2 text-lg font-medium text-white/85">
-                    {pillar.subtitle}
-                  </p>
-                  <p className="mt-4 text-sm text-white/60">{pillar.example}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-md sm:p-6">
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100/60">
+        <section className="mt-10 rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-md sm:p-6">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:items-stretch">
+            <div className="flex min-w-0 flex-col justify-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100/65">
                 Call to action
               </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 Are you looking to fund, build, or support Nature-Based Solutions?
               </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/75">
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/80">
                 Whether you are an investor, provider, policymaker, or ecosystem
                 partner, this platform helps you understand biodiversity value,
                 assess environmental risk, and move toward trusted action.
               </p>
 
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/support"
-                  className="inline-flex items-center justify-center rounded-xl border border-emerald-200/20 bg-emerald-400/20 px-5 py-3 text-sm font-semibold text-emerald-50 ring-1 ring-emerald-200/20 transition duration-200 hover:bg-emerald-400/25"
+                  className={`${buttonBase} ${buttonPrimary}`}
                 >
                   Contact support
                 </Link>
                 <Link
                   href="/risk-model"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/8 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/10 transition duration-200 hover:bg-white/12"
+                  className={`${buttonBase} ${buttonSecondary}`}
                 >
                   Explore the risk model
                 </Link>
@@ -312,13 +280,15 @@ export default function HomePage() {
                 <Link
                   key={item.key}
                   href={item.href}
-                  className="group rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5 transition duration-200 hover:border-emerald-300/25 hover:bg-black/30"
+                  className="group flex h-full flex-col justify-between rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5 transition duration-200 hover:border-emerald-300/30 hover:bg-black/30"
                 >
-                  <p className="text-sm font-semibold text-white">{item.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-white/65">
-                    {item.text}
-                  </p>
-                  <p className="mt-3 text-xs font-semibold text-emerald-200/70 transition group-hover:text-emerald-200">
+                  <div>
+                    <p className="text-base font-semibold text-white">{item.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-white/75">
+                      {item.text}
+                    </p>
+                  </div>
+                  <p className="mt-4 text-sm font-semibold text-emerald-200 transition group-hover:text-emerald-100">
                     {item.cta} →
                   </p>
                 </Link>

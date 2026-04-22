@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Info, ShieldAlert, Bird, Trees } from "lucide-react";
+import {
+  Info,
+  ShieldAlert,
+  Bird,
+  Trees,
+  ChevronDown,
+  ChevronUp,
+  Database,
+} from "lucide-react";
 import RiskMap from "@/components/maps/RiskMap";
 
 type CaseData = {
@@ -235,6 +243,10 @@ function prettifyRiskLabel(label: string) {
     .join(" ");
 }
 
+function formatOneDecimalPercent(value: number) {
+  return `${(value * 100).toFixed(1)}`;
+}
+
 function buildMetricsFromCase(caseData: CaseData) {
   const riskMean = caseData.raster_data.summary_stats.mean_raster_value;
   const riskStd = caseData.raster_data.summary_stats.std_raster_value;
@@ -266,7 +278,7 @@ function buildMetricsFromCase(caseData: CaseData) {
     riskStd,
     urbanMean,
     urbanStd,
-    riskScore: Math.round(riskMean * 100),
+    riskScore: Number((riskMean * 100).toFixed(1)),
   };
 }
 
@@ -292,19 +304,362 @@ function StatCard({
   );
 }
 
+function ThresholdScale({
+  value,
+  thresholds,
+}: {
+  value: number;
+  thresholds: Record<string, number>;
+}) {
+  const ordered = Object.entries(thresholds).sort((a, b) => a[1] - b[1]);
+  const max = 1;
+
+  const segments = ordered.map(([label, start], index) => {
+    const end = ordered[index + 1]?.[1] ?? max;
+    const width = Math.max(((end - start) / max) * 100, 6);
+
+    return {
+      label,
+      start,
+      end,
+      width,
+    };
+  });
+
+  const markerPosition = Math.min(Math.max(value * 100, 0), 100);
+  const activeLabel = prettifyRiskLabel(getRiskLabel(value, thresholds));
+
+  const segmentTone = (label: string) => {
+    switch (label) {
+      case "low":
+        return "from-emerald-500 to-emerald-400";
+      case "medium-low":
+        return "from-lime-500 to-yellow-400";
+      case "medium":
+        return "from-yellow-500 to-amber-400";
+      case "medium-high":
+        return "from-orange-500 to-orange-400";
+      case "high":
+        return "from-red-500 to-rose-500";
+      default:
+        return "from-white/20 to-white/10";
+    }
+  };
+
+  return (
+    <section className="h-full rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+        Risk linguistic thresholds
+      </p>
+      <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+        Biodiversity risk scale
+      </h2>
+      <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">
+        The raster mean is shown on the linguistic threshold scale as a percentage.
+      </p>
+
+      <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-white/45">
+              Current position
+            </p>
+            <p className="mt-1 text-3xl font-semibold text-white">
+              {formatOneDecimalPercent(value)}
+            </p>
+          </div>
+          <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/20">
+            {activeLabel}
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <div className="relative">
+            <div className="flex h-6 overflow-hidden rounded-full border border-white/10 bg-white/5">
+              {segments.map((segment) => (
+                <div
+                  key={segment.label}
+                  className={`h-full bg-gradient-to-r ${segmentTone(segment.label)}`}
+                  style={{ width: `${segment.width}%` }}
+                  title={`${prettifyRiskLabel(segment.label)}: ${formatOneDecimalPercent(
+                    segment.start
+                  )}% → ${formatOneDecimalPercent(segment.end)}%`}
+                />
+              ))}
+            </div>
+
+            <div
+              className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${markerPosition}%` }}
+            >
+              <div className="flex flex-col items-center">
+                <div className="mb-1 rounded-full border border-emerald-300/40 bg-[#07121d] px-2.5 py-1 text-[10px] font-semibold text-emerald-200 shadow-lg">
+                  {formatOneDecimalPercent(value)}
+                </div>
+                <div className="h-8 w-[2px] bg-white" />
+                <div className="h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.75)]" />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-2 sm:grid-cols-5">
+            {segments.map((segment, index) => {
+              const isCurrent =
+                (value >= segment.start && value < segment.end) ||
+                (index === segments.length - 1 && value >= segment.start);
+
+              return (
+                <div
+                  key={segment.label}
+                  className={`rounded-2xl border px-3 py-3 ring-1 ${
+                    isCurrent
+                      ? "border-emerald-400/30 bg-emerald-500/10 ring-emerald-400/20"
+                      : "border-white/10 bg-white/[0.03] ring-white/5"
+                  }`}
+                >
+                  <p className="text-xs font-semibold uppercase tracking-wider text-white/55">
+                    {prettifyRiskLabel(segment.label)}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-white">
+                    ≥ {formatOneDecimalPercent(segment.start)}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HiddenStats({
+  caseData,
+  metrics,
+}: {
+  caseData: CaseData;
+  metrics: ReturnType<typeof buildMetricsFromCase>;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-left ring-1 ring-white/5 transition hover:bg-black/30"
+      >
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 rounded-2xl bg-emerald-500/10 p-2 ring-1 ring-emerald-400/20">
+            <Database className="h-4 w-4 text-emerald-200" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Hidden stats
+            </p>
+            <h3 className="mt-1 text-xl font-semibold">
+              Technical metadata and supporting details
+            </h3>
+            <p className="mt-1 text-sm text-white/60">
+              Includes case summary, thresholds, raster summaries, endpoints, raster metadata, and XAI.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs font-medium text-white/70 ring-1 ring-white/10">
+          {open ? "Hide details" : "Show details"}
+          {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </div>
+      </button>
+
+      {open && (
+        <div className="mt-5 space-y-6">
+          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Case summary
+            </p>
+            <h4 className="mt-1 text-lg font-semibold">{caseData.id}</h4>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <StatCard
+                label="Risk label"
+                value={metrics.riskLabel}
+                icon={ShieldAlert}
+              />
+              <StatCard
+                label="Crop to polygon"
+                value={caseData.crop_to_polygon ? "Yes" : "No"}
+                icon={Info}
+              />
+              <StatCard
+                label="Climate model"
+                value={caseData.climate_model}
+                icon={Info}
+              />
+              <StatCard label="Period" value={caseData.period} icon={Info} />
+              <StatCard
+                label="Risk model"
+                value={caseData.risk_model}
+                icon={Info}
+              />
+              <StatCard
+                label="Risk type"
+                value={caseData.risk_type}
+                icon={Info}
+              />
+              <StatCard
+                label="SRI logic type"
+                value={caseData.sri_logic_type}
+                icon={Info}
+              />
+              <StatCard
+                label="SRI correction method"
+                value={caseData.sri_correction_method}
+                icon={Info}
+              />
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Thresholds
+            </p>
+            <h4 className="mt-1 text-lg font-semibold">Risk linguistic thresholds</h4>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              {Object.entries(caseData.risk_ling_thresholds)
+                .sort((a, b) => a[1] - b[1])
+                .map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 ring-1 ring-white/5"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
+                      {prettifyRiskLabel(label)}
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-white">
+                      {formatOneDecimalPercent(value)}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Raster summaries
+            </p>
+            <h4 className="mt-1 text-lg font-semibold">Returned summary stats</h4>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <StatCard
+                label="Raster mean"
+                value={formatOneDecimalPercent(metrics.riskMean)}
+                icon={ShieldAlert}
+              />
+              <StatCard
+                label="Raster std dev"
+                value={formatOneDecimalPercent(metrics.riskStd)}
+                icon={Info}
+              />
+              <StatCard
+                label="Urban raster mean"
+                value={formatOneDecimalPercent(metrics.urbanMean)}
+                icon={Info}
+              />
+              <StatCard
+                label="Urban raster std dev"
+                value={formatOneDecimalPercent(metrics.urbanStd)}
+                icon={Info}
+              />
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              XAI
+            </p>
+            <h4 className="mt-1 text-lg font-semibold">Dominant rule</h4>
+
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 ring-1 ring-white/5">
+              <p className="text-sm text-white/80">
+                {metrics.dominantRule ?? "No explanation rule available."}
+              </p>
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Linked resources
+            </p>
+            <h4 className="mt-1 text-lg font-semibold">Related endpoints</h4>
+
+            <div className="mt-4 space-y-3">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 ring-1 ring-white/5">
+                <p className="text-xs font-medium text-white/55">CHI</p>
+                <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.chi}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 ring-1 ring-white/5">
+                <p className="text-xs font-medium text-white/55">PAI</p>
+                <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.pai}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 ring-1 ring-white/5">
+                <p className="text-xs font-medium text-white/55">SRI</p>
+                <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.sri}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Raster metadata
+            </p>
+            <h4 className="mt-1 text-lg font-semibold">Raster info</h4>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <StatCard
+                label="Driver"
+                value={caseData.raster_data.meta.driver}
+                icon={Info}
+              />
+              <StatCard
+                label="Dtype"
+                value={caseData.raster_data.meta.dtype}
+                icon={Info}
+              />
+              <StatCard
+                label="NoData"
+                value={caseData.raster_data.meta.nodata}
+                icon={Info}
+              />
+              <StatCard
+                label="Width"
+                value={caseData.raster_data.meta.width}
+                icon={Info}
+              />
+              <StatCard
+                label="Height"
+                value={caseData.raster_data.meta.height}
+                icon={Info}
+              />
+              <StatCard
+                label="Band count"
+                value={caseData.raster_data.meta.count}
+                icon={Bird}
+              />
+            </div>
+          </section>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function RiskModelPage() {
   const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [polygonWkt, setPolygonWkt] = useState("");
 
   useEffect(() => {
-    // later:
-    // fetch(`/api/v1/cases/${caseId}`)
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     setCaseData(data);
-    //     setPolygonWkt(data.geometry || "");
-    //   });
-
     setCaseData(HARDCODED_CASE);
     setPolygonWkt(HARDCODED_CASE.geometry || "");
   }, []);
@@ -346,245 +701,58 @@ export default function RiskModelPage() {
             </div>
           </div>
         </header>
-      <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Interactive map
-            </p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-              Spatial biodiversity screening
-            </h2>
-          </div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/6 px-3 py-1.5 text-xs text-white/70 ring-1 ring-white/10">
-            <Info className="h-3.5 w-3.5" />
-            Polygon loaded from case geometry
-          </div>
-        </div>
 
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#07121d] ring-1 ring-white/5">
-          <RiskMap
-            polygonWkt={polygonWkt}
-            onPolygonWktChange={setPolygonWkt}
+        <div className="grid gap-8 xl:grid-cols-[1.2fr_0.8fr] xl:items-stretch">
+          <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                  Interactive map
+                </p>
+                <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+                  Spatial biodiversity screening
+                </h2>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/6 px-3 py-1.5 text-xs text-white/70 ring-1 ring-white/10">
+                <Info className="h-3.5 w-3.5" />
+                Polygon loaded from case geometry
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#07121d] ring-1 ring-white/5">
+              <RiskMap
+                polygonWkt={polygonWkt}
+                onPolygonWktChange={setPolygonWkt}
+              />
+            </div>
+          </section>
+
+          <ThresholdScale
+            value={metrics.riskMean}
+            thresholds={caseData.risk_ling_thresholds}
           />
         </div>
 
-  <div className="mt-4 grid gap-4 sm:grid-cols-1">
-    <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
-          Risk score
-        </p>
-        <ShieldAlert className="h-4 w-4 text-red-200" />
-      </div>
-      <p className="mt-3 text-3xl font-semibold">{metrics.riskScore}</p>
-      <p className="mt-1 text-xs text-white/45">Rounded from raster mean</p>
-    </div>
-  </div>
-</section>
-
-        <div className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
-          <section className="space-y-6">
-            <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                    Case summary
-                  </p>
-                  <h3 className="mt-1 text-xl font-semibold">{caseData.id}</h3>
+        <div className="grid gap-8 xl:grid-cols-[1fr_1fr]">
+          <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Species
+            </p>
+            <div className="mt-4 grid gap-4">
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
+                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-100">
+                  <Trees className="h-4 w-4" /> SRI species list
                 </div>
+                <ul className="space-y-2 text-sm text-white/70">
+                  {metrics.species.map((item) => (
+                    <li key={item}>• {item}</li>
+                  ))}
+                </ul>
               </div>
-
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <StatCard
-                  label="Risk label"
-                  value={metrics.riskLabel}
-                  icon={ShieldAlert}
-                />
-                <StatCard
-                  label="Crop to polygon"
-                  value={caseData.crop_to_polygon ? "Yes" : "No"}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Climate model"
-                  value={caseData.climate_model}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Period"
-                  value={caseData.period}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Risk model"
-                  value={caseData.risk_model}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Risk type"
-                  value={caseData.risk_type}
-                  icon={Info}
-                />
-                <StatCard
-                  label="SRI logic type"
-                  value={caseData.sri_logic_type}
-                  icon={Info}
-                />
-                <StatCard
-                  label="SRI correction method"
-                  value={caseData.sri_correction_method}
-                  icon={Info}
-                />
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                Raster summaries
-              </p>
-              <h3 className="mt-1 text-xl font-semibold">Returned summary stats</h3>
-
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <StatCard
-                  label="Raster mean"
-                  value={metrics.riskMean}
-                  icon={ShieldAlert}
-                />
-                <StatCard
-                  label="Raster std dev"
-                  value={metrics.riskStd}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Urban raster mean"
-                  value={metrics.urbanMean}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Urban raster std dev"
-                  value={metrics.urbanStd}
-                  icon={Info}
-                />
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                XAI
-              </p>
-              <h3 className="mt-1 text-xl font-semibold">Dominant rule</h3>
-
-              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                <p className="text-sm text-white/80">
-                  {metrics.dominantRule ?? "No explanation rule available."}
-                </p>
-              </div>
-            </section>
+            </div>
           </section>
 
-          <aside className="space-y-6">
-            <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                Thresholds
-              </p>
-              <h3 className="mt-1 text-xl font-semibold">Risk linguistic thresholds</h3>
-
-              <div className="mt-4 space-y-3">
-                {Object.entries(caseData.risk_ling_thresholds)
-                  .sort((a, b) => a[1] - b[1])
-                  .map(([label, value]) => (
-                    <div
-                      key={label}
-                      className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3 ring-1 ring-white/5"
-                    >
-                      <span className="text-sm text-white/70">{label}</span>
-                      <span className="text-sm font-semibold text-white">{value}</span>
-                    </div>
-                  ))}
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                Species
-              </p>
-              <div className="mt-4 grid gap-4">
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                  <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-100">
-                    <Trees className="h-4 w-4" /> SRI species list
-                  </div>
-                  <ul className="space-y-2 text-sm text-white/70">
-                    {metrics.species.map((item) => (
-                      <li key={item}>• {item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                Linked resources
-              </p>
-              <h3 className="mt-1 text-xl font-semibold">Related endpoints</h3>
-
-              <div className="mt-4 space-y-3">
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                  <p className="text-xs font-medium text-white/55">CHI</p>
-                  <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.chi}</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                  <p className="text-xs font-medium text-white/55">PAI</p>
-                  <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.pai}</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                  <p className="text-xs font-medium text-white/55">SRI</p>
-                  <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.sri}</p>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                Raster metadata
-              </p>
-              <h3 className="mt-1 text-xl font-semibold">Raster info</h3>
-
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <StatCard
-                  label="Driver"
-                  value={caseData.raster_data.meta.driver}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Dtype"
-                  value={caseData.raster_data.meta.dtype}
-                  icon={Info}
-                />
-                <StatCard
-                  label="NoData"
-                  value={caseData.raster_data.meta.nodata}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Width"
-                  value={caseData.raster_data.meta.width}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Height"
-                  value={caseData.raster_data.meta.height}
-                  icon={Info}
-                />
-                <StatCard
-                  label="Band count"
-                  value={caseData.raster_data.meta.count}
-                  icon={Bird}
-                />
-              </div>
-            </section>
-          </aside>
+          <HiddenStats caseData={caseData} metrics={metrics} />
         </div>
       </div>
     </div>
