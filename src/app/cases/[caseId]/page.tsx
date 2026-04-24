@@ -2,19 +2,34 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+
 import { useAuth } from "@/context/auth.context";
 import { caseDashboardService } from "@/services/case-dashboard.service";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import { CaseDashboardScreen } from "@/components/cases/CaseDashboardScreen";
+import { useCaseUsers } from "@/components/cases/hooks/useCaseUsers";
+import { CaseAccessManagement } from "@/components/cases/CaseAccessManagement";
 
 export default function CaseDashboardPage() {
   const params = useParams<{ caseId: string }>();
   const caseId = params.caseId;
+  const numericCaseId = Number(caseId);
+
   const { user } = useAuth();
 
   const [state, setState] = useState<CaseDashboardState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const { users, loading: usersLoading } = useCaseUsers(numericCaseId);
+
+  const myAccess = users.find((u) => u.user_id === user?.id);
+  const canManageUsers = Boolean(myAccess?.can_assign_users);
+
+  console.log("current user", user);
+  console.log("case users", users);
+  console.log("myAccess", myAccess);
+  console.log("canManageUsers", canManageUsers);
 
   async function loadState() {
     try {
@@ -69,6 +84,14 @@ export default function CaseDashboardPage() {
 
       {!loading && state && (
         <CaseDashboardScreen key={String(caseId)} state={state} />
+      )}
+
+      {!usersLoading && canManageUsers && (
+          <CaseAccessManagement
+            caseId={numericCaseId}
+            users={users}
+            onUserAdded={() => window.location.reload()}
+          />
       )}
     </div>
   );
