@@ -13,7 +13,7 @@ export interface CaseUserAccess {
 }
 
 export interface AssignCaseUserRequest {
-  user_id: string;
+  email: string;
   case_role: CaseRole;
   can_view: boolean;
   can_update: boolean;
