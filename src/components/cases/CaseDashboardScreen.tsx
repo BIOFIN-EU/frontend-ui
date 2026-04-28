@@ -335,52 +335,52 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
-            Documents
-          </p>
+      {/*<section className="grid gap-6 lg:grid-cols-[1fr_1fr]">*/}
+      {/*  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">*/}
+      {/*    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">*/}
+      {/*      Documents*/}
+      {/*    </p>*/}
 
-          <div className="mt-4 space-y-2">
-            {state.documents?.length ? (
-              state.documents.map((doc) => (
-                <div
-                  key={doc.case_document_id}
-                  className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-white/80"
-                >
-                  <p className="font-medium text-white">{doc.original_filename}</p>
-                  <p className="mt-1 text-xs text-white/50">
-                    Step: {doc.step_code} · Field: {doc.field_name}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-white/50">No documents uploaded</p>
-            )}
-          </div>
-        </div>
+      {/*    <div className="mt-4 space-y-2">*/}
+      {/*      {state.documents?.length ? (*/}
+      {/*        state.documents.map((doc) => (*/}
+      {/*          <div*/}
+      {/*            key={doc.case_document_id}*/}
+      {/*            className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-white/80"*/}
+      {/*          >*/}
+      {/*            <p className="font-medium text-white">{doc.original_filename}</p>*/}
+      {/*            <p className="mt-1 text-xs text-white/50">*/}
+      {/*              Step: {doc.step_code} · Field: {doc.field_name}*/}
+      {/*            </p>*/}
+      {/*          </div>*/}
+      {/*        ))*/}
+      {/*      ) : (*/}
+      {/*        <p className="text-sm text-white/50">No documents uploaded</p>*/}
+      {/*      )}*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
-            Workflow config
-          </p>
+      {/*  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">*/}
+      {/*    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">*/}
+      {/*      Workflow config*/}
+      {/*    </p>*/}
 
-          <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-            <p className="text-sm text-white/80">
-              <span className="font-medium text-white">Workflow code:</span>{" "}
-              {state.workflow_config.code}
-            </p>
-            <p className="mt-2 text-sm text-white/80">
-              <span className="font-medium text-white">Start step:</span>{" "}
-              {state.workflow_config.start_step}
-            </p>
-            <p className="mt-2 text-sm text-white/80">
-              <span className="font-medium text-white">Step count:</span>{" "}
-              {orderedSteps.length}
-            </p>
-          </div>
-        </div>
-      </section>
+      {/*    <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">*/}
+      {/*      <p className="text-sm text-white/80">*/}
+      {/*        <span className="font-medium text-white">Workflow code:</span>{" "}*/}
+      {/*        {state.workflow_config.code}*/}
+      {/*      </p>*/}
+      {/*      <p className="mt-2 text-sm text-white/80">*/}
+      {/*        <span className="font-medium text-white">Start step:</span>{" "}*/}
+      {/*        {state.workflow_config.start_step}*/}
+      {/*      </p>*/}
+      {/*      <p className="mt-2 text-sm text-white/80">*/}
+      {/*        <span className="font-medium text-white">Step count:</span>{" "}*/}
+      {/*        {orderedSteps.length}*/}
+      {/*      </p>*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*</section>*/}
     </div>
   );
 }
