@@ -7,7 +7,6 @@ import type {
   DashboardField,
   DashboardStep,
 } from "@/types/workflow";
-import { formatDate } from "@/lib/format";
 
 type OrderedStep = {
   code: string;
@@ -27,11 +26,7 @@ function getOrderedSteps(state: CaseDashboardState): OrderedStep[] {
     const step = workflow.steps?.[currentCode];
     if (!step) break;
 
-    ordered.push({
-      code: currentCode,
-      step,
-    });
-
+    ordered.push({ code: currentCode, step });
     currentCode = step.next;
   }
 
@@ -73,10 +68,7 @@ function getFieldValue(
 
   if (field.type === "file" && Array.isArray(state.documents)) {
     const matchingDoc = state.documents.find((doc) => {
-      return (
-        doc.field_name === field.name &&
-        doc.step_code === stepCode
-      );
+      return doc.field_name === field.name && doc.step_code === stepCode;
     });
 
     if (matchingDoc) {
@@ -110,8 +102,13 @@ function isFilled(value: unknown): boolean {
   return value !== null && value !== undefined && value !== "";
 }
 
-function isStepComplete(state: CaseDashboardState, orderedStep: OrderedStep): boolean {
-  const requiredFields = (orderedStep.step.fields || []).filter((field) => field.required);
+function isStepComplete(
+  state: CaseDashboardState,
+  orderedStep: OrderedStep
+): boolean {
+  const requiredFields = (orderedStep.step.fields || []).filter(
+    (field) => field.required
+  );
 
   if (!requiredFields.length) return true;
 
@@ -147,10 +144,7 @@ function PolygonFieldCard({
         </div>
 
         <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
-          <RiskMap
-            key={mapKey}
-            polygonWkt={polygonWkt}
-          />
+          <RiskMap key={mapKey} polygonWkt={polygonWkt} />
         </div>
       </div>
 
@@ -210,177 +204,109 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
   }
 
   const activeStepData = getStepData(state, activeStep.code);
+  const completedSteps = orderedSteps.filter((item) =>
+    isStepComplete(state, item)
+  ).length;
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
-              Case summary
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-              #{state.caseId}
-            </h1>
-          </div>
-
-          <div className="inline-flex items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-            {state.status}
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-            <p className="text-xs uppercase tracking-wider text-white/50">Case type</p>
-            <p className="mt-2 text-sm text-white/90">{state.caseType}</p>
-          </div>
-
-          <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-            <p className="text-xs uppercase tracking-wider text-white/50">Created at</p>
-            <p className="mt-2 text-sm text-white/90">{formatDate(state.createdAt)}</p>
-          </div>
-
-          <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-            <p className="text-xs uppercase tracking-wider text-white/50">Updated at</p>
-            <p className="mt-2 text-sm text-white/90">{formatDate(state.updatedAt)}</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-[0.75fr_1.25fr]">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+    <section className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md lg:sticky lg:top-24">
+        <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
             Steps
           </p>
 
-          <div className="mt-4 space-y-3">
-            {orderedSteps.map((item, index) => {
-              const active = item.code === activeStep.code;
-              const complete = isStepComplete(state, item);
-
-              return (
-                <button
-                  key={item.code}
-                  type="button"
-                  onClick={() => setActiveStepCode(item.code)}
-                  className={[
-                    "w-full rounded-xl border p-4 text-left transition",
-                    active
-                      ? "border-emerald-400/40 bg-emerald-500/10"
-                      : "border-white/10 bg-black/20 hover:bg-white/[0.06]",
-                  ].join(" ")}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
-                        Step {index + 1}
-                      </p>
-                      <p className="mt-1 text-sm font-medium text-white">
-                        {item.step.title}
-                      </p>
-                    </div>
-
-                    <div
-                      className={[
-                        "rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wider",
-                        complete
-                          ? "bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-400/25"
-                          : "bg-white/10 text-white/60 ring-1 ring-white/10",
-                      ].join(" ")}
-                    >
-                      {complete ? "Complete" : "Pending"}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          <p className="text-xs text-white/40">
+            {completedSteps}/{orderedSteps.length}
+          </p>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-            {activeStep.step.title}
-          </h2>
+        <div className="mt-4 space-y-3">
+          {orderedSteps.map((item, index) => {
+            const active = item.code === activeStep.code;
+            const complete = isStepComplete(state, item);
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {(activeStep.step.fields || []).map((field) => {
-              const value = getFieldValue(state, activeStepData, field, activeStep.code);
+            return (
+              <button
+                key={item.code}
+                type="button"
+                onClick={() => setActiveStepCode(item.code)}
+                className={[
+                  "w-full rounded-xl border p-4 text-left transition",
+                  active
+                    ? "border-emerald-400/40 bg-emerald-500/10"
+                    : "border-white/10 bg-black/20 hover:bg-white/[0.06]",
+                ].join(" ")}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
+                      Step {index + 1}
+                    </p>
 
-              if (field.name === "polygon_wkt") {
-                return (
-                  <PolygonFieldCard
-                    key={field.name}
-                    field={field}
-                    value={value}
-                    mapKey={`${state.caseId}-${activeStep.code}-${field.name}`}
-                  />
-                );
-              }
+                    <p className="mt-1 text-sm font-semibold text-white">
+                      {item.step.title}
+                    </p>
+                  </div>
 
+                  <span
+                    className={[
+                      "rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wider",
+                      complete
+                        ? "bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-400/25"
+                        : "bg-white/10 text-white/60 ring-1 ring-white/10",
+                    ].join(" ")}
+                  >
+                    {complete ? "Complete" : "Pending"}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </aside>
+
+      <div className="min-h-[360px] min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+        <h2 className="text-2xl font-semibold tracking-tight text-white">
+          {activeStep.step.title}
+        </h2>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {(activeStep.step.fields || []).map((field) => {
+            const value = getFieldValue(
+              state,
+              activeStepData,
+              field,
+              activeStep.code
+            );
+
+            if (field.name === "polygon_wkt") {
               return (
-                <StandardFieldCard
+                <PolygonFieldCard
                   key={field.name}
                   field={field}
                   value={value}
+                  mapKey={`${state.caseId}-${activeStep.code}-${field.name}`}
                 />
               );
-            })}
-          </div>
+            }
 
-          {(!activeStep.step.fields || activeStep.step.fields.length === 0) && (
-            <div className="mt-6 rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/50">
-              No fields configured for this step.
-            </div>
-          )}
+            return (
+              <StandardFieldCard
+                key={field.name}
+                field={field}
+                value={value}
+              />
+            );
+          })}
         </div>
-      </section>
 
-      {/*<section className="grid gap-6 lg:grid-cols-[1fr_1fr]">*/}
-      {/*  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">*/}
-      {/*    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">*/}
-      {/*      Documents*/}
-      {/*    </p>*/}
-
-      {/*    <div className="mt-4 space-y-2">*/}
-      {/*      {state.documents?.length ? (*/}
-      {/*        state.documents.map((doc) => (*/}
-      {/*          <div*/}
-      {/*            key={doc.case_document_id}*/}
-      {/*            className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-white/80"*/}
-      {/*          >*/}
-      {/*            <p className="font-medium text-white">{doc.original_filename}</p>*/}
-      {/*            <p className="mt-1 text-xs text-white/50">*/}
-      {/*              Step: {doc.step_code} · Field: {doc.field_name}*/}
-      {/*            </p>*/}
-      {/*          </div>*/}
-      {/*        ))*/}
-      {/*      ) : (*/}
-      {/*        <p className="text-sm text-white/50">No documents uploaded</p>*/}
-      {/*      )}*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
-
-      {/*  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">*/}
-      {/*    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">*/}
-      {/*      Workflow config*/}
-      {/*    </p>*/}
-
-      {/*    <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">*/}
-      {/*      <p className="text-sm text-white/80">*/}
-      {/*        <span className="font-medium text-white">Workflow code:</span>{" "}*/}
-      {/*        {state.workflow_config.code}*/}
-      {/*      </p>*/}
-      {/*      <p className="mt-2 text-sm text-white/80">*/}
-      {/*        <span className="font-medium text-white">Start step:</span>{" "}*/}
-      {/*        {state.workflow_config.start_step}*/}
-      {/*      </p>*/}
-      {/*      <p className="mt-2 text-sm text-white/80">*/}
-      {/*        <span className="font-medium text-white">Step count:</span>{" "}*/}
-      {/*        {orderedSteps.length}*/}
-      {/*      </p>*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
-      {/*</section>*/}
-    </div>
+        {(!activeStep.step.fields || activeStep.step.fields.length === 0) && (
+          <div className="mt-6 rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/50">
+            No fields configured for this step.
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

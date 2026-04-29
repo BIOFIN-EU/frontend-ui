@@ -48,9 +48,6 @@ export function CaseAccessManagement({
           <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
             Access
           </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-            Case access management
-          </h2>
         </div>
 
         <button
