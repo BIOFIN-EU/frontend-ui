@@ -7,6 +7,8 @@ import {
   TokenResponse,
 } from "@/lib/api";
 
+const BASE = "/api/auth";
+
 export type MeResponse = {
   id: string;
   name?: string;
@@ -14,7 +16,7 @@ export type MeResponse = {
 };
 
 export async function login(email: string, password: string) {
-  const data = await apiFetch<TokenResponse>("/api/auth/login", {
+  const data = await apiFetch<TokenResponse>(`${BASE}/login`, {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
@@ -24,20 +26,20 @@ export async function login(email: string, password: string) {
 }
 
 export async function register(email: string, password: string) {
-  return apiFetch("/api/auth/register", {
+  return apiFetch(`${BASE}/register`, {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
 }
 
 export async function me() {
-  return apiFetch<MeResponse>("/api/auth/me", {
+  return apiFetch<MeResponse>(`${BASE}/me`, {
     method: "GET",
   });
 }
 
 export async function changePassword(currentPassword: string, newPassword: string) {
-  return apiFetch("/api/auth/change-password", {
+  return apiFetch(`${BASE}/change-password`, {
     method: "POST",
     body: JSON.stringify({
       current_password: currentPassword,
@@ -51,7 +53,7 @@ export async function logout() {
 
   try {
     if (refreshToken) {
-      await apiFetch("/api/auth/logout", {
+      await apiFetch(`${BASE}/logout`, {
         method: "POST",
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
