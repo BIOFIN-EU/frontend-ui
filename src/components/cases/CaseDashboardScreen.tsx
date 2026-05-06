@@ -106,6 +106,11 @@ function isStepComplete(
   state: CaseDashboardState,
   orderedStep: OrderedStep
 ): boolean {
+  if (orderedStep.step.ui_mode === "assignment_table") {
+    const value = state[orderedStep.code];
+    return Array.isArray(value) && value.length > 0;
+  }
+
   const requiredFields = (orderedStep.step.fields || []).filter(
     (field) => field.required
   );
@@ -184,6 +189,72 @@ function StandardFieldCard({
   );
 }
 
+function getObjectLabel(value: unknown): string {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return "—";
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return String(record.name ?? record.code ?? record.id ?? "—");
+}
+
+function AssignmentTableCard({ assignments }: { assignments: unknown[] }) {
+  if (!assignments.length) {
+    return (
+      <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/50 md:col-span-2">
+        No assignments found.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 md:col-span-2">
+      {assignments.map((item, index) => {
+        const values =
+          item && typeof item === "object" && !Array.isArray(item)
+            ? Object.values(item).filter(
+                (value) =>
+                  value && typeof value === "object" && !Array.isArray(value)
+              )
+            : [];
+
+        const assignee = values[0];
+        const role = values[1];
+
+        return (
+          <div
+            key={index}
+            className="rounded-xl border border-white/10 bg-black/20 p-4"
+          >
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
+              Assignment {index + 1}
+            </p>
+
+            <div className="mt-3 grid gap-4 md:grid-cols-2">
+              <div>
+                <p className="text-sm font-medium text-white">
+                  Assigned Entity
+                </p>
+                <p className="mt-1 text-sm text-white/70">
+                  {getObjectLabel(assignee)}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-white">Role</p>
+                <p className="mt-1 text-sm text-white/70">
+                  {getObjectLabel(role)}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
   const orderedSteps = useMemo(() => getOrderedSteps(state), [state]);
   const [activeStepCode, setActiveStepCode] = useState<string>("");
@@ -207,6 +278,9 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
   const completedSteps = orderedSteps.filter((item) =>
     isStepComplete(state, item)
   ).length;
+
+  const activeStepValue = state[activeStep.code];
+  const assignments = Array.isArray(activeStepValue) ? activeStepValue : [];
 
   return (
     <section className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -272,33 +346,37 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
         </h2>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {(activeStep.step.fields || []).map((field) => {
-            const value = getFieldValue(
-              state,
-              activeStepData,
-              field,
-              activeStep.code
-            );
+          {activeStep.step.ui_mode === "assignment_table" ? (
+            <AssignmentTableCard assignments={assignments} />
+          ) : (
+            (activeStep.step.fields || []).map((field) => {
+              const value = getFieldValue(
+                state,
+                activeStepData,
+                field,
+                activeStep.code
+              );
 
-            if (field.name === "polygon_wkt") {
+              if (field.name === "polygon_wkt") {
+                return (
+                  <PolygonFieldCard
+                    key={field.name}
+                    field={field}
+                    value={value}
+                    mapKey={`${state.caseId}-${activeStep.code}-${field.name}`}
+                  />
+                );
+              }
+
               return (
-                <PolygonFieldCard
+                <StandardFieldCard
                   key={field.name}
                   field={field}
                   value={value}
-                  mapKey={`${state.caseId}-${activeStep.code}-${field.name}`}
                 />
               );
-            }
-
-            return (
-              <StandardFieldCard
-                key={field.name}
-                field={field}
-                value={value}
-              />
-            );
-          })}
+            })
+          )}
         </div>
 
         {(!activeStep.step.fields || activeStep.step.fields.length === 0) && (

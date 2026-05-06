@@ -5,6 +5,7 @@ import type { WorkflowState } from "@/types/case-dashboard";
 import { WorkflowFormStep } from "./WorkflowFormStep";
 import { WorkflowFileStep } from "./WorkflowFileStep";
 import { WorkflowMapStep } from "./WorkflowMapStep";
+import { WorkflowAssignmentStep } from "./WorkflowAssignmentStep";
 
 type Props = {
   state: WorkflowState;
@@ -77,6 +78,15 @@ export function WorkflowStepScreen({
       />
     );
   }
+
+  if (mode === "assignment_table") {
+  return (
+    <WorkflowAssignmentStep
+      state={state}
+      onStateUpdated={onStateUpdated}
+    />
+  );
+}
 
   return (
     <WorkflowFormStep
