@@ -17,6 +17,9 @@ import {
 // import RiskMap from "@/components/maps/RiskMap";
 import ManagementActionsMap from "@/components/maps/ManagementActionsMap";
 import DetailedDataPanel from "@/components/panels/DetailedDataPanel";
+import GenericPanelContent from "@/components/panels/GenericPanelContent";
+import BiodiversityLossAssessmentPanel from "@/components/panels/BiodiversityLossAssessmentPanel";
+
 
 type CaseData = {
   id: string;
@@ -362,6 +365,10 @@ const HARDCODED_CASE: CaseData = {
   }
 };
 
+const panelContentMap: Record<string, React.ComponentType<any>> = {
+  "biodiversity_loss_assessment": BiodiversityLossAssessmentPanel,
+  // All other data types will use GenericPanelContent by default
+};
 
 function getValidRasterValues(raster: number[][], nodata: number) {
   return raster.flat().filter((v) => v !== nodata);
@@ -659,6 +666,8 @@ export default function RiskModelPage() {
     setIsPanelOpen(true);
   };
 
+  // Determine which panel content to render
+  const PanelContent = panelContentMap[selectedDataType] || GenericPanelContent;
   useEffect(() => {
     setCaseData(HARDCODED_CASE);
     setPolygonWkt(HARDCODED_CASE.geometry || "");
@@ -737,12 +746,25 @@ export default function RiskModelPage() {
           onDataTypeClick={handleDataTypeClick}
         />
 
-        {/* Add the panel at the end */}
-        <DetailedDataPanel
-          isOpen={isPanelOpen}
-          onClose={() => setIsPanelOpen(false)}
+      <DetailedDataPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)}>
+
+        <PanelContent
           dataType={selectedDataType}
+          onClose={() => setIsPanelOpen(false)}
+          {...(selectedDataType === "biodiversity_loss_assessment" && {
+            riskMean: metrics.riskMean,
+            thresholds: caseData.risk_ling_thresholds,
+            caseData: {
+              risk_model: caseData.risk_model,
+              period: caseData.period,
+              risk_type: caseData.risk_type,
+              sri_logic_type: caseData.sri_logic_type,
+              sri_correction_method: caseData.sri_correction_method,
+              climate_model: caseData.climate_model,
+            }
+          })}
         />
+      </DetailedDataPanel>
       </div>
     </div>
   );
