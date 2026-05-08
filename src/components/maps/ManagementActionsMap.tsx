@@ -46,15 +46,13 @@ export default function ManagementActionsMap({
 }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<Map | null>(null);
-  const popupRef = useRef<HTMLDivElement | null>(null);
-  const overlayRef = useRef<Overlay | null>(null);
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
     const vectorSource = new VectorSource();
 
-    // Create main polygon layer (outline only) - THICKER BORDER
+    // Create main polygon layer (outline only)
     const mainPolygonLayer = new VectorLayer({
       source: vectorSource,
       style: new Style({
@@ -78,50 +76,44 @@ export default function ManagementActionsMap({
       }
     }
 
-    // Store category labels with their features for click handling
-    const categoryFeatures: Map<Feature<Geometry>, { label: string; description: string; color: string }> = new Map();
+    // Create a single vector source for all recommendation polygons
+    const recommendationSource = new VectorSource();
 
-    // Create layers for each recommendation category
-    const recommendationLayers: VectorLayer[] = [];
-
+    // Add each recommendation polygon as a feature with its metadata
     Object.entries(recommendationsPolygons).forEach(([category, wktString]) => {
       const meta = recommendationsMeta[category];
 
       if (meta && wktString) {
         try {
-          const source = new VectorSource();
           const feature = wktToFeature(wktString);
+          // Store metadata as properties on the feature
+          feature.set('label', meta.label);
+          feature.set('description', meta.description);
+          feature.set('color', meta.color);
+          feature.set('category', category);
 
-          // Store metadata with the feature
-          categoryFeatures.set(feature, {
-            label: meta.label,
-            description: meta.description,
-            color: meta.color,
-          });
-
-          source.addFeature(feature);
-
-          // Parse color from meta (e.g., "#10b981")
-          const color = meta.color;
-
-          const layer = new VectorLayer({
-            source: source,
-            style: new Style({
-              stroke: new Stroke({
-                color: color,
-                width: 2,
-              }),
-              fill: new Fill({
-                color: `${color}80`, // Add 0.5 alpha
-              }),
-            }),
-          });
-
-          recommendationLayers.push(layer);
+          recommendationSource.addFeature(feature);
         } catch (error) {
           console.error(`Error adding polygon for category ${category}:`, error);
         }
       }
+    });
+
+    // Style function that reads color from each feature
+    const recommendationLayer = new VectorLayer({
+      source: recommendationSource,
+      style: (feature) => {
+        const color = feature.get('color') || '#cccccc';
+        return new Style({
+          stroke: new Stroke({
+            color: color,
+            width: 2,
+          }),
+          fill: new Fill({
+            color: `${color}80`, // Add 0.5 alpha
+          }),
+        });
+      },
     });
 
     // Create popup overlay
@@ -138,7 +130,6 @@ export default function ManagementActionsMap({
       font-size: 14px;
       max-width: 300px;
       pointer-events: none;
-      transform: translate(-50%, -100%);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       z-index: 1000;
     `;
@@ -150,15 +141,13 @@ export default function ManagementActionsMap({
       stopEvent: false,
     });
 
-    overlayRef.current = popupOverlay;
-
-    // Create map with all layers
+    // Create map
     const map = new Map({
       target: mapRef.current,
       layers: [
         new TileLayer({ source: new OSM() }),
         mainPolygonLayer,
-        ...recommendationLayers,
+        recommendationLayer,
       ],
       view: new View({
         center: [0, 0],
@@ -168,67 +157,47 @@ export default function ManagementActionsMap({
 
     map.addOverlay(popupOverlay);
 
-    // Add click interaction to show popup
+    // Handle click events on the map
     map.on('click', (event) => {
-      let clickedFeature: Feature<Geometry> | null = null;
-      let categoryInfo: { label: string; description: string; color: string } | null = null;
+      // Check if we clicked on a feature in the recommendation layer
+      const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => {
+        return feature;
+      }, {
+        layerFilter: (layer) => layer === recommendationLayer,
+      });
 
-      // Check each recommendation layer for a hit
-      for (const layer of recommendationLayers) {
-        const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => {
-          return feature;
-        }, {
-          layerFilter: (l) => l === layer,
-        });
+      if (feature) {
+        // Get the feature's metadata
+        const label = feature.get('label');
+        const description = feature.get('description');
+        const color = feature.get('color');
 
-        if (feature) {
-          clickedFeature = feature as Feature<Geometry>;
-          categoryInfo = categoryFeatures.get(clickedFeature) || null;
-          break;
-        }
-      }
-
-      if (clickedFeature && categoryInfo) {
-        // Show popup with category info
-        const coordinate = event.coordinate;
-        popupOverlay.setPosition(coordinate);
-
-        // Create styled popup content
+        // Set popup content
         popupElement.innerHTML = `
           <div style="display: flex; flex-direction: column; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 12px; height: 12px; border-radius: 3px; background-color: ${categoryInfo.color}; border: 1px solid rgba(255,255,255,0.3);"></div>
-              <strong style="font-size: 16px; color: white;">${categoryInfo.label}</strong>
+              <div style="width: 12px; height: 12px; border-radius: 3px; background-color: ${color}; border: 1px solid rgba(255,255,255,0.3);"></div>
+              <strong style="font-size: 16px; color: white;">${label}</strong>
             </div>
             <div style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.4;">
-              ${categoryInfo.description}
+              ${description}
             </div>
           </div>
         `;
-        popupElement.style.display = 'block';
+
+        // Position the popup at the click location
+        popupOverlay.setPosition(event.coordinate);
       } else {
-        // Hide popup if clicking outside
+        // Hide popup if clicking outside any feature
         popupOverlay.setPosition(undefined);
-        popupElement.style.display = 'none';
       }
     });
 
-    // Optional: Add hover effect to change cursor
+    // Change cursor on hover over clickable features
     map.on('pointermove', (event) => {
-      let hasFeature = false;
-      for (const layer of recommendationLayers) {
-        const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => {
-          return feature;
-        }, {
-          layerFilter: (l) => l === layer,
-        });
-
-        if (feature) {
-          hasFeature = true;
-          break;
-        }
-      }
-
+      const hasFeature = map.hasFeatureAtPixel(event.pixel, {
+        layerFilter: (layer) => layer === recommendationLayer,
+      });
       const targetElement = map.getTargetElement();
       if (targetElement) {
         targetElement.style.cursor = hasFeature ? 'pointer' : '';
@@ -236,22 +205,8 @@ export default function ManagementActionsMap({
     });
 
     // Fit view to show all polygons
-    const allFeatures: Feature<Geometry>[] = [];
+    const allFeatures = [...vectorSource.getFeatures(), ...recommendationSource.getFeatures()];
 
-    // Collect main polygon feature
-    if (vectorSource.getFeatures().length > 0) {
-      allFeatures.push(...vectorSource.getFeatures());
-    }
-
-    // Collect recommendation features
-    recommendationLayers.forEach(layer => {
-      const source = layer.getSource();
-      if (source) {
-        allFeatures.push(...source.getFeatures());
-      }
-    });
-
-    // Fit view to show all features
     if (allFeatures.length > 0) {
       const extent = allFeatures.reduce((ext, feature) => {
         const geom = feature.getGeometry();
