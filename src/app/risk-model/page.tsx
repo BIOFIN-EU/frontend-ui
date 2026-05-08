@@ -206,7 +206,7 @@ const HARDCODED_CASE: CaseData = {
       "28": "IF (ch[likely] AND pa[protected]) AND si[medium-low] THEN risk[high]",
       "29": "IF (ch[likely] AND pa[protected]) AND si[low] THEN risk[high]",
     },
-    xai_humam_text: [],
+    xai_humam_text: ["IF it is Not a Protected Area AND Critical Habitat is 'Unknown' AND Species Richness is 'High' THEN Risk is 'Low'"],
   },
   risk_ling_thresholds: {
     low: 0.09285714285714287,
@@ -682,7 +682,7 @@ export default function RiskModelPage() {
       <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
         <header className="space-y-4">
           <div className="inline-flex items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-            Biodiversity risk model
+            BioFIN's Management Activities Recomendations
           </div>
 
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
