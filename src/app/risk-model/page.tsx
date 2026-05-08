@@ -307,7 +307,7 @@ const HARDCODED_CASE: CaseData = {
   recommendations_data: {
     raster: [
       [-9999.0, -9999.0, -9999.0, -9999.0, 1.0, 1.0],
-      [-9999.0, -9999.0, -9999.0, -9999.0, 2.0, 2.0],
+      [-9999.0, -9999.0, -9999.0, -9999.0, 5.0, 5.0],
       [-9999.0, -9999.0, -9999.0, -9999.0, 1.0, 3.0],
     ],
     summary_stats: {
@@ -339,28 +339,46 @@ const HARDCODED_CASE: CaseData = {
   },
   recommendations_polygons: {
       "1": "POLYGON((4.598488763140015 52.39690261469849,4.59894780280675 52.387830068910404,4.609625654246968 52.382524758083576,4.6129675938634565 52.40769458650479,4.598488763140015 52.39690261469849))",
-    "2": "POLYGON((4.609625654246968 52.382524758083576,4.625964631458413 52.38533788137002,4.620552651919607 52.39626555579616,4.6129675938634565 52.40769458650479,4.609625654246968 52.382524758083576))",
-     "3": "POLYGON((4.580779754239136 52.3998410255806,4.587427106562764 52.39102720425177,4.598488763140015 52.39690261469849,4.6129675938634565 52.40769458650479,4.590386331397723 52.40737630257422,4.580779754239136 52.3998410255806))"
+      "3": "POLYGON((4.580779754239136 52.3998410255806,4.587427106562764 52.39102720425177,4.598488763140015 52.39690261469849,4.6129675938634565 52.40769458650479,4.590386331397723 52.40737630257422,4.580779754239136 52.3998410255806))",
+      "5": "POLYGON((4.609625654246968 52.382524758083576,4.625964631458413 52.38533788137002,4.620552651919607 52.39626555579616,4.6129675938634565 52.40769458650479,4.609625654246968 52.382524758083576))"
   },
   recommendations_summary: {
     recommendations_meta: {
       "1": {
-        label: "Active Restoration (AR)",
-        description: "Interventions to accelerate ecosystem recovery and enhance biodiversity outcomes",
-        color: "#10b981",
-        examples: "Reforestation, replantation of native species, wetland restoration, invasive species removal"
+        label: "Active Protection Zones I (AP I)",
+        description: "Region with high resilience and high risk. Highest priority for active protection due to elevated risk levels. The habitats are relatively intact, but face high risk of degradation from anthropogenic activities.",
+        color: "#0b351bff", // dark green
+        examples: "Urgent adaptive management, designating natural reserves, establishing monitoring networks, wildlife conservation institutes, immediate threat mitigation"
       },
       "2": {
-        label: "Passive Protection (PP)",
-        description: "Measures to safeguard existing habitats and prevent further degradation",
-        color: "#3b82f6",
-        examples: "Establish conservation easements, implement land-use policies, create buffer zones, prevent urban encroachment"
+        label: "Active Protection Zones II (AP II)",
+        description: "Region with high resilience and medium risk. Active protection with proactive management measures to mitigate human stressors on habitats and species.",
+        color: "#0cc02aff", // green
+        examples: "Preventive conservation measures, wildlife corridor establishment, habitat connectivity enhancement, governance strategies for targeted species"
       },
       "3": {
-        label: "Sustainable Management (SM)",
-        description: "Balanced approaches integrating conservation with sustainable resource use",
-        color: "#f59e0b",
-        examples: "Sustainable harvesting quotas, certified logging practices, eco-tourism programs, community-based conservation"
+        label: "Passive Protection Zones (PP)",
+        description: "Region with high resilience and low risk. Due to intact habitat structures and low disturbance risk, minimal intervention is required. Focus on preventing potential anthropogenic impacts.",
+        color: "#86efac", // light green
+        examples: "Ecological Conservation Red Line policies, land-use restrictions, buffer zone maintenance, monitoring of encroachment risks"
+      },
+      "4": {
+        label: "Active Restoration Zones I (AR I)",
+        description: "Region with medium resilience and high risk. Prioritizes assisted and reconstructive restoration with intensive management to mitigate risks and improve biodiversity outcomes.",
+        color: "#eab308", // yellow
+        examples: "Tree planting on degraded farmland, soil and water conservation, fertilization, assisted natural regeneration"
+      },
+      "5": {
+        label: "Active Restoration Zones II (AR II)",
+        description: "Region with medium resilience and medium risk. Restoration measures with focus on overcoming specific obstacles to achieve restoration goals.",
+        color: "#f97316", // orange
+        examples: "Reforestation of native species, invasive species removal, habitat structure enhancement, ecological restoration planning"
+      },
+      "6": {
+        label: "Passive Restoration Zones (PR)",
+        description: "Region with medium resilience and low risk. Remnant forest patches facilitate natural recovery. Employ natural restoration strategies in low-disturbance environments.",
+        color: "#dc2626", // red
+        examples: "Preventing grazing, abandoned cropland natural recovery, grazing exclusion, spontaneous regeneration monitoring"
       }
     }
   }
