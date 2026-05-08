@@ -19,6 +19,7 @@ import ManagementActionsMap from "@/components/maps/ManagementActionsMap";
 import DetailedDataPanel from "@/components/panels/DetailedDataPanel";
 import GenericPanelContent from "@/components/panels/GenericPanelContent";
 import BiodiversityLossAssessmentPanel from "@/components/panels/BiodiversityLossAssessmentPanel";
+import SpeciesRichnessPanel from "@/components/panels/SpeciesRichnessPanel";
 
 
 type CaseData = {
@@ -367,6 +368,7 @@ const HARDCODED_CASE: CaseData = {
 
 const panelContentMap: Record<string, React.ComponentType<any>> = {
   "biodiversity_loss_assessment": BiodiversityLossAssessmentPanel,
+  "species_richness_metrics": SpeciesRichnessPanel,
   // All other data types will use GenericPanelContent by default
 };
 
@@ -746,25 +748,34 @@ export default function RiskModelPage() {
           onDataTypeClick={handleDataTypeClick}
         />
 
-      <DetailedDataPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)}>
-
-        <PanelContent
-          dataType={selectedDataType}
-          onClose={() => setIsPanelOpen(false)}
-          {...(selectedDataType === "biodiversity_loss_assessment" && {
-            riskMean: metrics.riskMean,
-            thresholds: caseData.risk_ling_thresholds,
-            caseData: {
-              risk_model: caseData.risk_model,
-              period: caseData.period,
-              risk_type: caseData.risk_type,
-              sri_logic_type: caseData.sri_logic_type,
-              sri_correction_method: caseData.sri_correction_method,
-              climate_model: caseData.climate_model,
-            }
-          })}
-        />
-      </DetailedDataPanel>
+        <DetailedDataPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)}>
+          <PanelContent
+            dataType={selectedDataType}
+            onClose={() => setIsPanelOpen(false)}
+            {...(selectedDataType === "biodiversity_loss_assessment" && {
+              riskMean: metrics.riskMean,
+              thresholds: caseData.risk_ling_thresholds,
+              caseData: {
+                risk_model: caseData.risk_model,
+                period: caseData.period,
+                risk_type: caseData.risk_type,
+                sri_logic_type: caseData.sri_logic_type,
+                sri_correction_method: caseData.sri_correction_method,
+                climate_model: caseData.climate_model,
+              }
+            })}
+            {...(selectedDataType === "species_richness_metrics" && {
+              caseData: {
+                sri_logic_type: caseData.sri_logic_type,
+                sri_correction_method: caseData.sri_correction_method,
+                sri: caseData.sri,
+                sri_species_list: caseData.sri_species_list,
+                country_code: caseData.country_code,
+              },
+              species: metrics.species,
+            })}
+          />
+        </DetailedDataPanel>
       </div>
     </div>
   );
