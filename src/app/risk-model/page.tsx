@@ -468,17 +468,6 @@ function StatCard({
   );
 }
 
-// Commented out for now - will be used in the future
-// function ThresholdScale({
-//   value,
-//   thresholds,
-// }: {
-//   value: number;
-//   thresholds: Record<string, number>;
-// }) {
-//   // ... existing code ...
-// }
-
 function RecommendationsPanel({
   caseData,
   metrics,
@@ -644,17 +633,6 @@ function DetailedExplanation({
     </section>
   );
 }
-
-// Commented out for now - will be used in the future
-// function HiddenStats({
-//   caseData,
-//   metrics,
-// }: {
-//   caseData: CaseData;
-//   metrics: ReturnType<typeof buildMetricsFromCase>;
-// }) {
-//   // ... existing code ...
-// }
 
 export default function RiskModelPage() {
   const [caseData, setCaseData] = useState<CaseData | null>(null);
