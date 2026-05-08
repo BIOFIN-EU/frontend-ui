@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 // import RiskMap from "@/components/maps/RiskMap";
 import ManagementActionsMap from "@/components/maps/ManagementActionsMap";
+import DetailedDataPanel from "@/components/panels/DetailedDataPanel";
 
 type CaseData = {
   id: string;
@@ -361,6 +362,7 @@ const HARDCODED_CASE: CaseData = {
   }
 };
 
+
 function getValidRasterValues(raster: number[][], nodata: number) {
   return raster.flat().filter((v) => v !== nodata);
 }
@@ -558,7 +560,13 @@ function RecommendationsPanel({
     </section>
   );
 }
-function DetailedExplanation({ caseData }: { caseData: CaseData }) {
+function DetailedExplanation({
+  caseData,
+  onDataTypeClick
+}: {
+  caseData: CaseData;
+  onDataTypeClick: (dataType: string) => void;
+}) {
   const explanationBlocks = caseData.xai_summary.xai_humam_text.detailed_explanation;
 
   const renderBlock = (block: ExplanationBlock, blockIndex: number) => {
@@ -578,13 +586,13 @@ function DetailedExplanation({ caseData }: { caseData: CaseData }) {
           }
           newResult.push(parts[i]);
           newResult.push(
-            <a
+            <button
               key={`${blockIndex}-${key}-${i}`}
-              href={`/#${value.data_type}`}
-              className="text-emerald-400 hover:text-emerald-300 underline transition-colors"
+              onClick={() => onDataTypeClick(value.data_type)}
+              className="text-emerald-400 hover:text-emerald-300 underline transition-colors cursor-pointer"
             >
               <strong className="text-emerald-300">{value.text}</strong>
-            </a>
+            </button>
           );
         }
         result = newResult;
@@ -642,6 +650,14 @@ function DetailedExplanation({ caseData }: { caseData: CaseData }) {
 export default function RiskModelPage() {
   const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [polygonWkt, setPolygonWkt] = useState("");
+
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [selectedDataType, setSelectedDataType] = useState("");
+
+  const handleDataTypeClick = (dataType: string) => {
+    setSelectedDataType(dataType);
+    setIsPanelOpen(true);
+  };
 
   useEffect(() => {
     setCaseData(HARDCODED_CASE);
@@ -715,7 +731,18 @@ export default function RiskModelPage() {
           <RecommendationsPanel caseData={caseData} metrics={metrics} />
         </div>
 
-        <DetailedExplanation caseData={caseData} />
+        {/* Update this line */}
+        <DetailedExplanation
+          caseData={caseData}
+          onDataTypeClick={handleDataTypeClick}
+        />
+
+        {/* Add the panel at the end */}
+        <DetailedDataPanel
+          isOpen={isPanelOpen}
+          onClose={() => setIsPanelOpen(false)}
+          dataType={selectedDataType}
+        />
       </div>
     </div>
   );
