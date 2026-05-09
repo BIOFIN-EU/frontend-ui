@@ -238,7 +238,7 @@ const HARDCODED_CASE: CaseData = {
     xai_humam_text: {
       "detailed_explanation": [
         {
-          "template": "This region qualifies as a {{protected_area}} with {{critical_habitat}} status and exhibits a {{species_richness}}. These characteristics collectively indicate a {{biodiversity_loss}}.",
+          "template": "This region contains a {{protected_area}} with {{critical_habitat}} status and exhibits a {{species_richness}}. These characteristics collectively indicate a {{biodiversity_loss}}.",
           "placeholders": {
             "protected_area": {
               "text": "Protected Area",
@@ -339,21 +339,21 @@ const HARDCODED_CASE: CaseData = {
   },
   recommendations_polygons: {
       "1": "POLYGON((4.598488763140015 52.39690261469849,4.59894780280675 52.387830068910404,4.609625654246968 52.382524758083576,4.6129675938634565 52.40769458650479,4.598488763140015 52.39690261469849))",
-      "3": "POLYGON((4.580779754239136 52.3998410255806,4.587427106562764 52.39102720425177,4.598488763140015 52.39690261469849,4.6129675938634565 52.40769458650479,4.590386331397723 52.40737630257422,4.580779754239136 52.3998410255806))",
-      "5": "POLYGON((4.609625654246968 52.382524758083576,4.625964631458413 52.38533788137002,4.620552651919607 52.39626555579616,4.6129675938634565 52.40769458650479,4.609625654246968 52.382524758083576))"
+      "5": "POLYGON((4.580779754239136 52.3998410255806,4.587427106562764 52.39102720425177,4.598488763140015 52.39690261469849,4.6129675938634565 52.40769458650479,4.590386331397723 52.40737630257422,4.580779754239136 52.3998410255806))",
+      "3": "POLYGON((4.609625654246968 52.382524758083576,4.625964631458413 52.38533788137002,4.620552651919607 52.39626555579616,4.6129675938634565 52.40769458650479,4.609625654246968 52.382524758083576))"
   },
   recommendations_summary: {
     recommendations_meta: {
       "1": {
         label: "Active Protection Zones I (AP I)",
         description: "Region with high resilience and high risk. Highest priority for active protection due to elevated risk levels. The habitats are relatively intact, but face high risk of degradation from anthropogenic activities.",
-        color: "#0b351bff", // dark green
+        color: "#135d18", // dark green
         examples: "Urgent adaptive management, designating natural reserves, establishing monitoring networks, wildlife conservation institutes, immediate threat mitigation"
       },
       "2": {
         label: "Active Protection Zones II (AP II)",
         description: "Region with high resilience and medium risk. Active protection with proactive management measures to mitigate human stressors on habitats and species.",
-        color: "#0cc02aff", // green
+        color: "#0cc02a", // green
         examples: "Preventive conservation measures, wildlife corridor establishment, habitat connectivity enhancement, governance strategies for targeted species"
       },
       "3": {

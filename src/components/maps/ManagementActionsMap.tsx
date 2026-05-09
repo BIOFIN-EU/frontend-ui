@@ -169,7 +169,7 @@ export default function ManagementActionsMap({
       if (feature) {
         // Get the feature's metadata
         const label = feature.get('label');
-        const description = feature.get('description');
+        // const description = feature.get('description');
         const color = feature.get('color');
 
         // Set popup content
@@ -178,9 +178,6 @@ export default function ManagementActionsMap({
             <div style="display: flex; align-items: center; gap: 8px;">
               <div style="width: 12px; height: 12px; border-radius: 3px; background-color: ${color}; border: 1px solid rgba(255,255,255,0.3);"></div>
               <strong style="font-size: 16px; color: white;">${label}</strong>
-            </div>
-            <div style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.4;">
-              ${description}
             </div>
           </div>
         `;
