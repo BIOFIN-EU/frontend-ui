@@ -20,6 +20,7 @@ import DetailedDataPanel from "@/components/panels/DetailedDataPanel";
 import GenericPanelContent from "@/components/panels/GenericPanelContent";
 import BiodiversityLossAssessmentPanel from "@/components/panels/BiodiversityLossAssessmentPanel";
 import SpeciesRichnessPanel from "@/components/panels/SpeciesRichnessPanel";
+import ClimateResiliencePanel from "@/components/panels/ClimateResiliencePanel";
 
 
 type CaseData = {
@@ -304,6 +305,39 @@ const HARDCODED_CASE: CaseData = {
   },
   sri_species_list:
     "Accipiter nisus,Aegithalos caudatus,Anthus trivialis,Buteo buteo,Certhia brachydactyla,Coccothraustes coccothraustes,Dendrocopos major,Dendrocopos minor,Garrulus glandarius,Lullula arborea,Luscinia megarhynchos,Oriolus oriolus,Periparus ater,Phoenicurus phoenicurus,Picus viridis,Regulus regulus,Streptopelia turtur,Sylvia borin",
+  resiliency_data: {
+    raster: [
+      [-9999.0, -9999.0, -9999.0, -9999.0, 0.1, 1.0],
+      [-9999.0, -9999.0, -9999.0, -9999.0, 0.5, 0.5],
+      [-9999.0, -9999.0, -9999.0, -9999.0, 0.1,0.75],
+    ],
+    summary_stats: {
+      mean_raster_value: 0.5,
+      std_raster_value: 0.7071067811865476,
+    },
+    meta: {
+      driver: "GTiff",
+      dtype: "float32",
+      nodata: -9999.0,
+      width: 6,
+      height: 3,
+      count: 1,
+      crs: 'GEOGCS["WGS 84"...]',
+      transform: [
+        0.008983152841195215,
+        0.0,
+        4.572424796168365,
+        0.0,
+        -0.008983152841195215,
+        52.40771367553288,
+        0.0,
+        0.0,
+        1.0,
+      ],
+      compress: "DEFLATE",
+      predictor: 3,
+    }
+  },
   recommendations_data: {
     raster: [
       [-9999.0, -9999.0, -9999.0, -9999.0, 1.0, 1.0],
@@ -337,6 +371,16 @@ const HARDCODED_CASE: CaseData = {
       predictor: 3,
     }
   },
+  resiliency_summary: {
+    climate_scenario: "ssp585",
+    climate_model: "EC-Earth3-Veg",
+    periods: ["current", "2040", "2060"],
+    sri_logic_type: "fuzzy",
+    sri_correction_method: "HFI",
+    // current sri, fut2040,
+    sri_list: ["/api/v1/sri/get/630e8f43-35e5-403e-9dc4-430f52114f0c/", "/api/v1/sri/get/630e8f43-35e5-403e-9dc4-430f52114f0d/", "/api/v1/sri/get/630e8f43-35e5-403e-9dc4-430f52114f0e/"],
+
+  },
   recommendations_polygons: {
       "1": "POLYGON((4.598488763140015 52.39690261469849,4.59894780280675 52.387830068910404,4.609625654246968 52.382524758083576,4.6129675938634565 52.40769458650479,4.598488763140015 52.39690261469849))",
       "5": "POLYGON((4.580779754239136 52.3998410255806,4.587427106562764 52.39102720425177,4.598488763140015 52.39690261469849,4.6129675938634565 52.40769458650479,4.590386331397723 52.40737630257422,4.580779754239136 52.3998410255806))",
@@ -346,36 +390,42 @@ const HARDCODED_CASE: CaseData = {
     recommendations_meta: {
       "1": {
         label: "Active Protection Zones I (AP I)",
+        label_short: "AP I",
         description: "Region with high resilience and high risk. Highest priority for active protection due to elevated risk levels. The habitats are relatively intact, but face high risk of degradation from anthropogenic activities.",
         color: "#135d18", // dark green
         examples: "Urgent adaptive management, designating natural reserves, establishing monitoring networks, wildlife conservation institutes, immediate threat mitigation"
       },
       "2": {
         label: "Active Protection Zones II (AP II)",
+        label_short: "AP II",
         description: "Region with high resilience and medium risk. Active protection with proactive management measures to mitigate human stressors on habitats and species.",
         color: "#0cc02a", // green
         examples: "Preventive conservation measures, wildlife corridor establishment, habitat connectivity enhancement, governance strategies for targeted species"
       },
       "3": {
         label: "Passive Protection Zones (PP)",
+        label_short: "PP",
         description: "Region with high resilience and low risk. Due to intact habitat structures and low disturbance risk, minimal intervention is required. Focus on preventing potential anthropogenic impacts.",
         color: "#86efac", // light green
         examples: "Ecological Conservation Red Line policies, land-use restrictions, buffer zone maintenance, monitoring of encroachment risks"
       },
       "4": {
         label: "Active Restoration Zones I (AR I)",
+        label_short: "AR I",
         description: "Region with medium resilience and high risk. Prioritizes assisted and reconstructive restoration with intensive management to mitigate risks and improve biodiversity outcomes.",
         color: "#eab308", // yellow
         examples: "Tree planting on degraded farmland, soil and water conservation, fertilization, assisted natural regeneration"
       },
       "5": {
         label: "Active Restoration Zones II (AR II)",
+        label_short: "AR II",
         description: "Region with medium resilience and medium risk. Restoration measures with focus on overcoming specific obstacles to achieve restoration goals.",
         color: "#f97316", // orange
         examples: "Reforestation of native species, invasive species removal, habitat structure enhancement, ecological restoration planning"
       },
       "6": {
         label: "Passive Restoration Zones (PR)",
+        label_short: "PR",
         description: "Region with medium resilience and low risk. Remnant forest patches facilitate natural recovery. Employ natural restoration strategies in low-disturbance environments.",
         color: "#dc2626", // red
         examples: "Preventing grazing, abandoned cropland natural recovery, grazing exclusion, spontaneous regeneration monitoring"
@@ -387,6 +437,7 @@ const HARDCODED_CASE: CaseData = {
 const panelContentMap: Record<string, React.ComponentType<any>> = {
   "biodiversity_loss_assessment": BiodiversityLossAssessmentPanel,
   "species_richness_metrics": SpeciesRichnessPanel,
+  "climate_resilience_metrics": ClimateResiliencePanel,
   // All other data types will use GenericPanelContent by default
 };
 
@@ -769,6 +820,15 @@ export default function RiskModelPage() {
                 country_code: caseData.country_code,
               },
               species: metrics.species,
+            })}
+            {...(selectedDataType === "climate_resilience_metrics" && {
+              caseData: {
+                climate_model: caseData.climate_model,
+                climate_scenario: caseData.climate_scenario,
+                period: caseData.period,
+                country_code: caseData.country_code,
+              },
+              recommendationsMeta: caseData.recommendations_summary?.recommendations_meta
             })}
           />
         </DetailedDataPanel>
