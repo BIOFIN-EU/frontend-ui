@@ -1,6 +1,6 @@
 // components/panels/ClimateResiliencePanel.tsx
 import React from "react";
-import { X, Thermometer, BookOpen, Link as LinkIcon, Calendar, TrendingUp } from "lucide-react";
+import { X, Thermometer, BookOpen, Link as LinkIcon, Calendar, TrendingUp, Activity, BarChart3 } from "lucide-react";
 
 interface ClimateResiliencePanelProps {
   dataType: string;
@@ -13,10 +13,22 @@ interface ClimateResiliencePanelProps {
   };
   recommendationsMeta?: Record<string, {
     label: string;
+    label_short: string;
     description: string;
     color: string;
     examples: string;
   }>;
+  biodiversityRiskData?: {
+    mean_raster_value: number;
+    std_raster_value: number;
+  };
+  resiliencyData?: {
+    mean_raster_value: number;
+    std_raster_value: number;
+    climate_scenario?: string;
+    climate_model?: string;
+    periods?: string[];
+  };
 }
 
 export default function ClimateResiliencePanel({
@@ -24,6 +36,8 @@ export default function ClimateResiliencePanel({
   onClose,
   caseData,
   recommendationsMeta,
+  biodiversityRiskData,
+  resiliencyData,
 }: ClimateResiliencePanelProps) {
   // 5x5 Matrix: Climate Resiliency (rows) vs Biodiversity Risk (columns)
   const matrix = [
@@ -39,48 +53,62 @@ export default function ClimateResiliencePanel({
     ["Low Priority", "Low Priority", "Low Priority", "Low Priority", "Low Priority"]
   ];
 
-
   const riskLevels = ["high", "medium-high", "medium", "medium-low", "low"];
-  const resiliencyLevels =  ["high", "medium-high", "medium", "medium-low", "low"];
+  const resiliencyLevels = ["high", "medium-high", "medium", "medium-low", "low"];
 
-const getCellColor = (value: string) => {
-  if (value === "Low Priority") {
-    return "bg-gray-700 text-white/50";
-  }
+    const getCellColor = (value: string) => {
+    if (value === "Low Priority") {
+        const meta = Object.values(recommendationsMeta || {}).find(m => m.label_short === "Low Priority");
+        if (meta) {
+        return `bg-[${meta.color}] text-white/50`;
+        }
+        return "bg-gray-700 text-white/50";
+    }
 
-  // Find metadata by matching label_short
-  const meta = Object.values(recommendationsMeta || {}).find(m => m.label_short === value);
+    // Find metadata by matching label_short
+    const meta = Object.values(recommendationsMeta || {}).find(m => m.label_short === value);
 
-  if (!meta) return "bg-gray-800 text-white";
+    if (!meta) return "bg-gray-800 text-white";
 
-  // Return appropriate classes based on the color
-  // Map the color values to Tailwind classes
-  switch (meta.color) {
-    case "#135d18": // AP I
-      return "bg-[#135d18] text-white";
-    case "#0cc02a": // AP II
-      return "bg-[#0cc02a] text-white";
-    case "#86efac": // PP
-      return "bg-[#86efac] text-gray-900";
-    case "#eab308": // AR I
-      return "bg-[#eab308] text-gray-900";
-    case "#f97316": // AR II
-      return "bg-[#f97316] text-white";
-    case "#dc2626": // PR
-      return "bg-[#dc2626] text-white";
-    default:
-      return "bg-gray-800 text-white";
-  }
-};
+    // Use inline style or switch statement
+    return `bg-[${meta.color}] text-white`;
+    };
 
-const getActionDescription = (value: string) => {
-  if (value === "Low Priority") {
-    return "Low Priority - No immediate action required";
-  }
+  const getActionDescription = (value: string) => {
+    if (value === "Low Priority") {
+      return "Low Priority - No immediate action required";
+    }
 
-  const meta = Object.values(recommendationsMeta || {}).find(m => m.label_short === value);
-  return meta?.label ?? value;
-};
+    const meta = Object.values(recommendationsMeta || {}).find(m => m.label_short === value);
+    return meta?.label ?? value;
+  };
+
+  // Format mean value for display
+  const formatMeanValue = (value: number | undefined) => {
+    if (value === undefined || value === -1) return "N/A";
+    return value.toFixed(3);
+  };
+
+  // Get risk level description based on mean value
+  const getRiskLevel = (meanValue: number | undefined) => {
+    if (meanValue === undefined) return "Unknown";
+    if (meanValue <= 0.0929) return "Low";
+    if (meanValue <= 0.25) return "Medium-Low";
+    if (meanValue <= 0.5) return "Medium";
+    if (meanValue <= 0.75) return "Medium-High";
+    return "High";
+  };
+
+  // Get resiliency level description based on mean value
+  const getResiliencyLevel = (meanValue: number | undefined) => {
+    if (meanValue === undefined) return "Unknown";
+    // Assuming resiliency values are on a similar scale (0-1)
+    // Lower values might indicate lower resilience? Adjust based on your actual scale
+    if (meanValue >= 0.75) return "High";
+    if (meanValue >= 0.5) return "Medium";
+    if (meanValue >= 0.25) return "Low";
+    return "Very Low";
+  };
 
   return (
     <>
@@ -120,29 +148,172 @@ const getActionDescription = (value: string) => {
           </p>
         </div>
 
+        {/* Management Priority Framework - 5x5 Matrix */}
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+        <h3 className="text-lg font-semibold text-emerald-200 mb-4">
+            Management Priority Framework
+        </h3>
+        <p className="text-sm text-white/60 mb-4">
+            Decision matrix combining Climate Resiliency (vertical axis) vs Biodiversity Risk (horizontal axis):
+        </p>
+
+        <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+            {/* Header row */}
+            <thead>
+                <tr>
+                <th className="p-2 text-left text-white/60 font-medium bg-black/40 rounded-tl-xl border border-white/20">
+                    Climate Resiliency ↓ / Biodiversity Risk →
+                </th>
+                {riskLevels.map((risk) => (
+                    <th key={risk} className="p-2 text-center text-white/60 font-medium bg-black/40 border border-white/20">
+                    {risk.charAt(0).toUpperCase() + risk.slice(1)}
+                    </th>
+                ))}
+                </tr>
+            </thead>
+            <tbody>
+                {resiliencyLevels.map((resiliency, rowIndex) => (
+                <tr key={resiliency}>
+                    <td className="p-2 font-medium text-white/80 bg-black/30 border border-white/20">
+                    {resiliency.charAt(0).toUpperCase() + resiliency.slice(1)}
+                    </td>
+                    {matrix[rowIndex].map((value, colIndex) => (
+                    <td
+                        key={`${rowIndex}-${colIndex}`}
+                        className={`p-2 text-center border border-white/20 ${getCellColor(value)}`}
+                        title={getActionDescription(value)}
+                    >
+                        {value}
+                    </td>
+                    ))}
+                </tr>
+                ))}
+            </tbody>
+            </table>
+        </div>
+
+          {/* Legend */}
+          <div className="mt-6 pt-4 border-t border-white/10">
+            <h4 className="text-sm font-semibold text-white/70 mb-3">Legend</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+              {Object.entries(recommendationsMeta || {})
+                .sort(([a], [b]) => Number(a) - Number(b))
+                .map(([key, meta]) => (
+                  <div key={key} className="flex items-center gap-2 group relative">
+                    <div
+                      className="w-4 h-4 rounded"
+                      style={{ backgroundColor: meta.color }}
+                    />
+                    <span
+                      className="text-white/60 cursor-help"
+                      title={`${meta.description}\n\nExamples: ${meta.examples}`}
+                    >
+                      {meta.label_short || meta.label}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Key Metrics Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Biodiversity Risk Metric */}
+          <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-red-950/20 to-black/20 p-5 ring-1 ring-white/5">
+            <div className="flex items-center gap-2 mb-3">
+              <Activity className="h-5 w-5 text-red-400" />
+              <h3 className="text-lg font-semibold text-red-200">
+                Biodiversity Risk
+              </h3>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-white/45">Mean Risk Value</p>
+                <p className="text-2xl font-bold text-white">
+                  {formatMeanValue(biodiversityRiskData?.mean_raster_value)}
+                </p>
+                <p className="text-xs text-white/40 mt-1">
+                  Std Dev: {formatMeanValue(biodiversityRiskData?.std_raster_value)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Climate Resiliency Metric */}
+          <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-950/20 to-black/20 p-5 ring-1 ring-white/5">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="h-5 w-5 text-emerald-400" />
+              <h3 className="text-lg font-semibold text-emerald-200">
+                Climate Resiliency
+              </h3>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-white/45">Mean Resiliency Value</p>
+                <p className="text-2xl font-bold text-white">
+                  {formatMeanValue(resiliencyData?.mean_raster_value)}
+                </p>
+                <p className="text-xs text-white/40 mt-1">
+                  Std Dev: {formatMeanValue(resiliencyData?.std_raster_value)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Model Configuration */}
         <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
           <h3 className="text-lg font-semibold text-emerald-200 mb-3">
             Model Configuration
           </h3>
-          <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="grid grid-cols-2 gap-3 text-sm mb-4">
             <div>
               <p className="text-xs text-white/45">Climate Model</p>
-              <p className="text-white/80 font-medium">{caseData?.climate_model ?? "current"}</p>
+              <p className="text-white/80 font-medium">
+                {resiliencyData?.climate_model ?? caseData?.climate_model ?? "current"}
+              </p>
             </div>
             <div>
               <p className="text-xs text-white/45">Climate Scenario</p>
-              <p className="text-white/80 font-medium">{caseData?.climate_scenario ?? "SSP585 (worst-case)"}</p>
+              <p className="text-white/80 font-medium">
+                {resiliencyData?.climate_scenario
+                  ? resiliencyData.climate_scenario.toUpperCase()
+                  : (caseData?.climate_scenario ?? "SSP585 (worst-case)")}
+              </p>
             </div>
             <div>
               <p className="text-xs text-white/45">Time Period</p>
-              <p className="text-white/80 font-medium">{caseData?.period ?? "current"}</p>
+              <p className="text-white/80 font-medium">
+                {resiliencyData?.periods
+                  ? resiliencyData.periods.join(" → ")
+                  : (caseData?.period ?? "current")}
+              </p>
             </div>
             <div>
               <p className="text-xs text-white/45">Country Code</p>
               <p className="text-white/80 font-medium">{caseData?.country_code ?? "NL"}</p>
             </div>
           </div>
+
+          {/* Additional Resiliency Parameters */}
+          {resiliencyData && (resiliencyData.climate_scenario || resiliencyData.climate_model) && (
+            <div className="mt-3 pt-3 border-t border-white/10">
+              <p className="text-xs text-white/45 mb-2">Resiliency SRI Parameters</p>
+              <div className="flex flex-wrap gap-2">
+                {resiliencyData.sri_logic_type && (
+                  <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                    SRI Logic: {resiliencyData.sri_logic_type}
+                  </span>
+                )}
+                {resiliencyData.sri_correction_method && (
+                  <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                    Correction: {resiliencyData.sri_correction_method}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Future Projections */}
@@ -150,11 +321,11 @@ const getActionDescription = (value: string) => {
           <div className="flex items-center gap-2 mb-3">
             <Calendar className="h-5 w-5 text-orange-400" />
             <h3 className="text-lg font-semibold text-emerald-200">
-              Future Projections (2040 & 2060)
+              Future Projections {resiliencyData?.periods ? `(${resiliencyData.periods.join(", ")})` : "(2040 & 2060)"}
             </h3>
           </div>
           <p className="text-sm leading-relaxed text-white/70 mb-4">
-            Future Species Richness Index calculations are trained using an ensemble of models under the SSP585 ("worst-case") climate scenario, ensuring a cautious and conservative approach to climate resilience assessment. These projections are subsequently corrected using the Human Footprint Index (HFI) to account for anticipated anthropogenic pressures.
+            Future Species Richness Index calculations are trained using an ensemble of models under the {resiliencyData?.climate_scenario?.toUpperCase() ?? "SSP585"} ("worst-case") climate scenario, ensuring a cautious and conservative approach to climate resilience assessment. These projections are subsequently corrected using the {resiliencyData?.sri_correction_method ?? "Human Footprint Index (HFI)"} to account for anticipated anthropogenic pressures.
           </p>
           <div className="rounded-lg bg-orange-500/5 border border-orange-500/20 p-3">
             <div className="flex items-center gap-2 mb-2">
@@ -162,91 +333,11 @@ const getActionDescription = (value: string) => {
               <p className="text-xs font-semibold text-orange-300 uppercase tracking-wider">Methodology Note</p>
             </div>
             <p className="text-xs text-white/60">
-              Ensemble modeling reduces prediction uncertainty by aggregating multiple model outputs. The SSP585 scenario represents a high-emission trajectory with radiative forcing reaching 8.5 W/m² by 2100.
+              Ensemble modeling reduces prediction uncertainty by aggregating multiple model outputs. The {resiliencyData?.climate_scenario?.toUpperCase() ?? "SSP585"} scenario represents a high-emission trajectory with radiative forcing reaching 8.5 W/m² by 2100.
             </p>
           </div>
         </div>
 
-        {/* Management Priority Framework - 5x5 Matrix */}
-        <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-          <h3 className="text-lg font-semibold text-emerald-200 mb-4">
-            Management Priority Framework
-          </h3>
-          <p className="text-sm text-white/60 mb-4">
-            Decision matrix combining Climate Resiliency (vertical axis) vs Biodiversity Risk (horizontal axis):
-          </p>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              {/* Header row */}
-              <thead>
-                <tr>
-                  <th className="p-2 text-left text-white/60 font-medium bg-black/40 rounded-tl-xl">
-                    Climate Resiliency ↓ / Biodiversity Risk →
-                  </th>
-                  {riskLevels.map((risk) => (
-                    <th key={risk} className="p-2 text-center text-white/60 font-medium bg-black/40">
-                      {risk.charAt(0).toUpperCase() + risk.slice(1)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {resiliencyLevels.map((resiliency, rowIndex) => (
-                  <tr key={resiliency}>
-                    <td className="p-2 font-medium text-white/80 bg-black/30 border-r border-white/10">
-                      {resiliency.charAt(0).toUpperCase() + resiliency.slice(1)}
-                    </td>
-                    {matrix[rowIndex].map((value, colIndex) => (
-                      <td
-                        key={`${rowIndex}-${colIndex}`}
-                        className={`p-2 text-center border border-white/5 ${getCellColor(value)}`}
-                        title={getActionDescription(value)}
-                      >
-                        {value}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Legend */}
-          <div className="mt-6 pt-4 border-t border-white/10">
-            <h4 className="text-sm font-semibold text-white/70 mb-3">Legend</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-[#166534]"></div>
-                <span className="text-white/60">API - Active Protection I</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-[#22c55e]"></div>
-                <span className="text-white/60">APII - Active Protection II</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-[#86efac]"></div>
-                <span className="text-white/60">PP - Passive Protection</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-[#eab308]"></div>
-                <span className="text-white/60">ARI - Active Restoration I</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-[#f97316]"></div>
-                <span className="text-white/60">ARII - Active Restoration II</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-[#dc2626]"></div>
-                <span className="text-white/60">PR - Passive Restoration</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-gray-700"></div>
-                <span className="text-white/60">Low Priority</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Methodology Reference */}
         <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">

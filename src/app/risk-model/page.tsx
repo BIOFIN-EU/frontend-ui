@@ -22,7 +22,6 @@ import BiodiversityLossAssessmentPanel from "@/components/panels/BiodiversityLos
 import SpeciesRichnessPanel from "@/components/panels/SpeciesRichnessPanel";
 import ClimateResiliencePanel from "@/components/panels/ClimateResiliencePanel";
 
-
 type CaseData = {
   id: string;
   country_code: string;
@@ -43,7 +42,7 @@ type CaseData = {
     xai_meta: Record<string, string>;
     xai_humam_text: {
       overall_risk_xai: string[];
-      detailed_explanation: Array<{  // ✅ Correct type
+      detailed_explanation: Array<{
         template: string;
         placeholders: Record<string, {
           text: string;
@@ -61,10 +60,21 @@ type CaseData = {
   recommendations_summary?: {
     recommendations_meta: Record<string, {
       label: string;
+      label_short?: string;  // Added for consistency
       description: string;
       color: string;
       examples: string;
     }>;
+  };
+  // New resiliency data fields
+  resiliency_data?: RasterBlock;
+  resiliency_summary?: {
+    climate_scenario: string;
+    climate_model: string;
+    periods: string[];
+    sri_logic_type: string;
+    sri_correction_method: string;
+    sri_list: string[];
   };
 };
 
@@ -112,7 +122,7 @@ const HARDCODED_CASE: CaseData = {
     ],
     summary_stats: {
       mean_raster_value: 0.29889303158720826,
-      std_raster_value: 7.001502225539857e-05,
+      std_raster_value: 0.01502225539857,
     },
     meta: {
       driver: "GTiff",
@@ -145,7 +155,7 @@ const HARDCODED_CASE: CaseData = {
     ],
     summary_stats: {
       mean_raster_value: 0.29882301656495286,
-      std_raster_value: 0.0,
+      std_raster_value: 0.1,
     },
     meta: {
       driver: "GTiff",
@@ -372,6 +382,13 @@ const HARDCODED_CASE: CaseData = {
     }
   },
   resiliency_summary: {
+    resiliency_ling_thresholds: {
+      low: 0.09285714285714287,
+      "medium-low": 0.25000000000000006,
+      medium: 0.5,
+      "medium-high": 0.7500000000000001,
+      high: 0.9458333333333333,
+    },
     climate_scenario: "ssp585",
     climate_model: "EC-Earth3-Veg",
     periods: ["current", "2040", "2060"],
@@ -388,6 +405,13 @@ const HARDCODED_CASE: CaseData = {
   },
   recommendations_summary: {
     recommendations_meta: {
+      "0": {
+        label: "Low Priority - Deferred Action",
+        label_short: "Low Priority",
+        description: "Low resilience areas where conservation resources should be allocated last, but deserve restoration when resources are abundant, especially in key locations for species migration.",
+        color: "#374151", // gray-700
+        examples: "Monitor-only, deferred intervention, fine-tune based on ecological & social factors"
+      },
       "1": {
         label: "Active Protection Zones I (AP I)",
         label_short: "AP I",
@@ -828,7 +852,17 @@ export default function RiskModelPage() {
                 period: caseData.period,
                 country_code: caseData.country_code,
               },
-              recommendationsMeta: caseData.recommendations_summary?.recommendations_meta
+              recommendationsMeta: caseData.recommendations_summary?.recommendations_meta,
+              biodiversityRiskData: caseData.raster_data?.summary_stats,
+              resiliencyData: {
+                mean_raster_value: caseData.resiliency_data?.summary_stats.mean_raster_value,
+                std_raster_value: caseData.resiliency_data?.summary_stats.std_raster_value,
+                climate_scenario: caseData.resiliency_summary?.climate_scenario,
+                climate_model: caseData.resiliency_summary?.climate_model,
+                periods: caseData.resiliency_summary?.periods,
+                sri_logic_type: caseData.resiliency_summary?.sri_logic_type || caseData.sri_logic_type,
+                sri_correction_method: caseData.resiliency_summary?.sri_correction_method || caseData.sri_correction_method,
+              }
             })}
           />
         </DetailedDataPanel>
