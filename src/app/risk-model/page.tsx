@@ -9,8 +9,18 @@ import {
   ChevronDown,
   ChevronUp,
   Database,
+  Target,
+  MapPin,
+  AlertTriangle,
+  Leaf,
 } from "lucide-react";
-import RiskMap from "@/components/maps/RiskMap";
+// import RiskMap from "@/components/maps/RiskMap";
+import ManagementActionsMap from "@/components/maps/ManagementActionsMap";
+import DetailedDataPanel from "@/components/panels/DetailedDataPanel";
+import GenericPanelContent from "@/components/panels/GenericPanelContent";
+import BiodiversityLossAssessmentPanel from "@/components/panels/BiodiversityLossAssessmentPanel";
+import SpeciesRichnessPanel from "@/components/panels/SpeciesRichnessPanel";
+import ClimateResiliencePanel from "@/components/panels/ClimateResiliencePanel";
 
 type CaseData = {
   id: string;
@@ -30,12 +40,42 @@ type CaseData = {
   xai_raster: RasterBlock;
   xai_summary: {
     xai_meta: Record<string, string>;
-    xai_humam_text: string[];
+    xai_humam_text: {
+      overall_risk_xai: string[];
+      detailed_explanation: Array<{
+        template: string;
+        placeholders: Record<string, {
+          text: string;
+          data_type: string;
+        }>;
+      }>;
+    };
   };
   risk_ling_thresholds: Record<string, number>;
   chi: string;
   pai: string;
   sri: string;
+  recommendations_data?: RasterBlock;
+  recommendations_polygons?: Record<string, string>;
+  recommendations_summary?: {
+    recommendations_meta: Record<string, {
+      label: string;
+      label_short?: string;  // Added for consistency
+      description: string;
+      color: string;
+      examples: string;
+    }>;
+  };
+  // New resiliency data fields
+  resiliency_data?: RasterBlock;
+  resiliency_summary?: {
+    climate_scenario: string;
+    climate_model: string;
+    periods: string[];
+    sri_logic_type: string;
+    sri_correction_method: string;
+    sri_list: string[];
+  };
 };
 
 type RasterBlock = {
@@ -82,7 +122,7 @@ const HARDCODED_CASE: CaseData = {
     ],
     summary_stats: {
       mean_raster_value: 0.29889303158720826,
-      std_raster_value: 7.001502225539857e-05,
+      std_raster_value: 0.01502225539857,
     },
     meta: {
       driver: "GTiff",
@@ -115,7 +155,7 @@ const HARDCODED_CASE: CaseData = {
     ],
     summary_stats: {
       mean_raster_value: 0.29882301656495286,
-      std_raster_value: 0.0,
+      std_raster_value: 0.1,
     },
     meta: {
       driver: "GTiff",
@@ -206,7 +246,65 @@ const HARDCODED_CASE: CaseData = {
       "28": "IF (ch[likely] AND pa[protected]) AND si[medium-low] THEN risk[high]",
       "29": "IF (ch[likely] AND pa[protected]) AND si[low] THEN risk[high]",
     },
-    xai_humam_text: [],
+    xai_humam_text: {
+      "detailed_explanation": [
+        {
+          "template": "This region contains a {{protected_area}} with {{critical_habitat}} status and exhibits a {{species_richness}}. These characteristics collectively indicate a {{biodiversity_loss}}.",
+          "placeholders": {
+            "protected_area": {
+              "text": "Protected Area",
+              "data_type": "protected_area_assessment"
+            },
+            "critical_habitat": {
+              "text": "likely Critical Habitat",
+              "data_type": "critical_habitat_status"
+            },
+            "species_richness": {
+              "text": "low Species Richness Index",
+              "data_type": "species_richness_metrics"
+            },
+            "biodiversity_loss": {
+              "text": "high likelihood of Biodiversity Loss",
+              "data_type": "biodiversity_loss_assessment"
+            }
+          }
+        },
+        {
+          "template": "Furthermore, based on {{climate_projections}} and {{urban_expansion}} modelling, this area demonstrates {{climate_resilience}} in the face of a future worst-case scenario for climate-change.",
+          "placeholders": {
+            "climate_projections": {
+              "text": "future climate projections",
+              "data_type": "climate_projection_models"
+            },
+            "urban_expansion": {
+              "text": "projected urban expansion",
+              "data_type": "urban_expansion_forecast"
+            },
+            "climate_resilience": {
+              "text": "low climate-resilience",
+              "data_type": "climate_resilience_metrics"
+            }
+          }
+        },
+        {
+          "template": "Given these converging factors ({{biodiversity_loss_factors}} and {{climate_resilience_factor}}), we suggest that the following {{management_actions}} should be prioritised: Active Restoration (AR) and Passive Protection (PP). Capital allocation toward nature-positive activities within these intervention types should improve biodiversity outcomes while strengthening long-term resilience against future climate and urbanisation pressures.",
+          "placeholders": {
+            "biodiversity_loss_factors": {
+              "text": "high likelihood of Biodiversity Loss",
+              "data_type": "biodiversity_loss_assessment"
+            },
+            "climate_resilience_factor": {
+              "text": "low climate-resilience",
+              "data_type": "climate_resilience_metrics"
+            },
+            "management_actions": {
+              "text": "Management Actions",
+              "data_type": "management_priorities"
+            }
+          }
+        }
+      ]
+    }
   },
   risk_ling_thresholds: {
     low: 0.09285714285714287,
@@ -217,6 +315,154 @@ const HARDCODED_CASE: CaseData = {
   },
   sri_species_list:
     "Accipiter nisus,Aegithalos caudatus,Anthus trivialis,Buteo buteo,Certhia brachydactyla,Coccothraustes coccothraustes,Dendrocopos major,Dendrocopos minor,Garrulus glandarius,Lullula arborea,Luscinia megarhynchos,Oriolus oriolus,Periparus ater,Phoenicurus phoenicurus,Picus viridis,Regulus regulus,Streptopelia turtur,Sylvia borin",
+  resiliency_data: {
+    raster: [
+      [-9999.0, -9999.0, -9999.0, -9999.0, 0.1, 1.0],
+      [-9999.0, -9999.0, -9999.0, -9999.0, 0.5, 0.5],
+      [-9999.0, -9999.0, -9999.0, -9999.0, 0.1,0.75],
+    ],
+    summary_stats: {
+      mean_raster_value: 0.5,
+      std_raster_value: 0.7071067811865476,
+    },
+    meta: {
+      driver: "GTiff",
+      dtype: "float32",
+      nodata: -9999.0,
+      width: 6,
+      height: 3,
+      count: 1,
+      crs: 'GEOGCS["WGS 84"...]',
+      transform: [
+        0.008983152841195215,
+        0.0,
+        4.572424796168365,
+        0.0,
+        -0.008983152841195215,
+        52.40771367553288,
+        0.0,
+        0.0,
+        1.0,
+      ],
+      compress: "DEFLATE",
+      predictor: 3,
+    }
+  },
+  recommendations_data: {
+    raster: [
+      [-9999.0, -9999.0, -9999.0, -9999.0, 1.0, 1.0],
+      [-9999.0, -9999.0, -9999.0, -9999.0, 5.0, 5.0],
+      [-9999.0, -9999.0, -9999.0, -9999.0, 1.0, 3.0],
+    ],
+    summary_stats: {
+      mean_raster_value: 1.5,
+      std_raster_value: 0.7071067811865476,
+    },
+    meta: {
+      driver: "GTiff",
+      dtype: "float32",
+      nodata: -9999.0,
+      width: 6,
+      height: 3,
+      count: 1,
+      crs: 'GEOGCS["WGS 84"...]',
+      transform: [
+        0.008983152841195215,
+        0.0,
+        4.572424796168365,
+        0.0,
+        -0.008983152841195215,
+        52.40771367553288,
+        0.0,
+        0.0,
+        1.0,
+      ],
+      compress: "DEFLATE",
+      predictor: 3,
+    }
+  },
+  resiliency_summary: {
+    resiliency_ling_thresholds: {
+      low: 0.09285714285714287,
+      "medium-low": 0.25000000000000006,
+      medium: 0.5,
+      "medium-high": 0.7500000000000001,
+      high: 0.9458333333333333,
+    },
+    climate_scenario: "ssp585",
+    climate_model: "EC-Earth3-Veg",
+    periods: ["current", "2040", "2060"],
+    sri_logic_type: "fuzzy",
+    sri_correction_method: "HFI",
+    // current sri, fut2040,
+    sri_list: ["/api/v1/sri/get/630e8f43-35e5-403e-9dc4-430f52114f0c/", "/api/v1/sri/get/630e8f43-35e5-403e-9dc4-430f52114f0d/", "/api/v1/sri/get/630e8f43-35e5-403e-9dc4-430f52114f0e/"],
+
+  },
+  recommendations_polygons: {
+      "1": "POLYGON((4.598488763140015 52.39690261469849,4.59894780280675 52.387830068910404,4.609625654246968 52.382524758083576,4.6129675938634565 52.40769458650479,4.598488763140015 52.39690261469849))",
+      "5": "POLYGON((4.580779754239136 52.3998410255806,4.587427106562764 52.39102720425177,4.598488763140015 52.39690261469849,4.6129675938634565 52.40769458650479,4.590386331397723 52.40737630257422,4.580779754239136 52.3998410255806))",
+      "3": "POLYGON((4.609625654246968 52.382524758083576,4.625964631458413 52.38533788137002,4.620552651919607 52.39626555579616,4.6129675938634565 52.40769458650479,4.609625654246968 52.382524758083576))"
+  },
+  recommendations_summary: {
+    recommendations_meta: {
+      "0": {
+        label: "Low Priority - Deferred Action",
+        label_short: "Low Priority",
+        description: "Low resilience areas where conservation resources should be allocated last, but deserve restoration when resources are abundant, especially in key locations for species migration.",
+        color: "#374151", // gray-700
+        examples: "Monitor-only, deferred intervention, fine-tune based on ecological & social factors"
+      },
+      "1": {
+        label: "Active Protection Zones I (AP I)",
+        label_short: "AP I",
+        description: "Region with high resilience and high risk. Highest priority for active protection due to elevated risk levels. The habitats are relatively intact, but face high risk of degradation from anthropogenic activities.",
+        color: "#135d18", // dark green
+        examples: "Urgent adaptive management, designating natural reserves, establishing monitoring networks, wildlife conservation institutes, immediate threat mitigation"
+      },
+      "2": {
+        label: "Active Protection Zones II (AP II)",
+        label_short: "AP II",
+        description: "Region with high resilience and medium risk. Active protection with proactive management measures to mitigate human stressors on habitats and species.",
+        color: "#0cc02a", // green
+        examples: "Preventive conservation measures, wildlife corridor establishment, habitat connectivity enhancement, governance strategies for targeted species"
+      },
+      "3": {
+        label: "Passive Protection Zones (PP)",
+        label_short: "PP",
+        description: "Region with high resilience and low risk. Due to intact habitat structures and low disturbance risk, minimal intervention is required. Focus on preventing potential anthropogenic impacts.",
+        color: "#86efac", // light green
+        examples: "Ecological Conservation Red Line policies, land-use restrictions, buffer zone maintenance, monitoring of encroachment risks"
+      },
+      "4": {
+        label: "Active Restoration Zones I (AR I)",
+        label_short: "AR I",
+        description: "Region with medium resilience and high risk. Prioritizes assisted and reconstructive restoration with intensive management to mitigate risks and improve biodiversity outcomes.",
+        color: "#eab308", // yellow
+        examples: "Tree planting on degraded farmland, soil and water conservation, fertilization, assisted natural regeneration"
+      },
+      "5": {
+        label: "Active Restoration Zones II (AR II)",
+        label_short: "AR II",
+        description: "Region with medium resilience and medium risk. Restoration measures with focus on overcoming specific obstacles to achieve restoration goals.",
+        color: "#f97316", // orange
+        examples: "Reforestation of native species, invasive species removal, habitat structure enhancement, ecological restoration planning"
+      },
+      "6": {
+        label: "Passive Restoration Zones (PR)",
+        label_short: "PR",
+        description: "Region with medium resilience and low risk. Remnant forest patches facilitate natural recovery. Employ natural restoration strategies in low-disturbance environments.",
+        color: "#dc2626", // red
+        examples: "Preventing grazing, abandoned cropland natural recovery, grazing exclusion, spontaneous regeneration monitoring"
+      }
+    }
+  }
+};
+
+const panelContentMap: Record<string, React.ComponentType<any>> = {
+  "biodiversity_loss_assessment": BiodiversityLossAssessmentPanel,
+  "species_richness_metrics": SpeciesRichnessPanel,
+  "climate_resilience_metrics": ClimateResiliencePanel,
+  // All other data types will use GenericPanelContent by default
 };
 
 function getValidRasterValues(raster: number[][], nodata: number) {
@@ -268,6 +514,16 @@ function buildMetricsFromCase(caseData: CaseData) {
     .map((s) => s.trim())
     .filter(Boolean);
 
+  // Get unique recommendation categories present in the raster
+  let recommendationCategories: number[] = [];
+  if (caseData.recommendations_data) {
+    const values = getValidRasterValues(
+      caseData.recommendations_data.raster,
+      caseData.recommendations_data.meta.nodata
+    );
+    recommendationCategories = [...new Set(values.map(v => Math.round(v)))].sort();
+  }
+
   return {
     riskLabel: prettifyRiskLabel(
       getRiskLabel(riskMean, caseData.risk_ling_thresholds)
@@ -279,6 +535,7 @@ function buildMetricsFromCase(caseData: CaseData) {
     urbanMean,
     urbanStd,
     riskScore: Number((riskMean * 100).toFixed(1)),
+    recommendationCategories,
   };
 }
 
@@ -304,353 +561,168 @@ function StatCard({
   );
 }
 
-function ThresholdScale({
-  value,
-  thresholds,
-}: {
-  value: number;
-  thresholds: Record<string, number>;
-}) {
-  const ordered = Object.entries(thresholds).sort((a, b) => a[1] - b[1]);
-  const max = 1;
-
-  const segments = ordered.map(([label, start], index) => {
-    const end = ordered[index + 1]?.[1] ?? max;
-    const width = Math.max(((end - start) / max) * 100, 6);
-
-    return {
-      label,
-      start,
-      end,
-      width,
-    };
-  });
-
-  const markerPosition = Math.min(Math.max(value * 100, 0), 100);
-  const activeLabel = prettifyRiskLabel(getRiskLabel(value, thresholds));
-
-  const segmentTone = (label: string) => {
-    switch (label) {
-      case "low":
-        return "from-emerald-500 to-emerald-400";
-      case "medium-low":
-        return "from-lime-500 to-yellow-400";
-      case "medium":
-        return "from-yellow-500 to-amber-400";
-      case "medium-high":
-        return "from-orange-500 to-orange-400";
-      case "high":
-        return "from-red-500 to-rose-500";
-      default:
-        return "from-white/20 to-white/10";
-    }
-  };
-
-  return (
-    <section className="h-full rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-        Risk linguistic thresholds
-      </p>
-      <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-        Biodiversity risk scale
-      </h2>
-      <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">
-        The raster mean is shown on the linguistic threshold scale as a percentage.
-      </p>
-
-      <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-white/45">
-              Current position
-            </p>
-            <p className="mt-1 text-3xl font-semibold text-white">
-              {formatOneDecimalPercent(value)}
-            </p>
-          </div>
-          <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/20">
-            {activeLabel}
-          </div>
-        </div>
-
-        <div className="mt-8">
-          <div className="relative">
-            <div className="flex h-6 overflow-hidden rounded-full border border-white/10 bg-white/5">
-              {segments.map((segment) => (
-                <div
-                  key={segment.label}
-                  className={`h-full bg-gradient-to-r ${segmentTone(segment.label)}`}
-                  style={{ width: `${segment.width}%` }}
-                  title={`${prettifyRiskLabel(segment.label)}: ${formatOneDecimalPercent(
-                    segment.start
-                  )}% → ${formatOneDecimalPercent(segment.end)}%`}
-                />
-              ))}
-            </div>
-
-            <div
-              className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${markerPosition}%` }}
-            >
-              <div className="flex flex-col items-center">
-                <div className="mb-1 rounded-full border border-emerald-300/40 bg-[#07121d] px-2.5 py-1 text-[10px] font-semibold text-emerald-200 shadow-lg">
-                  {formatOneDecimalPercent(value)}
-                </div>
-                <div className="h-8 w-[2px] bg-white" />
-                <div className="h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.75)]" />
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-2 sm:grid-cols-5">
-            {segments.map((segment, index) => {
-              const isCurrent =
-                (value >= segment.start && value < segment.end) ||
-                (index === segments.length - 1 && value >= segment.start);
-
-              return (
-                <div
-                  key={segment.label}
-                  className={`rounded-2xl border px-3 py-3 ring-1 ${
-                    isCurrent
-                      ? "border-emerald-400/30 bg-emerald-500/10 ring-emerald-400/20"
-                      : "border-white/10 bg-white/[0.03] ring-white/5"
-                  }`}
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wider text-white/55">
-                    {prettifyRiskLabel(segment.label)}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-white">
-                    ≥ {formatOneDecimalPercent(segment.start)}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HiddenStats({
+function RecommendationsPanel({
   caseData,
   metrics,
 }: {
   caseData: CaseData;
   metrics: ReturnType<typeof buildMetricsFromCase>;
 }) {
-  const [open, setOpen] = useState(false);
+  const getCategoryColor = (categoryId: number): string => {
+    const meta = caseData.recommendations_summary?.recommendations_meta[String(categoryId)];
+    return meta?.color || "#6b7280";
+  };
+
+  const getCategoryLabel = (categoryId: number): string => {
+    const meta = caseData.recommendations_summary?.recommendations_meta[String(categoryId)];
+    return meta?.label || `Category ${categoryId}`;
+  };
+
+  const getCategoryDescription = (categoryId: number): string => {
+    const meta = caseData.recommendations_summary?.recommendations_meta[String(categoryId)];
+    return meta?.description || "No description available";
+  };
+
+  const getCategoryExamples = (categoryId: number): string => {
+    const meta = caseData.recommendations_summary?.recommendations_meta[String(categoryId)];
+    return meta?.examples || "Site-specific management interventions";
+  };
+
+  return (
+    <section className="h-full rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <div className="mb-4 flex items-start gap-3">
+        <div className="mt-0.5 rounded-2xl bg-emerald-500/10 p-2 ring-1 ring-emerald-400/20">
+          <Target className="h-5 w-5 text-emerald-200" />
+        </div>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+            Investment prioritization
+          </p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+            Recommendations for Management Actions Priority
+          </h2>
+        </div>
+      </div>
+
+      <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">
+        Prioritized management actions requiring investment to enhance biodiversity through Nature Positive Actions (NPAs).
+      </p>
+
+      <div className="mt-6 space-y-4">
+        {metrics.recommendationCategories.map((categoryId) => (
+          <div
+            key={categoryId}
+            className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5 transition hover:bg-black/30"
+          >
+            <div className="mb-3 flex items-center gap-2">
+              <div
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: getCategoryColor(categoryId) }}
+              />
+              <h3
+                className="text-lg font-bold"
+                style={{ color: getCategoryColor(categoryId) }}
+              >
+                {getCategoryLabel(categoryId)}
+              </h3>
+            </div>
+
+            <p className="text-sm text-white/70 mb-3">
+              {getCategoryDescription(categoryId)}
+            </p>
+
+            <div className="mt-3 pt-3 border-t border-white/10">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/45 mb-2">
+                Examples of Nature Positive Activities:
+              </p>
+              <p className="text-sm text-white/60">
+                {getCategoryExamples(categoryId)}
+              </p>
+            </div>
+          </div>
+        ))}
+
+        {metrics.recommendationCategories.length === 0 && (
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-5 text-center text-white/50">
+            No recommendation categories present in the current region.
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+function DetailedExplanation({
+  caseData,
+  onDataTypeClick
+}: {
+  caseData: CaseData;
+  onDataTypeClick: (dataType: string) => void;
+}) {
+  const explanationBlocks = caseData.xai_summary.xai_humam_text.detailed_explanation;
+
+  const renderBlock = (block: ExplanationBlock, blockIndex: number) => {
+    let result: React.ReactNode[] = [];
+    let remaining = block.template;
+
+    // Replace placeholders one by one
+    for (const [key, value] of Object.entries(block.placeholders)) {
+      const parts = remaining.split(new RegExp(`{{${key}}}`, 'g'));
+
+      if (parts.length > 1) {
+        const newResult: React.ReactNode[] = [];
+        for (let i = 0; i < parts.length - 1; i++) {
+          if (result.length > 0) {
+            newResult.push(...result);
+            result = [];
+          }
+          newResult.push(parts[i]);
+          newResult.push(
+            <button
+              key={`${blockIndex}-${key}-${i}`}
+              onClick={() => onDataTypeClick(value.data_type)}
+              className="text-emerald-400 hover:text-emerald-300 underline transition-colors cursor-pointer"
+            >
+              <strong className="text-emerald-300">{value.text}</strong>
+            </button>
+          );
+        }
+        result = newResult;
+        remaining = parts[parts.length - 1];
+      }
+    }
+
+    if (remaining) {
+      result.push(remaining);
+    }
+
+    return <span className="whitespace-pre-line">{result}</span>;
+  };
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-      <button
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-left ring-1 ring-white/5 transition hover:bg-black/30"
-      >
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 rounded-2xl bg-emerald-500/10 p-2 ring-1 ring-emerald-400/20">
-            <Database className="h-4 w-4 text-emerald-200" />
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Hidden stats
-            </p>
-            <h3 className="mt-1 text-xl font-semibold">
-              Technical metadata and supporting details
-            </h3>
-            <p className="mt-1 text-sm text-white/60">
-              Includes case summary, thresholds, raster summaries, endpoints, raster metadata, and XAI.
-            </p>
-          </div>
+      <div className="mb-4 flex items-start gap-3">
+        <div className="mt-0.5 rounded-2xl bg-emerald-500/10 p-2 ring-1 ring-emerald-400/20">
+          <AlertTriangle className="h-5 w-5 text-emerald-200" />
         </div>
-
-        <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs font-medium text-white/70 ring-1 ring-white/10">
-          {open ? "Hide details" : "Show details"}
-          {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+            Nature Positive Activities Rationale
+          </p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+            Detailed Explanation
+          </h2>
         </div>
-      </button>
+      </div>
 
-      {open && (
-        <div className="mt-5 space-y-6">
-          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Case summary
-            </p>
-            <h4 className="mt-1 text-lg font-semibold">{caseData.id}</h4>
-
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <StatCard
-                label="Risk label"
-                value={metrics.riskLabel}
-                icon={ShieldAlert}
-              />
-              <StatCard
-                label="Crop to polygon"
-                value={caseData.crop_to_polygon ? "Yes" : "No"}
-                icon={Info}
-              />
-              <StatCard
-                label="Climate model"
-                value={caseData.climate_model}
-                icon={Info}
-              />
-              <StatCard label="Period" value={caseData.period} icon={Info} />
-              <StatCard
-                label="Risk model"
-                value={caseData.risk_model}
-                icon={Info}
-              />
-              <StatCard
-                label="Risk type"
-                value={caseData.risk_type}
-                icon={Info}
-              />
-              <StatCard
-                label="SRI logic type"
-                value={caseData.sri_logic_type}
-                icon={Info}
-              />
-              <StatCard
-                label="SRI correction method"
-                value={caseData.sri_correction_method}
-                icon={Info}
-              />
+      <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-6 ring-1 ring-white/5">
+        <div className="text-white/80 leading-relaxed space-y-4">
+          {explanationBlocks.map((block, idx) => (
+            <div key={idx} className="mb-4 last:mb-0">
+              {renderBlock(block, idx)}
             </div>
-          </section>
-
-          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Thresholds
-            </p>
-            <h4 className="mt-1 text-lg font-semibold">Risk linguistic thresholds</h4>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-              {Object.entries(caseData.risk_ling_thresholds)
-                .sort((a, b) => a[1] - b[1])
-                .map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 ring-1 ring-white/5"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
-                      {prettifyRiskLabel(label)}
-                    </p>
-                    <p className="mt-1 text-lg font-semibold text-white">
-                      {formatOneDecimalPercent(value)}
-                    </p>
-                  </div>
-                ))}
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Raster summaries
-            </p>
-            <h4 className="mt-1 text-lg font-semibold">Returned summary stats</h4>
-
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <StatCard
-                label="Raster mean"
-                value={formatOneDecimalPercent(metrics.riskMean)}
-                icon={ShieldAlert}
-              />
-              <StatCard
-                label="Raster std dev"
-                value={formatOneDecimalPercent(metrics.riskStd)}
-                icon={Info}
-              />
-              <StatCard
-                label="Urban raster mean"
-                value={formatOneDecimalPercent(metrics.urbanMean)}
-                icon={Info}
-              />
-              <StatCard
-                label="Urban raster std dev"
-                value={formatOneDecimalPercent(metrics.urbanStd)}
-                icon={Info}
-              />
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              XAI
-            </p>
-            <h4 className="mt-1 text-lg font-semibold">Dominant rule</h4>
-
-            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 ring-1 ring-white/5">
-              <p className="text-sm text-white/80">
-                {metrics.dominantRule ?? "No explanation rule available."}
-              </p>
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Linked resources
-            </p>
-            <h4 className="mt-1 text-lg font-semibold">Related endpoints</h4>
-
-            <div className="mt-4 space-y-3">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 ring-1 ring-white/5">
-                <p className="text-xs font-medium text-white/55">CHI</p>
-                <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.chi}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 ring-1 ring-white/5">
-                <p className="text-xs font-medium text-white/55">PAI</p>
-                <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.pai}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 ring-1 ring-white/5">
-                <p className="text-xs font-medium text-white/55">SRI</p>
-                <p className="mt-1 break-all text-sm font-semibold text-white">{caseData.sri}</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Raster metadata
-            </p>
-            <h4 className="mt-1 text-lg font-semibold">Raster info</h4>
-
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <StatCard
-                label="Driver"
-                value={caseData.raster_data.meta.driver}
-                icon={Info}
-              />
-              <StatCard
-                label="Dtype"
-                value={caseData.raster_data.meta.dtype}
-                icon={Info}
-              />
-              <StatCard
-                label="NoData"
-                value={caseData.raster_data.meta.nodata}
-                icon={Info}
-              />
-              <StatCard
-                label="Width"
-                value={caseData.raster_data.meta.width}
-                icon={Info}
-              />
-              <StatCard
-                label="Height"
-                value={caseData.raster_data.meta.height}
-                icon={Info}
-              />
-              <StatCard
-                label="Band count"
-                value={caseData.raster_data.meta.count}
-                icon={Bird}
-              />
-            </div>
-          </section>
+          ))}
         </div>
-      )}
+      </div>
     </section>
   );
 }
@@ -659,6 +731,16 @@ export default function RiskModelPage() {
   const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [polygonWkt, setPolygonWkt] = useState("");
 
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [selectedDataType, setSelectedDataType] = useState("");
+
+  const handleDataTypeClick = (dataType: string) => {
+    setSelectedDataType(dataType);
+    setIsPanelOpen(true);
+  };
+
+  // Determine which panel content to render
+  const PanelContent = panelContentMap[selectedDataType] || GenericPanelContent;
   useEffect(() => {
     setCaseData(HARDCODED_CASE);
     setPolygonWkt(HARDCODED_CASE.geometry || "");
@@ -682,13 +764,13 @@ export default function RiskModelPage() {
       <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
         <header className="space-y-4">
           <div className="inline-flex items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-            Biodiversity risk model
+            BioFIN's Management Activities Recommendations
           </div>
 
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-2">
               <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-                Biodiversity Risk Explorer
+                Management Activities Recommendations
               </h1>
               <p className="max-w-3xl text-sm leading-6 text-white/70 sm:text-base">
                 Example case loaded with hardcoded data.
@@ -707,53 +789,83 @@ export default function RiskModelPage() {
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                  Interactive map
+                  Spatial analysis
                 </p>
                 <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-                  Spatial biodiversity screening
+                  Priority Management Actions by Region
                 </h2>
               </div>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/6 px-3 py-1.5 text-xs text-white/70 ring-1 ring-white/10">
-                <Info className="h-3.5 w-3.5" />
-                Polygon loaded from case geometry
+                <MapPin className="h-3.5 w-3.5" />
+                Management action areas displayed
               </div>
             </div>
 
             <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#07121d] ring-1 ring-white/5">
-              <RiskMap
+              <ManagementActionsMap
                 polygonWkt={polygonWkt}
-                onPolygonWktChange={setPolygonWkt}
+                recommendationsPolygons={caseData.recommendations_polygons}
+                recommendationsMeta={caseData.recommendations_summary.recommendations_meta}
               />
             </div>
           </section>
 
-          <ThresholdScale
-            value={metrics.riskMean}
-            thresholds={caseData.risk_ling_thresholds}
+          <RecommendationsPanel caseData={caseData} metrics={metrics} />
+        </div>
+
+        {/* Update this line */}
+        <DetailedExplanation
+          caseData={caseData}
+          onDataTypeClick={handleDataTypeClick}
+        />
+
+        <DetailedDataPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)}>
+          <PanelContent
+            dataType={selectedDataType}
+            onClose={() => setIsPanelOpen(false)}
+            {...(selectedDataType === "biodiversity_loss_assessment" && {
+              riskMean: metrics.riskMean,
+              thresholds: caseData.risk_ling_thresholds,
+              caseData: {
+                risk_model: caseData.risk_model,
+                period: caseData.period,
+                risk_type: caseData.risk_type,
+                sri_logic_type: caseData.sri_logic_type,
+                sri_correction_method: caseData.sri_correction_method,
+                climate_model: caseData.climate_model,
+              }
+            })}
+            {...(selectedDataType === "species_richness_metrics" && {
+              caseData: {
+                sri_logic_type: caseData.sri_logic_type,
+                sri_correction_method: caseData.sri_correction_method,
+                sri: caseData.sri,
+                sri_species_list: caseData.sri_species_list,
+                country_code: caseData.country_code,
+              },
+              species: metrics.species,
+            })}
+            {...(selectedDataType === "climate_resilience_metrics" && {
+              caseData: {
+                climate_model: caseData.climate_model,
+                climate_scenario: caseData.climate_scenario,
+                period: caseData.period,
+                country_code: caseData.country_code,
+              },
+              recommendationsMeta: caseData.recommendations_summary?.recommendations_meta,
+              biodiversityRiskData: caseData.raster_data?.summary_stats,
+              resiliencyData: {
+                mean_raster_value: caseData.resiliency_data?.summary_stats.mean_raster_value,
+                std_raster_value: caseData.resiliency_data?.summary_stats.std_raster_value,
+                climate_scenario: caseData.resiliency_summary?.climate_scenario,
+                climate_model: caseData.resiliency_summary?.climate_model,
+                periods: caseData.resiliency_summary?.periods,
+                sri_logic_type: caseData.resiliency_summary?.sri_logic_type || caseData.sri_logic_type,
+                sri_correction_method: caseData.resiliency_summary?.sri_correction_method || caseData.sri_correction_method,
+              }
+            })}
           />
-        </div>
-
-        <div className="grid gap-8 xl:grid-cols-[1fr_1fr]">
-          <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Species
-            </p>
-            <div className="mt-4 grid gap-4">
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-100">
-                  <Trees className="h-4 w-4" /> SRI species list
-                </div>
-                <ul className="space-y-2 text-sm text-white/70">
-                  {metrics.species.map((item) => (
-                    <li key={item}>• {item}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          <HiddenStats caseData={caseData} metrics={metrics} />
-        </div>
+        </DetailedDataPanel>
       </div>
     </div>
   );
