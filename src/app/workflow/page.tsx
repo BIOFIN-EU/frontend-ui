@@ -9,16 +9,11 @@ const workflows = [
   {
     code: "private_lending_v1",
     title: "Private Lending",
-    description: "Standard workflow with financial and identifier steps.",
-  },
-  {
-    code: "private_lending_with_document_v1",
-    title: "Private Lending (with document)",
-    description: "Includes supporting document upload step.",
+    description: "Use Case 1",
   },
   {
     code: "use_case_2_v1",
-    title: "Forestry NbS (Use Case 2)",
+    title: "Public / Private Partnership for NbS",
     description: "Use Case 2",
   }
 ];

@@ -1,0 +1,167 @@
+"use client";
+
+import { AlertTriangle, Leaf, Target } from "lucide-react";
+import { ThresholdScale } from "@/components/risk/ThresholdScale";
+
+type ExplanationPlaceholder = {
+  text: string;
+  data_type: string;
+};
+
+type ExplanationBlock = {
+  template: string;
+  placeholders: Record<string, ExplanationPlaceholder>;
+};
+
+
+export function BiodiversityRiskInsight({
+  value,
+  thresholds,
+  explanationBlocks = [],
+  onDataTypeClick,
+}: {
+  value: number;
+  thresholds: Record<string, number>;
+  explanationBlocks?: ExplanationBlock[];
+  onDataTypeClick?: (dataType: string) => void;
+}) {
+  return (
+    <div className="space-y-8">
+      <ThresholdScale value={value} thresholds={thresholds} />
+
+      <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+        <div className="mb-4 flex items-start gap-3">
+          <div className="mt-0.5 rounded-2xl bg-emerald-500/10 p-2 ring-1 ring-emerald-400/20">
+            <AlertTriangle className="h-5 w-5 text-emerald-200" />
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Nature Positive Activities Rationale
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
+              Detailed Explanation
+            </h2>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-6 ring-1 ring-white/5">
+          {explanationBlocks.length > 0 ? (
+            <div className="space-y-4 text-sm leading-7 text-white/80">
+              {explanationBlocks.map((block, blockIndex) => (
+                <p key={blockIndex}>
+                  <RenderedExplanation
+                    block={block}
+                    blockIndex={blockIndex}
+                    onDataTypeClick={onDataTypeClick}
+                  />
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-white/55">
+              No detailed explanation is available for this case yet.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+        <div className="mb-4 flex items-start gap-3">
+          <div className="mt-0.5 rounded-2xl bg-emerald-500/10 p-2 ring-1 ring-emerald-400/20">
+            <Target className="h-5 w-5 text-emerald-200" />
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+              Investment prioritization
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
+              Recommendations for Management Actions Priority
+            </h2>
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <ActionCard
+            title="Active Restoration"
+            description="Restore habitat quality where biodiversity risk or resilience indicators suggest improvement potential."
+          />
+          <ActionCard
+            title="Passive Protection"
+            description="Protect existing ecological value and reduce disturbance in areas that can recover naturally."
+          />
+          <ActionCard
+            title="Habitat Connectivity"
+            description="Improve corridors, edges, hedgerows, and stepping-stone habitats across the landscape."
+          />
+          <ActionCard
+            title="Nature Positive Monitoring"
+            description="Track biodiversity and resilience indicators over time to support adaptive management."
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function RenderedExplanation({
+  block,
+  blockIndex,
+  onDataTypeClick,
+}: {
+  block: ExplanationBlock;
+  blockIndex: number;
+  onDataTypeClick?: (dataType: string) => void;
+}) {
+  const pattern = /{{(.*?)}}/g;
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(block.template)) !== null) {
+    const key = match[1];
+    const placeholder = block.placeholders[key];
+
+    nodes.push(block.template.slice(lastIndex, match.index));
+
+    if (placeholder) {
+      nodes.push(
+        <button
+          key={`${blockIndex}-${key}`}
+          type="button"
+          onClick={() => onDataTypeClick?.(placeholder.data_type)}
+          className="text-emerald-400 underline decoration-emerald-400/40 underline-offset-4 transition hover:text-emerald-300"
+        >
+          <strong>{placeholder.text}</strong>
+        </button>
+      );
+    } else {
+      nodes.push(match[0]);
+    }
+
+    lastIndex = pattern.lastIndex;
+  }
+
+  nodes.push(block.template.slice(lastIndex));
+
+  return <>{nodes}</>;
+}
+
+function ActionCard({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
+      <div className="flex items-center gap-2">
+        <Leaf className="h-4 w-4 text-emerald-200" />
+        <p className="font-semibold text-white">{title}</p>
+      </div>
+      <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
+    </div>
+  );
+}

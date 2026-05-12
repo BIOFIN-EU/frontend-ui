@@ -9,7 +9,8 @@ import type { CaseDashboardState } from "@/types/workflow";
 import { CaseDashboardScreen } from "@/components/cases/CaseDashboardScreen";
 import { CaseDashboardMenu } from "@/components/cases/CaseDashboardMenu";
 import { useCaseUsers } from "@/components/cases/hooks/useCaseUsers";
-import { ThresholdScale } from "@/components/risk/ThresholdScale";
+import { BiodiversityRiskInsight } from "@/components/risk/BiodiversityRiskInsight";
+
 
 export default function CaseDashboardPage() {
   const params = useParams<{ caseId: string }>();
@@ -26,6 +27,68 @@ export default function CaseDashboardPage() {
 
   const myAccess = users.find((u) => u.user_id === user?.id);
   const canManageUsers = Boolean(myAccess?.can_assign_users);
+
+
+const HARDCODED_EXPLANATION_BLOCKS = [
+  {
+    template:
+      "This region contains a {{protected_area}} with {{critical_habitat}} status and exhibits a {{species_richness}}. These characteristics collectively indicate a {{biodiversity_loss}}.",
+    placeholders: {
+      protected_area: {
+        text: "Protected Area",
+        data_type: "protected_area_assessment",
+      },
+      critical_habitat: {
+        text: "likely Critical Habitat",
+        data_type: "critical_habitat_status",
+      },
+      species_richness: {
+        text: "low Species Richness Index",
+        data_type: "species_richness_metrics",
+      },
+      biodiversity_loss: {
+        text: "high likelihood of Biodiversity Loss",
+        data_type: "biodiversity_loss_assessment",
+      },
+    },
+  },
+  {
+    template:
+      "Furthermore, based on {{climate_projections}} and {{urban_expansion}} modelling, this area demonstrates {{climate_resilience}} in the face of a future worst-case scenario for climate-change.",
+    placeholders: {
+      climate_projections: {
+        text: "future climate projections",
+        data_type: "climate_projection_models",
+      },
+      urban_expansion: {
+        text: "projected urban expansion",
+        data_type: "urban_expansion_forecast",
+      },
+      climate_resilience: {
+        text: "low climate-resilience",
+        data_type: "climate_resilience_metrics",
+      },
+    },
+  },
+  {
+    template:
+      "Given these converging factors ({{biodiversity_loss_factors}} and {{climate_resilience_factor}}), we suggest that the following {{management_actions}} should be prioritised: Active Restoration (AR) and Passive Protection (PP). Capital allocation toward nature-positive activities within these intervention types should improve biodiversity outcomes while strengthening long-term resilience against future climate and urbanisation pressures.",
+    placeholders: {
+      biodiversity_loss_factors: {
+        text: "high likelihood of Biodiversity Loss",
+        data_type: "biodiversity_loss_assessment",
+      },
+      climate_resilience_factor: {
+        text: "low climate-resilience",
+        data_type: "climate_resilience_metrics",
+      },
+      management_actions: {
+        text: "Management Actions",
+        data_type: "management_priorities",
+      },
+    },
+  },
+];
 
   async function loadState() {
     try {
@@ -95,135 +158,17 @@ export default function CaseDashboardPage() {
             <CaseDashboardScreen key={String(caseId)} state={state} />
 
             {!usersLoading && canManageUsers && (
-              <>
-                <ThresholdScale
-                  value={0.29889303158720826}
-                  thresholds={{
-                    low: 0.09285714285714287,
-                    "medium-low": 0.25000000000000006,
-                    medium: 0.5,
-                    "medium-high": 0.7500000000000001,
-                    high: 0.9458333333333333,
-                  }}
-                />
-
-                <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                    Risk interpretation
-                  </p>
-
-                  <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
-                    What this biodiversity risk score means
-                  </h2>
-
-                  <p className="mt-3 max-w-3xl text-sm leading-6 text-white/70">
-                    This case has an indicative biodiversity risk score of{" "}
-                    <span className="font-semibold text-white">29.9%</span>,
-                    which falls in the{" "}
-                    <span className="font-semibold text-emerald-200">
-                      Medium Low
-                    </span>{" "}
-                    risk category. This suggests that the area is not currently
-                    classified as high risk, but there are still opportunities to
-                    improve habitat quality, species resilience, and ecological
-                    connectivity.
-                  </p>
-
-                  <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
-                        Main risk driver
-                      </p>
-                      <h3 className="mt-2 text-lg font-semibold text-white">
-                        Low species suitability
-                      </h3>
-                      <p className="mt-2 text-sm leading-6 text-white/65">
-                        The example explanation rule indicates that species
-                        suitability is low. This could mean the current land
-                        conditions offer limited nesting, feeding, or shelter
-                        opportunities for the selected bird species.
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
-                        Priority habitat opportunity
-                      </p>
-                      <h3 className="mt-2 text-lg font-semibold text-white">
-                        Woodland edges and field margins
-                      </h3>
-                      <p className="mt-2 text-sm leading-6 text-white/65">
-                        Several species in the SRI list are associated with
-                        trees, shrubs, woodland edges, hedgerows, and
-                        structurally diverse farmland.
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
-                        Protected area context
-                      </p>
-                      <h3 className="mt-2 text-lg font-semibold text-white">
-                        Unprotected landscape
-                      </h3>
-                      <p className="mt-2 text-sm leading-6 text-white/65">
-                        The XAI rule refers to an unprotected area.
-                        Nature-positive actions could therefore focus on
-                        voluntary farm-level measures and local ecological
-                        corridors.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-5 ring-1 ring-emerald-400/20">
-                    <h3 className="text-lg font-semibold text-emerald-100">
-                      Suggested nature-positive actions
-                    </h3>
-
-                    <div className="mt-4 grid gap-3 md:grid-cols-2">
-                      <div className="rounded-xl bg-black/20 p-4">
-                        <p className="font-semibold text-white">
-                          Plant native hedgerows
-                        </p>
-                        <p className="mt-1 text-sm text-white/65">
-                          Improve shelter, nesting habitat, and movement
-                          corridors for birds and insects.
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl bg-black/20 p-4">
-                        <p className="font-semibold text-white">
-                          Create flower-rich margins
-                        </p>
-                        <p className="mt-1 text-sm text-white/65">
-                          Increase insect availability, which supports species
-                          such as redstarts, warblers, pipits, and nightingales.
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl bg-black/20 p-4">
-                        <p className="font-semibold text-white">
-                          Retain mature trees
-                        </p>
-                        <p className="mt-1 text-sm text-white/65">
-                          Support treecreepers, woodpeckers, tits, jays, and
-                          other woodland species.
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl bg-black/20 p-4">
-                        <p className="font-semibold text-white">
-                          Reduce pesticide pressure
-                        </p>
-                        <p className="mt-1 text-sm text-white/65">
-                          Help restore insect populations and improve food
-                          availability across the site.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </>
+              <BiodiversityRiskInsight
+              value={0.29889303158720826}
+              thresholds={{
+                low: 0.09285714285714287,
+                "medium-low": 0.25000000000000006,
+                medium: 0.5,
+                "medium-high": 0.7500000000000001,
+                high: 0.9458333333333333,
+              }}
+              explanationBlocks={HARDCODED_EXPLANATION_BLOCKS}
+            />
             )}
           </main>
 

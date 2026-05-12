@@ -9,7 +9,9 @@ export default function NavClient() {
   return (
     <nav className="nav">
       <Link href="/" className="navLink">Home</Link>
+        {isAuthed && (
       <Link href="/risk-model" className="navLink">Investment Priorities</Link>
+            )}
       <Link href="/about" className="navLink">About</Link>
       <Link href="/support" className="navLink">Support</Link>
 
