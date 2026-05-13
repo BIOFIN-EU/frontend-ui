@@ -20,7 +20,7 @@ FROM dev AS builder
 RUN npx tsc
 
 # ── production ─────────────────────────────────────────────────────────────────
-FROM node:20-alpine
+FROM node:20-alpine AS production
 WORKDIR /app
 
 COPY --from=builder /app/dist         ./dist
