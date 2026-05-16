@@ -114,7 +114,7 @@ export default function SpeciesRichnessPanel({
             className="inline-flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
           >
             <LinkIcon className="h-3.5 w-3.5" />
-            <span>Author et al. Year - Reference here</span>
+            <span>Siham et al. Year - Reference here</span>
           </a>
         </div>
 
