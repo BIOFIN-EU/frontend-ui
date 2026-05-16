@@ -299,7 +299,7 @@ const HARDCODED_CASE: CaseData = {
             },
             "management_actions": {
               "text": "Management Actions",
-              "data_type": "management_priorities"
+              "data_type": "climate_resilience_metrics"
             }
           }
         }
