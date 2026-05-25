@@ -55,24 +55,15 @@ export default function ClimateResiliencePanel({
 
   const riskLevels = ["high", "medium-high", "medium", "medium-low", "low"];
   const resiliencyLevels = ["high", "medium-high", "medium", "medium-low", "low"];
-
-    const getCellColor = (value: string) => {
+  const getCellColor = (value: string): string => {
     if (value === "Low Priority") {
-        const meta = Object.values(recommendationsMeta || {}).find(m => m.label_short === "Low Priority");
-        if (meta) {
-        return `bg-[${meta.color}] text-white/50`;
-        }
-        return "bg-gray-700 text-white/50";
+      const meta = Object.values(recommendationsMeta || {}).find(m => m.label_short === "Low Priority");
+      return meta?.color || "";
     }
 
-    // Find metadata by matching label_short
     const meta = Object.values(recommendationsMeta || {}).find(m => m.label_short === value);
-
-    if (!meta) return "bg-gray-800 text-white";
-
-    // Use inline style or switch statement
-    return `bg-[${meta.color}] text-white`;
-    };
+    return meta?.color || "";
+  };
 
   const getActionDescription = (value: string) => {
     if (value === "Low Priority") {
@@ -181,7 +172,8 @@ export default function ClimateResiliencePanel({
                     {matrix[rowIndex].map((value, colIndex) => (
                     <td
                         key={`${rowIndex}-${colIndex}`}
-                        className={`p-2 text-center border border-white/20 ${getCellColor(value)}`}
+                        className="p-2 text-center border border-white/20 text-white"
+                        style={{ backgroundColor: getCellColor(value) }}
                         title={getActionDescription(value)}
                     >
                         {value}

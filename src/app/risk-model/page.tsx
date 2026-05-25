@@ -299,7 +299,7 @@ const HARDCODED_CASE: CaseData = {
             },
             "management_actions": {
               "text": "Management Actions",
-              "data_type": "management_priorities"
+              "data_type": "climate_resilience_metrics"
             }
           }
         }
@@ -862,6 +862,51 @@ export default function RiskModelPage() {
                 periods: caseData.resiliency_summary?.periods,
                 sri_logic_type: caseData.resiliency_summary?.sri_logic_type || caseData.sri_logic_type,
                 sri_correction_method: caseData.resiliency_summary?.sri_correction_method || caseData.sri_correction_method,
+              }
+            })}
+            // {/* Add the new generic panel cases here */}
+            {...(selectedDataType === "protected_area_assessment" && {
+              title: "Protected Area Assessment",
+              description: "Analysis of protected area status and coverage in the selected region.",
+              scientificReference: {
+                dataset: "WDPA_Mar2026_Public",
+                organization: "World Database on Protected Areas (WDPA)",
+                citation: "UNEP-WCMC (2026). Protected Area Profile for the selected region. World Database on Protected Areas (WDPA_Mar2026_Public). Cambridge, UK: UNEP World Conservation Monitoring Centre.",
+                url: "https://www.protectedplanet.net/",
+                description: "The WDPA is the most comprehensive global database of terrestrial and marine protected areas, updated monthly and jointly managed by UNEP-WCMC and IUCN."
+              }
+            })}
+            {...(selectedDataType === "urban_expansion_forecast" && {
+              title: "Urban Expansion Forecast",
+              description: "Assessment of projected urban expansion and human pressure on natural habitats.",
+              scientificReference: {
+                dataset: "Human Footprint 2009 (HFP2009)",
+                organization: "Wildlife Conservation Society (WCS) and Center for International Earth Science Information Network (CIESIN)",
+                citation: "Venter, O., Sanderson, E.W., Magrach, A., Allan, J.R., Beher, J., Jones, K.R., Possingham, H.P., Laurance, W.F., Wood, P., Fekete, B.M., Levy, M.A. & Watson, J.E.M. (2009). Human Footprint 2009 (HFP2009). Wildlife Conservation Society and Columbia University.",
+                url: "https://sedac.ciesin.columbia.edu/data/set/wildareas-v2-human-footprint-2009",
+                description: "The Human Footprint dataset measures direct and indirect human pressures on the environment, including population density, built environments, infrastructure, and land use intensity."
+              }
+            })}
+            {...(selectedDataType === "critical_habitat_status" && {
+              title: "Critical Habitat Status",
+              description: "Assessment of critical habitat areas based on global biodiversity screening.",
+              scientificReference: {
+                dataset: "UNEP-WCMC Global Critical Habitat Screening Layer 2025",
+                organization: "United Nations Environment Programme World Conservation Monitoring Centre (UNEP-WCMC)",
+                citation: "UNEP-WCMC (2025). Global Critical Habitat Screening Layer Database. Cambridge, UK: UN Environment Programme World Conservation Monitoring Centre.",
+                url: "https://www.unep-wcmc.org/",
+                description: "This global screening layer identifies areas likely to contain critical habitat based on the presence of biodiversity features including threatened species, unique ecosystems, and key biodiversity areas (KBAs)."
+              }
+            })}
+            {...(selectedDataType === "climate_projection_models" && {
+              title: "Climate Projection Models",
+              description: "Analysis of future climate projections and their impact on biodiversity.",
+              scientificReference: {
+                dataset: "CMIP6 - Coupled Model Intercomparison Project Phase 6",
+                organization: "World Climate Research Programme (WCRP)",
+                citation: "Eyring, V., Bony, S., Meehl, G.A., Senior, C.A., Stevens, B., Stouffer, R.J. & Taylor, K.E. (2016). Overview of the Coupled Model Intercomparison Project Phase 6 (CMIP6) experimental design and organization. Geoscientific Model Development, 9(5), 1937-1958.",
+                url: "https://www.wcrp-climate.org/wgcm-cmip",
+                description: "This assessment uses the EC-Earth3-Veg climate model under the SSP5-8.5 (Shared Socioeconomic Pathway 5-8.5) high-emissions scenario. EC-Earth3-Veg includes dynamic vegetation feedbacks and represents the latest generation of Earth system models. SSP5-8.5 represents a future with high fossil fuel development, rapid economic growth, and high greenhouse gas emissions, allowing assessment of biodiversity resilience under worst-case climate conditions."
               }
             })}
           />
