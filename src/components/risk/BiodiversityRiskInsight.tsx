@@ -65,42 +65,6 @@ export function BiodiversityRiskInsight({
           )}
         </div>
       </section>
-
-      <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
-        <div className="mb-4 flex items-start gap-3">
-          <div className="mt-0.5 rounded-2xl bg-emerald-500/10 p-2 ring-1 ring-emerald-400/20">
-            <Target className="h-5 w-5 text-emerald-200" />
-          </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-              Investment prioritization
-            </p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
-              Recommendations for Management Actions Priority
-            </h2>
-          </div>
-        </div>
-
-        <div className="grid gap-3 md:grid-cols-2">
-          <ActionCard
-            title="Active Restoration"
-            description="Restore habitat quality where biodiversity risk or resilience indicators suggest improvement potential."
-          />
-          <ActionCard
-            title="Passive Protection"
-            description="Protect existing ecological value and reduce disturbance in areas that can recover naturally."
-          />
-          <ActionCard
-            title="Habitat Connectivity"
-            description="Improve corridors, edges, hedgerows, and stepping-stone habitats across the landscape."
-          />
-          <ActionCard
-            title="Nature Positive Monitoring"
-            description="Track biodiversity and resilience indicators over time to support adaptive management."
-          />
-        </div>
-      </section>
     </div>
   );
 }

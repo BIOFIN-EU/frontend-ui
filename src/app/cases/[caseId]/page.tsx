@@ -159,15 +159,20 @@ const HARDCODED_EXPLANATION_BLOCKS = [
 
             {!usersLoading && canManageUsers && (
               <BiodiversityRiskInsight
-              value={0.29889303158720826}
-              thresholds={{
-                low: 0.09285714285714287,
-                "medium-low": 0.25000000000000006,
-                medium: 0.5,
-                "medium-high": 0.7500000000000001,
-                high: 0.9458333333333333,
-              }}
-              explanationBlocks={HARDCODED_EXPLANATION_BLOCKS}
+              value={state.raster_data?.summary_stats?.mean_raster_value ?? 0.29889303158720826}
+              thresholds={
+                state.risk_ling_thresholds ?? {
+                  low: 0.09285714285714287,
+                  "medium-low": 0.25000000000000006,
+                  medium: 0.5,
+                  "medium-high": 0.7500000000000001,
+                  high: 0.9458333333333333,
+                }
+              }
+              explanationBlocks={
+                state.xai_summary?.xai_humam_text?.detailed_explanation ??
+                HARDCODED_EXPLANATION_BLOCKS
+              }
             />
             )}
           </main>
