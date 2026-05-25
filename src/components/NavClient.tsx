@@ -23,6 +23,9 @@ export default function NavClient() {
         <Link href="/cases" className="navLink">Cases</Link>
 
       )}
+        {isAuthed && (
+      <Link href="/intermediaries/new" className="navLink">Intermedaries</Link>
+            )}
     </nav>
   );
 }

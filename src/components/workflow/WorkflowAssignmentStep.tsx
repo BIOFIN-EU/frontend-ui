@@ -141,7 +141,6 @@ export function WorkflowAssignmentStep({ state, onStateUpdated }: Props) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-white">{step.title}</h2>
         <p className="mt-2 text-sm text-white/60">
           Create one or more assignments and define the role for each.
         </p>

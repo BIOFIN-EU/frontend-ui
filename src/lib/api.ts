@@ -101,8 +101,7 @@ function extractErrorMessage(data: any, status: number): string {
 }
 
 function extractFieldErrors(data: any): Record<string, string> {
-  const explicitFieldErrors =
-    data?.detail?.field_errors || data?.field_errors;
+  const explicitFieldErrors = data?.detail?.field_errors || data?.field_errors;
 
   if (
     explicitFieldErrors &&
@@ -121,8 +120,7 @@ function extractFieldErrors(data: any): Record<string, string> {
       const loc = Array.isArray(item?.loc) ? item.loc : [];
       const msg = typeof item?.msg === "string" ? item.msg : "Invalid value";
 
-      const fieldName =
-        loc.length > 0 ? String(loc[loc.length - 1]) : "form";
+      const fieldName = loc.length > 0 ? String(loc[loc.length - 1]) : "form";
 
       if (!result[fieldName]) {
         result[fieldName] = msg;
@@ -139,6 +137,7 @@ let refreshPromise: Promise<void> | null = null;
 
 async function refreshAccessToken() {
   const rt = getRefreshToken();
+
   if (!rt) {
     clearTokens();
     throw new Error("No refresh token");
@@ -181,6 +180,12 @@ export async function apiFetch<T>(
   const token = getAccessToken();
   const url = `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
 
+  console.log("apiFetch debug", {
+    url,
+    hasAccessToken: Boolean(token),
+    hasRefreshToken: Boolean(getRefreshToken()),
+  });
+
   const headers = new Headers(options.headers);
 
   if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
@@ -196,11 +201,23 @@ export async function apiFetch<T>(
     headers,
   });
 
+  console.log("apiFetch response", {
+    url,
+    status: res.status,
+  });
+
   if (res.status === 401 && retry && getRefreshToken()) {
     try {
+      console.log("401 received, attempting token refresh");
+
       await ensureRefreshedOnce();
+
+      console.log("Token refresh successful, retrying request");
+
       return apiFetch<T>(path, options, false);
     } catch (err) {
+      console.error("Token refresh failed", err);
+
       authFailureHandler?.();
       throw err;
     }
@@ -209,6 +226,12 @@ export async function apiFetch<T>(
   const data = await parseJsonSafe(res);
 
   if (!res.ok) {
+    console.error("apiFetch error response", {
+      url,
+      status: res.status,
+      data,
+    });
+
     const message = extractErrorMessage(data, res.status);
     const fieldErrors = extractFieldErrors(data);
 
