@@ -25,7 +25,7 @@ export function CaseDashboardMenu({ caseId, state, canManageUsers }: Props) {
         </p>
 
         <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">
-          Loan Identifier #{state.caseId ?? caseId}
+          Case Identifier #{state.caseId ?? caseId}
         </h2>
 
         <div className="mt-3">

@@ -126,11 +126,11 @@ const HARDCODED_EXPLANATION_BLOCKS = [
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-            Loan Identifier #{caseId}
+            Case Identifier #{caseId}
           </div>
 
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-            Loan Dashboard
+            Case Dashboard
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">

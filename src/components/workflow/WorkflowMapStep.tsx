@@ -160,7 +160,7 @@ export function WorkflowMapStep({ state, onStateUpdated }: Props) {
 
       <div className="space-y-2">
         <label className="block text-sm font-medium text-white">
-          Farm Location
+          Location
         </label>
         <textarea
           value={polygonWkt}

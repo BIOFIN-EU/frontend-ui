@@ -24,7 +24,7 @@ export default function NavClient() {
 
       )}
         {isAuthed && (
-      <Link href="/intermediaries/new" className="navLink">Intermedaries</Link>
+      <Link href="/intermediaries" className="navLink">Intermedaries</Link>
             )}
     </nav>
   );
