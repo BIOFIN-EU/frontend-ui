@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/context/auth.context";
 import { workflowService } from "@/services/workflow.service";
 import type { WorkflowState } from "@/types/case-dashboard";
-import { WorkflowStepScreen } from "@/components/workflow/WorkflowStepScreen";
+import { PathwayStepScreen } from "@/components/pathways/PathwayStepScreen";
 
 export default function WorkflowCasePage() {
   const params = useParams<{ caseId: string }>();
@@ -56,7 +56,7 @@ export default function WorkflowCasePage() {
     <div className="space-y-8">
       <header className="space-y-4">
         <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-          Case #{caseId}
+          Project #{caseId}
         </div>
       </header>
 
@@ -85,7 +85,7 @@ export default function WorkflowCasePage() {
               </h2>
 
               <div className="mt-6">
-                <WorkflowStepScreen
+                <PathwayStepScreen
                   state={state}
                   onStateUpdated={setState}
                   onReload={loadState}

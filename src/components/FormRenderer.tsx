@@ -79,6 +79,19 @@ function Field({
         </div>
       );
 
+    case "content":
+      return (
+        <div className="rounded-xl border border-blue-400/20 bg-blue-400/5 p-4">
+          <h3 className="mb-2 text-sm font-semibold text-blue-100">
+            {field.label}
+          </h3>
+
+          <div className="text-sm leading-relaxed text-white/80 whitespace-pre-wrap">
+            {field.content}
+          </div>
+        </div>
+      );
+
     case "select":
       return (
         <div className="space-y-1">

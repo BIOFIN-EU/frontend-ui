@@ -228,7 +228,7 @@ export default function BiodiversityLossAssessmentPanel({
             <h4 className="text-sm font-semibold text-emerald-200 mb-2">Model Configuration</h4>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p className="text-xs text-white/45">Risk Model</p>
+                <p className="text-xs text-white/45">Vulnerability Index</p>
                 <p className="text-white/80 font-medium">{caseData?.risk_model}</p>
               </div>
               <div>

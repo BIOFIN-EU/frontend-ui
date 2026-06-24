@@ -9,23 +9,28 @@ export default function NavClient() {
   return (
     <nav className="nav">
       <Link href="/" className="navLink">Home</Link>
-        {isAuthed && (
-      <Link href="/risk-model" className="navLink">Investment Priorities</Link>
-            )}
       <Link href="/about" className="navLink">About</Link>
       <Link href="/support" className="navLink">Support</Link>
 
       {isAuthed && (
-        <Link href="/workflow" className="navLink">Workflow</Link>
+        <>
+          <Link href="/vulnerability-index" className="navLink">
+            Vulnerability Index
+          </Link>
 
-      )}
-      {isAuthed && (
-        <Link href="/cases" className="navLink">Cases</Link>
+          <Link href="/pathways" className="navLink">
+            Pathways
+          </Link>
 
+          <Link href="/projects" className="navLink">
+            Projects
+          </Link>
+
+          <Link href="/intermediaries" className="navLink">
+            Intermediaries
+          </Link>
+        </>
       )}
-        {isAuthed && (
-      <Link href="/intermediaries" className="navLink">Intermedaries</Link>
-            )}
     </nav>
   );
 }

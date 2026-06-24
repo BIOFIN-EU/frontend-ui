@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/auth.context";
 import { caseListService } from "@/services/case-list.service";
 import type { CaseListItem } from "@/types/case-list";
-import { CaseListScreen } from "@/components/cases/CaseListScreen";
+import { ProjectListScreen } from "@/components/projects/ProjectListScreen";
 
 export default function CasesPage() {
   const { user } = useAuth();
@@ -38,24 +38,26 @@ export default function CasesPage() {
     return (
       <section className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight text-white">
-          Cases
+          Projects
         </h1>
-        <p className="text-sm text-white/70">Loading case access…</p>
+        <p className="text-sm text-white/70">Loading project access…</p>
       </section>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8">Total projects
+
+
       <header className="space-y-4">
         <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-          Case dashboard
+          Project dashboard
         </div>
       </header>
 
       {loading && (
         <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
-          Loading cases...
+          Loading projects...
         </div>
       )}
 
@@ -65,7 +67,7 @@ export default function CasesPage() {
         </div>
       )}
 
-      {!loading && !error && <CaseListScreen cases={cases} />}
+      {!loading && !error && <ProjectListScreen cases={cases} />}
     </div>
   );
 }

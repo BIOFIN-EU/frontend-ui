@@ -10,7 +10,7 @@ type CaseAccessManagementProps = {
   onUserAdded: () => void;
 };
 
-export function CaseAccessManagement({
+export function ProjectAccessManagement({
   caseId,
   users,
   onUserAdded,

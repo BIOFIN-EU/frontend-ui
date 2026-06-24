@@ -27,14 +27,14 @@ const audiences = [
     key: "fund",
     title: "Fund Nature-Based Solutions",
     text: "Explore biodiversity risk, opportunity, and evidence to support stronger investment decisions.",
-    href: "/support?audience=funder",
+    href: "/pathways",
     cta: "Explore funding pathways",
   },
   {
     key: "build",
     title: "Build Nature-Based Solutions",
     text: "Showcase your project, understand requirements, and position your solution for financing.",
-    href: "/support?audience=builder",
+    href: "/pathways",
     cta: "See how to get started",
   },
   {
@@ -267,10 +267,10 @@ export default function HomePage() {
                   Contact support
                 </Link>
                 <Link
-                  href="/risk-model"
+                  href="/vulnerability-index"
                   className={`${buttonBase} ${buttonSecondary}`}
                 >
-                  Explore the risk model
+                  Explore the Vulnerability Index
                 </Link>
               </div>
             </div>

@@ -10,7 +10,7 @@ type Props = {
   onStateUpdated: (state: WorkflowState) => void;
 };
 
-export function WorkflowFileStep({ state, onStateUpdated }: Props) {
+export function PathwayFileStep({ state, onStateUpdated }: Props) {
   const step = state.step;
 
   if (!step) {

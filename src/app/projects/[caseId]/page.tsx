@@ -6,10 +6,10 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/context/auth.context";
 import { caseDashboardService } from "@/services/case-dashboard.service";
 import type { CaseDashboardState } from "@/types/workflow";
-import { CaseDashboardScreen } from "@/components/cases/CaseDashboardScreen";
-import { CaseDashboardMenu } from "@/components/cases/CaseDashboardMenu";
-import { useCaseUsers } from "@/components/cases/hooks/useCaseUsers";
-import { BiodiversityRiskInsight } from "@/components/risk/BiodiversityRiskInsight";
+import { ProjectDashboardScreen } from "@/components/projects/ProjectDashboardScreen";
+import { ProjectDashboardMenu } from "@/components/projects/ProjectDashboardMenu";
+import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";
+import { BiodiversityRiskInsight } from "@/components/vulnerability-index/BiodiversityRiskInsight";
 
 
 export default function CaseDashboardPage() {
@@ -114,9 +114,9 @@ const HARDCODED_EXPLANATION_BLOCKS = [
     return (
       <section className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight text-white">
-          Case dashboard
+          Project dashboard
         </h1>
-        <p className="text-sm text-white/70">Loading case access…</p>
+        <p className="text-sm text-white/70">Loading project access…</p>
       </section>
     );
   }
@@ -126,15 +126,15 @@ const HARDCODED_EXPLANATION_BLOCKS = [
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-            Case Identifier #{caseId}
+            Project Identifier #{caseId}
           </div>
 
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-            Case Dashboard
+            Project Dashboard
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
-            Review submitted workflow data, biodiversity risk context, and case
+            Review submitted workflow data, biodiversity risk context, and project
             access settings.
           </p>
         </div>
@@ -142,7 +142,7 @@ const HARDCODED_EXPLANATION_BLOCKS = [
 
       {loading && (
         <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
-          Loading case dashboard...
+          Loading project dashboard...
         </div>
       )}
 
@@ -155,7 +155,7 @@ const HARDCODED_EXPLANATION_BLOCKS = [
       {!loading && state && (
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_280px]">
           <main className="min-w-0 space-y-8">
-            <CaseDashboardScreen key={String(caseId)} state={state} />
+            <ProjectDashboardScreen key={String(caseId)} state={state} />
 
             {!usersLoading && canManageUsers && (
               <BiodiversityRiskInsight
@@ -178,7 +178,7 @@ const HARDCODED_EXPLANATION_BLOCKS = [
           </main>
 
           <aside className="min-w-0 xl:sticky xl:top-24">
-            <CaseDashboardMenu
+            <ProjectDashboardMenu
               caseId={caseId}
               state={state}
               canManageUsers={!usersLoading && canManageUsers}

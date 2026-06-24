@@ -12,7 +12,7 @@ type Props = {
 
 type AssignmentRow = Record<string, string>;
 
-export function WorkflowAssignmentStep({ state, onStateUpdated }: Props) {
+export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
   const step = state.step;
 
   const assignmentField = useMemo(() => {

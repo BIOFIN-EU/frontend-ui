@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 
 import { useAuth } from "@/context/auth.context";
-import { useCaseUsers } from "@/components/cases/hooks/useCaseUsers";
-import { CaseAccessManagement } from "@/components/cases/CaseAccessManagement";
+import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";
+import { ProjectAccessManagement } from "@/components/projects/ProjectAccessManagement";
 
 export default function CaseAccessPage() {
   const params = useParams<{ caseId: string }>();
@@ -21,7 +21,7 @@ export default function CaseAccessPage() {
   if (!user || loading) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
-        Loading case access…
+        Loading project access…
       </div>
     );
   }
@@ -30,7 +30,7 @@ export default function CaseAccessPage() {
     return (
       <div className="space-y-4">
         <Link
-          href={`/cases/${caseId}`}
+          href={`/projects/${caseId}`}
           className="text-sm font-semibold text-emerald-200 hover:text-emerald-100"
         >
           ← Back to dashboard
@@ -47,7 +47,7 @@ export default function CaseAccessPage() {
     <div className="space-y-6">
       <header className="space-y-3">
         <Link
-          href={`/cases/${caseId}`}
+          href={`/projects/${caseId}`}
           className="text-sm font-semibold text-emerald-200 hover:text-emerald-100"
         >
           ← Back to dashboard
@@ -55,15 +55,15 @@ export default function CaseAccessPage() {
 
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-            Case #{caseId}
+            Project #{caseId}
           </p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">
-            Case access management
+            Project access management
           </h1>
         </div>
       </header>
 
-      <CaseAccessManagement
+      <ProjectAccessManagement
         caseId={numericCaseId}
         users={users}
         onUserAdded={() => window.location.reload()}

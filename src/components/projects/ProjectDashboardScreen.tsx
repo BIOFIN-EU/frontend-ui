@@ -52,6 +52,20 @@ function getFieldValue(
   field: DashboardField,
   stepCode: string
 ): unknown {
+    // Temporary workaround until consent is stored
+  if (field.name === "disclaimer_acknowledged") {
+    return "Agreed";
+  }
+
+    if (field.name === "allow_data_sharing") {
+    return "Accepted";
+  }
+
+  // Hide static content fields from dashboard rendering
+  if (field.type === "content") {
+    return null;
+  }
+
   if (stepData && field.name in stepData) {
     return stepData[field.name] ?? null;
   }
@@ -255,7 +269,7 @@ function AssignmentTableCard({ assignments }: { assignments: unknown[] }) {
   );
 }
 
-export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
+export function ProjectDashboardScreen({ state }: { state: CaseDashboardState }) {
   const orderedSteps = useMemo(() => getOrderedSteps(state), [state]);
   const [activeStepCode, setActiveStepCode] = useState<string>("");
 
@@ -349,7 +363,9 @@ export function CaseDashboardScreen({ state }: { state: CaseDashboardState }) {
           {activeStep.step.ui_mode === "assignment_table" ? (
             <AssignmentTableCard assignments={assignments} />
           ) : (
-            (activeStep.step.fields || []).map((field) => {
+            (activeStep.step.fields || [])
+            .filter((field) => field.type !== "content")
+            .map((field) => {
               const value = getFieldValue(
                 state,
                 activeStepData,

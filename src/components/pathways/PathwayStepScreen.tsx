@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import type { WorkflowState } from "@/types/case-dashboard";
-import { WorkflowFormStep } from "./WorkflowFormStep";
-import { WorkflowFileStep } from "./WorkflowFileStep";
-import { WorkflowMapStep } from "./WorkflowMapStep";
-import { WorkflowAssignmentStep } from "./WorkflowAssignmentStep";
+import { PathwayFormStep } from "./PathwayFormStep";
+import { PathwayFileStep } from "./PathwayFileStep";
+import { PathwayMapStep } from "./PathwayMapStep";
+import { PathwayAssignmentStep } from "./PathwayAssignmentStep";
 
 type Props = {
   state: WorkflowState;
@@ -22,7 +22,7 @@ function inferMode(step: WorkflowState["step"]) {
   return "form";
 }
 
-export function WorkflowStepScreen({
+export function PathwayStepScreen({
   state,
   onStateUpdated,
   onReload,
@@ -36,10 +36,10 @@ export function WorkflowStepScreen({
               Completed
             </p>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-              Your case has been created successfully
+              Your project has been created successfully
             </h2>
             <p className="mt-3 max-w-2xl text-sm text-white/75">
-              You have completed all required steps. You can now open your case
+              You have completed all required steps. You can now open your project
               dashboard to review the submitted information, documents, and next
               steps.
             </p>
@@ -47,10 +47,10 @@ export function WorkflowStepScreen({
 
           <div className="shrink-0">
             <Link
-              href={`/cases/${state.case_id}`}
+              href={`/projects/${state.case_id}`}
               className="inline-flex items-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300"
             >
-              View case #{state.case_id}
+              View project #{state.case_id}
             </Link>
           </div>
         </div>
@@ -63,7 +63,7 @@ export function WorkflowStepScreen({
 
   if (mode === "map_form") {
     return (
-      <WorkflowMapStep
+      <PathwayMapStep
         state={state}
         onStateUpdated={onStateUpdated}
       />
@@ -72,7 +72,7 @@ export function WorkflowStepScreen({
 
   if (mode === "file_form") {
     return (
-      <WorkflowFileStep
+      <PathwayFileStep
         state={state}
         onStateUpdated={onStateUpdated}
       />
@@ -81,7 +81,7 @@ export function WorkflowStepScreen({
 
   if (mode === "assignment_table") {
   return (
-    <WorkflowAssignmentStep
+    <PathwayAssignmentStep
       state={state}
       onStateUpdated={onStateUpdated}
     />
@@ -89,7 +89,7 @@ export function WorkflowStepScreen({
 }
 
   return (
-    <WorkflowFormStep
+    <PathwayFormStep
       state={state}
       onStateUpdated={onStateUpdated}
     />

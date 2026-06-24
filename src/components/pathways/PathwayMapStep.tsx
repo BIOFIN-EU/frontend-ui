@@ -12,7 +12,7 @@ type Props = {
   onStateUpdated: (state: WorkflowState) => void;
 };
 
-export function WorkflowMapStep({ state, onStateUpdated }: Props) {
+export function PathwayMapStep({ state, onStateUpdated }: Props) {
   const step = state.step!;
   const [polygonWkt, setPolygonWkt] = useState("");
   const [error, setError] = useState("");

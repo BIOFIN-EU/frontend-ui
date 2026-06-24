@@ -132,7 +132,7 @@ export default function ClimateResiliencePanel({
             Climate Resilience Assessment
           </h3>
           <p className="text-sm leading-relaxed text-white/70 mb-4">
-            Climate resilience is assessed by integrating habitat risk and landscape resilience to determine priority management actions. The BioFIN Biodiversity Risk Model evaluates current habitat risk levels, while landscape resilience is derived from Species Richness Index (SRI) projections under future climate scenarios.
+            Climate resilience is assessed by integrating habitat risk and landscape resilience to determine priority management actions. The BioFIN Biodiversity Vulnerability Index evaluates current habitat risk levels, while landscape resilience is derived from Species Richness Index (SRI) projections under future climate scenarios.
           </p>
           <p className="text-sm leading-relaxed text-white/70">
             This combined approach enables identification of zones requiring active protection, passive protection, active restoration, or passive restoration based on their resilience trajectory and current risk exposure.

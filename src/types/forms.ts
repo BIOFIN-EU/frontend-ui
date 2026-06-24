@@ -8,8 +8,19 @@ export type FieldOption = { label: string; value: string };
 
 export type FieldSchema = {
   id: string;
-  type: "text" | "number" | "select" | "radio" | "checkbox";
+  type:
+    | "text"
+    | "number"
+    | "select"
+    | "radio"
+    | "checkbox"
+    | "textarea"
+    | "file"
+    | "content";
+
   label: string;
+  content?: string;
+
   required?: boolean;
   options?: FieldOption[];
   visible_if?: VisibleIfRule;

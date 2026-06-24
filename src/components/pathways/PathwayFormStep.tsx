@@ -12,7 +12,7 @@ type Props = {
 };
 
 
-export function WorkflowFormStep({ state, onStateUpdated }: Props) {
+export function PathwayFormStep({ state, onStateUpdated }: Props) {
   const step = state.step;
   const [lookupOptions, setLookupOptions] = useState<Record<string, LookupOption[]>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -66,6 +66,7 @@ export function WorkflowFormStep({ state, onStateUpdated }: Props) {
         id: f.name,
         label: f.display_name,
         type: f.type as any,
+        content: f.content,
         required: !!f.required,
         options:
           f.type === "select" && f.options_source
