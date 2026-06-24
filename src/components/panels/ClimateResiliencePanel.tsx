@@ -50,7 +50,7 @@ export default function ClimateResiliencePanel({
     // Medium-Low Resiliency
     ["AR I", "AR I", "AR II", "AR II", "PR"],
     // Low Resiliency
-    ["Low Priority", "Low Priority", "Low Priority", "Low Priority", "Low Priority"]
+    ["LP", "LP", "LP", "LP", "LP"]
   ];
 
   const riskLevels = ["high", "medium-high", "medium", "medium-low", "low"];
