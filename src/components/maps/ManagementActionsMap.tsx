@@ -12,6 +12,8 @@ import WKT from "ol/format/WKT";
 import type Feature from "ol/Feature";
 import type Geometry from "ol/geom/Geometry";
 import Overlay from "ol/Overlay";
+import ScaleLine from "ol/control/ScaleLine";
+import { defaults as defaultControls } from "ol/control/defaults.js";
 
 type RecommendationsMeta = {
   [key: string]: {
@@ -49,6 +51,15 @@ export default function ManagementActionsMap({
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
+
+    // Create the scale line control with your desired configuration
+    const scaleControl = new ScaleLine({
+      units: "metric", // or "imperial", "nautical", "degrees"
+      bar: true, // true for scale bar, false for text-only scale line
+      steps: 4, // number of steps in the scale bar
+      text: true, // show scale text
+      minWidth: 140, // minimum width of the scale bar
+    });
 
     const vectorSource = new VectorSource();
 
@@ -140,10 +151,10 @@ export default function ManagementActionsMap({
       offset: [0, -10],
       stopEvent: false,
     });
-
     // Create map
     const map = new Map({
       target: mapRef.current,
+      controls: defaultControls().extend([scaleControl]), // Add this line
       layers: [
         new TileLayer({ source: new OSM() }),
         mainPolygonLayer,
