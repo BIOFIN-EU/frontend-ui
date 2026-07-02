@@ -444,3 +444,19 @@ body::before {
   height: 18px;
   stroke-width: 1.7;
 }
+
+/* =====================
+   VULNERABILITY INDEX MAP
+   ===================== */
+
+/* Scale bar text styling */
+.ol-scale-text {
+  font-weight: bold !important;
+  font-size: 14px !important;
+}
+
+/* This targets the step text (0, 50, 100) */
+.ol-scale-step-text {
+  font-weight: bold !important;
+  font-size: 13px !important;
+}
