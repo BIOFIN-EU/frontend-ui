@@ -69,7 +69,7 @@ export default function ManagementActionsMap({
       style: new Style({
         stroke: new Stroke({
           color: "#000000",
-          width: 6,
+          width: 3,
         }),
         fill: new Fill({
           color: "rgba(0, 0, 0, 0)",
@@ -116,12 +116,9 @@ export default function ManagementActionsMap({
       style: (feature) => {
         const color = feature.get('color') || '#cccccc';
         return new Style({
-          stroke: new Stroke({
-            color: color,
-            width: 2,
-          }),
+          stroke: null, // Explicitly remove any stroke
           fill: new Fill({
-            color: `${color}80`, // Add 0.5 alpha
+            color: `${color}FF`, // Add 0.5 alpha
           }),
         });
       },
@@ -161,8 +158,8 @@ export default function ManagementActionsMap({
         recommendationLayer,
       ],
       view: new View({
-        center: [0, 0],
-        zoom: 2,
+        center: [794421.1588563935, 6809900.680716462],
+        zoom: 6.76519547453094,
       }),
     });
 
@@ -240,6 +237,7 @@ export default function ManagementActionsMap({
     }
 
     mapInstanceRef.current = map;
+    window.mapInstance = map;
 
     return () => {
       map.setTarget(undefined);
@@ -251,12 +249,12 @@ export default function ManagementActionsMap({
     <div className="relative h-[460px] w-full overflow-hidden rounded-2xl border border-white/10">
       <div ref={mapRef} className="h-full w-full" />
 
-      <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-md">
+      {/* <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-md">
         <p className="text-sm font-semibold text-white">Management Actions Map</p>
         <p className="mt-1 text-xs text-white/70">
           Click on any colored area to see management action details
         </p>
-      </div>
+      </div> */}
     </div>
   );
 }
