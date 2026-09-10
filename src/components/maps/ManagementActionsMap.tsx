@@ -333,7 +333,7 @@ export default function ManagementActionsMap({
     if (recommendationLayerRef.current && resilienceLayerRef.current && riskLayerRef.current) {
       recommendationLayerRef.current.setVisible(activeMode === "recommendations");
       resilienceLayerRef.current.setVisible(activeMode === "resilience");
-      riskLayerRef.current.setVisible(activeMode === "");
+      riskLayerRef.current.setVisible(activeMode === "risk");
     }
   }, [activeMode]);
 
