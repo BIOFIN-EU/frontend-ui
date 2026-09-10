@@ -242,12 +242,9 @@ export default function ClimateResiliencePanel({
             </div>
             <div className="space-y-2">
               <div>
-                <p className="text-xs text-white/45">Mean Resiliency Value</p>
+                <p className="text-xs text-white/45">Dominant Resiliency Class</p>
                 <p className="text-2xl font-bold text-white">
-                  {formatMeanValue(resiliencyData?.mean_raster_value)}
-                </p>
-                <p className="text-xs text-white/40 mt-1">
-                  Std Dev: {formatMeanValue(resiliencyData?.std_raster_value)}
+                  {resiliencyData?.resilience_dominant_class}
                 </p>
               </div>
             </div>
@@ -263,23 +260,21 @@ export default function ClimateResiliencePanel({
             <div>
               <p className="text-xs text-white/45">Climate Model</p>
               <p className="text-white/80 font-medium">
-                {resiliencyData?.climate_model ?? caseData?.climate_model ?? "current"}
+                {caseData?.climate_model ?? "current"}
               </p>
             </div>
             <div>
               <p className="text-xs text-white/45">Climate Scenario</p>
               <p className="text-white/80 font-medium">
-                {resiliencyData?.climate_scenario
-                  ? resiliencyData.climate_scenario.toUpperCase()
+                {resiliencyData?.climate_scenarios
+                  ? resiliencyData.climate_scenarios.toUpperCase()
                   : (caseData?.climate_scenario ?? "SSP585 (worst-case)")}
               </p>
             </div>
             <div>
               <p className="text-xs text-white/45">Time Period</p>
               <p className="text-white/80 font-medium">
-                {resiliencyData?.periods
-                  ? resiliencyData.periods.join(" → ")
-                  : (caseData?.period ?? "current")}
+                {resiliencyData?.periods}
               </p>
             </div>
             <div>
@@ -289,7 +284,7 @@ export default function ClimateResiliencePanel({
           </div>
 
           {/* Additional Resiliency Parameters */}
-          {resiliencyData && (resiliencyData.climate_scenario || resiliencyData.climate_model) && (
+          {resiliencyData && (resiliencyData.climate_scenarios || resiliencyData.climate_model) && (
             <div className="mt-3 pt-3 border-t border-white/10">
               <p className="text-xs text-white/45 mb-2">Resiliency SRI Parameters</p>
               <div className="flex flex-wrap gap-2">
@@ -313,11 +308,11 @@ export default function ClimateResiliencePanel({
           <div className="flex items-center gap-2 mb-3">
             <Calendar className="h-5 w-5 text-orange-400" />
             <h3 className="text-lg font-semibold text-emerald-200">
-              Future Projections {resiliencyData?.periods ? `(${resiliencyData.periods.join(", ")})` : "(2040 & 2060)"}
+              Future Projections {resiliencyData?.periods }
             </h3>
           </div>
           <p className="text-sm leading-relaxed text-white/70 mb-4">
-            Future Species Richness Index calculations are trained using an ensemble of models under the {resiliencyData?.climate_scenario?.toUpperCase() ?? "SSP585"} ("worst-case") climate scenario, ensuring a cautious and conservative approach to climate resilience assessment. These projections are subsequently corrected using the {resiliencyData?.sri_correction_method ?? "Human Footprint Index (HFI)"} to account for anticipated anthropogenic pressures.
+            Future Species Richness Index calculations are trained using an ensemble of models under the {resiliencyData?.climate_scenarios?.toUpperCase() ?? "SSP585"} climate scenarios, ensuring a cautious and conservative approach to climate resilience assessment. These projections are subsequently corrected using the {resiliencyData?.sri_correction_method ?? "Human Footprint Index (HFI)"} to account for anticipated anthropogenic pressures.
           </p>
           <div className="rounded-lg bg-orange-500/5 border border-orange-500/20 p-3">
             <div className="flex items-center gap-2 mb-2">
@@ -325,7 +320,7 @@ export default function ClimateResiliencePanel({
               <p className="text-xs font-semibold text-orange-300 uppercase tracking-wider">Methodology Note</p>
             </div>
             <p className="text-xs text-white/60">
-              Ensemble modeling reduces prediction uncertainty by aggregating multiple model outputs. The {resiliencyData?.climate_scenario?.toUpperCase() ?? "SSP585"} scenario represents a high-emission trajectory with radiative forcing reaching 8.5 W/m² by 2100.
+              Ensemble modeling reduces prediction uncertainty by aggregating multiple model outputs. Among the {resiliencyData?.climate_scenarios?.toUpperCase() ?? "SSP585"} scenarios, one represents a high-emission trajectory with radiative forcing reaching 8.5 W/m² by 2100.
             </p>
           </div>
         </div>

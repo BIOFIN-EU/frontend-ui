@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
@@ -28,6 +28,10 @@ type Props = {
   polygonWkt: string;
   recommendationsPolygons: Record<string, string>;
   recommendationsMeta: RecommendationsMeta;
+  resiliencePolygons: Record<string, string>;   // new
+  resilienceMeta: RecommendationsMeta;         // new
+  riskPolygons: Record<string, string>;
+  riskMeta: RecommendationsMeta;
 };
 
 const wktFormat = new WKT();
@@ -45,7 +49,15 @@ export default function ManagementActionsMap({
   polygonWkt,
   recommendationsPolygons,
   recommendationsMeta,
+  resiliencePolygons,
+  resilienceMeta,
+  riskPolygons,
+  riskMeta
 }: Props) {
+  const [activeMode, setActiveMode] = useState<'recommendations' | 'resilience' | 'risk'>('recommendations');
+  const recommendationLayerRef = useRef<VectorLayer | null>(null);
+  const resilienceLayerRef = useRef<VectorLayer | null>(null);
+  const riskLayerRef = useRef<VectorLayer | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<Map | null>(null);
 
@@ -123,6 +135,75 @@ export default function ManagementActionsMap({
         });
       },
     });
+    recommendationLayerRef.current = recommendationLayer;
+        // ---- Create resilience layer ----
+    const resilienceSource = new VectorSource();
+    Object.entries(resiliencePolygons).forEach(([category, wktString]) => {
+      const meta = resilienceMeta[category];
+      if (meta && wktString) {
+        try {
+          const feature = wktToFeature(wktString);
+          feature.set('label', meta.label);
+          feature.set('description', meta.description);
+          feature.set('color', meta.color);
+          feature.set('category', category);
+          resilienceSource.addFeature(feature);
+        } catch (error) {
+          console.error(`Error adding resilience polygon for category ${category}:`, error);
+        }
+      }
+    });
+
+    const resilienceLayer = new VectorLayer({
+      source: resilienceSource,
+      style: (feature) => {
+        const color = feature.get('color') || '#cccccc';
+        return new Style({
+          stroke: null,
+          fill: new Fill({
+            color: `${color}FF`,
+          }),
+        });
+      },
+    });
+    resilienceLayerRef.current = resilienceLayer;
+
+
+
+        // ---- Create risk layer ----
+    const riskSource = new VectorSource();
+    Object.entries(riskPolygons).forEach(([category, wktString]) => {
+      const meta = riskMeta[category];
+      if (meta && wktString) {
+        try {
+          const feature = wktToFeature(wktString);
+          feature.set('label', meta.label);
+          feature.set('description', meta.description);
+          feature.set('color', meta.color);
+          feature.set('category', category);
+          riskSource.addFeature(feature);
+        } catch (error) {
+          console.error(`Error adding risk polygon for category ${category}:`, error);
+        }
+      }
+    });
+
+    const riskLayer = new VectorLayer({
+      source: riskSource,
+      style: (feature) => {
+        const color = feature.get('color') || '#cccccc';
+        return new Style({
+          stroke: null,
+          fill: new Fill({
+            color: `${color}FF`,
+          }),
+        });
+      },
+    });
+    riskLayerRef.current = riskLayer;
+    riskLayer.setVisible(activeMode === "risk");
+    recommendationLayer.setVisible(activeMode === "recommendations");
+    resilienceLayer.setVisible(activeMode === "resilience");
 
     // Create popup overlay
     const popupElement = document.createElement('div');
@@ -156,6 +237,8 @@ export default function ManagementActionsMap({
         new TileLayer({ source: new OSM() }),
         mainPolygonLayer,
         recommendationLayer,
+        resilienceLayer,
+        riskLayer,
       ],
       view: new View({
         center: [794421.1588563935, 6809900.680716462],
@@ -165,13 +248,14 @@ export default function ManagementActionsMap({
 
     map.addOverlay(popupOverlay);
 
+
     // Handle click events on the map
     map.on('click', (event) => {
       // Check if we clicked on a feature in the recommendation layer
       const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => {
         return feature;
       }, {
-        layerFilter: (layer) => layer === recommendationLayer,
+        layerFilter: (layer) => layer === recommendationLayer || layer === resilienceLayer || layer === riskLayer,
       });
 
       if (feature) {
@@ -201,7 +285,7 @@ export default function ManagementActionsMap({
     // Change cursor on hover over clickable features
     map.on('pointermove', (event) => {
       const hasFeature = map.hasFeatureAtPixel(event.pixel, {
-        layerFilter: (layer) => layer === recommendationLayer,
+        layerFilter: (layer) => layer === recommendationLayer || layer === resilienceLayer || layer === riskLayer,
       });
       const targetElement = map.getTargetElement();
       if (targetElement) {
@@ -243,10 +327,50 @@ export default function ManagementActionsMap({
       map.setTarget(undefined);
       mapInstanceRef.current = null;
     };
-  }, [polygonWkt, recommendationsPolygons, recommendationsMeta]);
+  }, [polygonWkt, recommendationsPolygons, recommendationsMeta, resiliencePolygons, resilienceMeta, riskPolygons, riskMeta]);
+
+  useEffect(() => {
+    if (recommendationLayerRef.current && resilienceLayerRef.current && riskLayerRef.current) {
+      recommendationLayerRef.current.setVisible(activeMode === "recommendations");
+      resilienceLayerRef.current.setVisible(activeMode === "resilience");
+      riskLayerRef.current.setVisible(activeMode === "");
+    }
+  }, [activeMode]);
 
   return (
     <div className="relative h-[460px] w-full overflow-hidden rounded-2xl border border-white/10">
+      <div className="absolute left-8 top-4 flex gap-2 rounded-xl z-10 bg-black/50 p-1 backdrop-blur-sm border border-white/10">
+        <button
+          onClick={() => setActiveMode("recommendations")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            activeMode === "recommendations"
+              ? "bg-emerald-500 text-white"
+              : "text-white/60 hover:text-white hover:bg-white/10"
+          }`}
+        >
+          Recommendations
+        </button>
+        <button
+          onClick={() => setActiveMode("resilience")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            activeMode === "resilience"
+              ? "bg-emerald-500 text-white"
+              : "text-white/60 hover:text-white hover:bg-white/10"
+          }`}
+        >
+          Resilience
+        </button>
+        <button
+          onClick={() => setActiveMode("risk")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            activeMode === "risk"
+              ? "bg-emerald-500 text-white"
+              : "text-white/60 hover:text-white hover:bg-white/10"
+          }`}
+        >
+          Vulnerability
+        </button>
+      </div>
       <div ref={mapRef} className="h-full w-full" />
 
       {/* <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-md">
@@ -257,4 +381,7 @@ export default function ManagementActionsMap({
       </div> */}
     </div>
   );
+
+
+
 }
