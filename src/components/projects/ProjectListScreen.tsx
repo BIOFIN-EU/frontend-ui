@@ -45,7 +45,10 @@ function InfoBlock({
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
         {label}
       </p>
-      <p className="mt-2 text-sm leading-6 text-white/90">{value}</p>
+
+      <p className="mt-2 text-sm leading-6 text-white/90">
+        {value}
+      </p>
     </div>
   );
 }
@@ -76,8 +79,13 @@ export function ProjectListScreen({ cases }: Props) {
 
     return cases
       .filter((item) => {
-        if (typeFilter !== "all" && item.caseType !== typeFilter) return false;
-        if (statusFilter !== "all" && item.status !== statusFilter) return false;
+        if (typeFilter !== "all" && item.caseType !== typeFilter) {
+          return false;
+        }
+
+        if (statusFilter !== "all" && item.status !== statusFilter) {
+          return false;
+        }
 
         if (!q) return true;
 
@@ -102,17 +110,22 @@ export function ProjectListScreen({ cases }: Props) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
               Projects
             </p>
+
             <h1 className="text-3xl font-semibold tracking-tight text-white">
               Project dashboard
             </h1>
+
             <p className="max-w-2xl text-sm leading-6 text-white/60">
-              Browse, filter, and open your cases from one place.
+              Browse, filter, and open your projects from one place.
             </p>
           </div>
 
-          <div className="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200">
-            {filteredCases.length} visible
-          </div>
+          <Link
+            href="/pathways"
+            className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500"
+          >
+            Create New Project
+          </Link>
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -120,6 +133,7 @@ export function ProjectListScreen({ cases }: Props) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
               Total projects
             </p>
+
             <p className="mt-3 text-3xl font-semibold text-white">
               {cases.length}
             </p>
@@ -129,6 +143,7 @@ export function ProjectListScreen({ cases }: Props) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
               Project types
             </p>
+
             <p className="mt-3 text-3xl font-semibold text-white">
               {caseTypes.length}
             </p>
@@ -138,6 +153,7 @@ export function ProjectListScreen({ cases }: Props) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
               Statuses
             </p>
+
             <p className="mt-3 text-3xl font-semibold text-white">
               {statuses.length}
             </p>
@@ -146,11 +162,22 @@ export function ProjectListScreen({ cases }: Props) {
       </section>
 
       <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <p className="text-sm text-white/50">
+            Filter projects
+          </p>
+
+          <div className="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200">
+            {filteredCases.length} visible
+          </div>
+        </div>
+
         <div className="grid gap-4 lg:grid-cols-[1.5fr_0.85fr_0.85fr]">
           <div>
             <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
               Search
             </label>
+
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -163,11 +190,15 @@ export function ProjectListScreen({ cases }: Props) {
             <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
               Project type
             </label>
+
             <Select
               value={typeFilter}
               onChange={setTypeFilter}
               options={[
-                { label: "All", value: "all" },
+                {
+                  label: "All",
+                  value: "all",
+                },
                 ...caseTypes.map((ct) => ({
                   label: ct,
                   value: ct,
@@ -180,11 +211,15 @@ export function ProjectListScreen({ cases }: Props) {
             <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
               Status
             </label>
+
             <Select
               value={statusFilter}
               onChange={setStatusFilter}
               options={[
-                { label: "All", value: "all" },
+                {
+                  label: "All",
+                  value: "all",
+                },
                 ...statuses.map((s) => ({
                   label: formatStatusLabel(s),
                   value: s,
@@ -198,7 +233,7 @@ export function ProjectListScreen({ cases }: Props) {
       <section className="space-y-4">
         {filteredCases.length === 0 ? (
           <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-8 text-sm text-white/60">
-            No cases found.
+            No projects found.
           </div>
         ) : (
           filteredCases.map((item) => (
@@ -227,7 +262,7 @@ export function ProjectListScreen({ cases }: Props) {
                     </div>
 
                     <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white transition group-hover:text-emerald-100">
-                      {item.name || "Untitled case"}
+                      {item.name || "Untitled project"}
                     </h2>
 
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-white/60 line-clamp-2">
@@ -237,6 +272,7 @@ export function ProjectListScreen({ cases }: Props) {
 
                   <div className="flex items-center gap-2 text-sm font-medium text-white/35 transition group-hover:text-emerald-200">
                     <span>Open</span>
+
                     <span className="transition-transform duration-200 group-hover:translate-x-1">
                       →
                     </span>
@@ -244,15 +280,21 @@ export function ProjectListScreen({ cases }: Props) {
                 </div>
 
                 <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  <InfoBlock label="Project type" value={item.caseType || "Unknown"} />
+                  <InfoBlock
+                    label="Project type"
+                    value={item.caseType || "Unknown"}
+                  />
+
                   <InfoBlock
                     label="Created"
                     value={formatDate(item.createdAt)}
                   />
+
                   <InfoBlock
                     label="Updated"
                     value={formatDate(item.updatedAt)}
                   />
+
                   <InfoBlock
                     label="Last updated by"
                     value={item.updatedBy || "Unknown"}
