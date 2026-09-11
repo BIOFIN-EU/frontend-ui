@@ -45,14 +45,14 @@ export default function RootLayout({
               <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
 
                 {/* LEFT GROUP */}
-                <div className="flex items-center gap-8">
+                  <div className="flex items-center gap-4">
                     <Image
-                      src="/biofin_logo.jpg"
-                      alt="BIOFIN"
-                      width={48}
-                      height={48}
+                      src="/biofin_arrow.png"
+                      alt="BIOFIN-EU"
+                      width={100}
+                      height={50}
                       priority
-                      className="h-9 w-auto object-contain"
+                      className="h-11 w-auto object-contain"
                     />
 
                     <div className="flex flex-col leading-tight">
