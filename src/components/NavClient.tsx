@@ -9,7 +9,14 @@ export default function NavClient() {
   return (
     <nav className="nav">
       <Link href="/" className="navLink">Home</Link>
-      <Link href="/about" className="navLink">About</Link>
+      <Link
+          href="https://biofin-project.eu/"
+          className="navLink"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          BIOFIN-EU Project
+      </Link>
       <Link href="/support" className="navLink">Support</Link>
 
       {isAuthed && (
@@ -19,7 +26,7 @@ export default function NavClient() {
           </Link>
 
           <Link href="/pathways" className="navLink">
-            Pathways
+            Project Pathways
           </Link>
 
           <Link href="/projects" className="navLink">

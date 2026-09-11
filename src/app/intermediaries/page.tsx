@@ -49,10 +49,6 @@ export default function IntermediariesPage() {
     <div className="space-y-8">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
-            Intermediary master data
-          </div>
-
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">
             Intermediaries
           </h1>

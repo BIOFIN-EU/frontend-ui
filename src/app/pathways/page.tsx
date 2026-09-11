@@ -29,7 +29,7 @@ const pathways = [
     features: [
       "Financing Model Selection",
       "Location Assessment & Vulnerability Index",
-      "NbS Definition",
+      "Nature-based Solutions Definition",
       "Funding Requirements",
       "Investment Rationale",
       "Supporting Documents",

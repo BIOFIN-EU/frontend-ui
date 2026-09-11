@@ -6,6 +6,7 @@ import { useAuth } from "@/context/auth.context";
 import { caseListService } from "@/services/case-list.service";
 import type { CaseListItem } from "@/types/case-list";
 import { ProjectListScreen } from "@/components/projects/ProjectListScreen";
+import Link from "next/link";
 
 export default function CasesPage() {
   const { user } = useAuth();
@@ -52,6 +53,15 @@ export default function CasesPage() {
       <header className="space-y-4">
         <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
           Project dashboard
+        </div>
+
+        <div>
+          <Link
+            href="/pathways"
+            className="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+          >
+            Create New Project
+          </Link>
         </div>
       </header>
 

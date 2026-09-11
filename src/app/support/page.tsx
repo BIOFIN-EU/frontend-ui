@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Select } from "@/components/ui/Select";
 type ContactReason =
-  | "I am an NBS Funder"
-  | "NBS Policy Maker"
-  | "I want to get funding for my NBS"
+  | "I am an Nature-based Solutions Funder"
+  | "Nature-based Solutions Policy Maker"
+  | "I want to get funding for my Nature-based Solutions"
   | "";
 
 export default function SupportPage() {
@@ -77,7 +77,7 @@ export default function SupportPage() {
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
             <p className="text-sm font-semibold text-white">
-              NbS Funders
+              Nature-based Solutions Funders
             </p>
             <p className="mt-2 text-sm text-white/70">
               Looking for investment opportunities or tools to assess biodiversity impact? Reach out and we’ll guide you.
@@ -86,7 +86,7 @@ export default function SupportPage() {
 
           <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
             <p className="text-sm font-semibold text-white">
-              NbS Intermediaries
+              Nature-based Solutions Intermediaries
             </p>
             <p className="mt-2 text-sm text-white/70">
               Certify, guide, and verify nature-based solutions that deliver real impact.
@@ -95,7 +95,7 @@ export default function SupportPage() {
 
           <div className="rounded-xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
             <p className="text-sm font-semibold text-white">
-              NbS Providers
+              Nature-based Solutions Providers
             </p>
             <p className="mt-2 text-sm text-white/70">
               Need funding or visibility for your nature-based solution? We can help connect you with the right tools and partners.
@@ -150,9 +150,9 @@ export default function SupportPage() {
                 onChange={(nextValue) => setReason(nextValue as ContactReason)}
                 options={[
                   { label: "Select an option", value: "" },
-                  { label: "NbS Funder", value: "I am an NBS Funder" },
-                  { label: "NbS Intermediary", value: "I am an NbS Intermediary" },
-                  { label: "NbS Provider", value: "I want to get funding for my NBS" },
+                  { label: "Nature-based Solutions Funder", value: "I am an Nature-based Solutions Funder" },
+                  { label: "Nature-based Solutions Intermediary", value: "I am an Nature-based Solutions Intermediary" },
+                  { label: "Nature-based Solutions Provider", value: "I want to get funding for my Nature-based Solutions" },
                 ]}
               />
             </div>

@@ -39,7 +39,7 @@ const audiences = [
   },
   {
     key: "support",
-    title: "Support Nature-Based Solutions",
+    title: "Get Support",
     text: "Use policy, reporting, and ecosystem intelligence to guide action across stakeholders.",
     href: "/support?audience=support",
     cta: "Discover support options",
@@ -145,12 +145,10 @@ export default function HomePage() {
 
             <div className="space-y-4">
               <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Finance, assess, and report on biodiversity with confidence.
+                Invest in biodiversity with confidence.
               </h1>
               <p className="max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-                A modern platform for biodiversity classification, risk appraisal,
-                and regulatory reporting that helps investors, providers, and
-                policy stakeholders work with Nature-Based Solutions more effectively.
+                A platform that supports financers and providers to make efficient and transparent investments in Nature-based Solutions.
               </p>
             </div>
 
@@ -163,8 +161,10 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="/about"
+                href="https://biofin-project.eu/"
                 className={`${buttonBase} ${buttonSecondary}`}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Learn more
               </Link>
@@ -183,7 +183,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-300/20 to-cyan-300/10 ring-1 ring-white/10">
-                  <span className="text-sm font-semibold text-white">NBS</span>
+                  <span className="text-sm font-semibold text-white">NbS</span>
                 </div>
               </div>
 
@@ -202,9 +202,9 @@ export default function HomePage() {
                     </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-                    <p className="text-sm font-semibold text-white">Report</p>
+                    <p className="text-sm font-semibold text-white">Communicate</p>
                     <p className="mt-1 text-xs leading-5 text-white/75">
-                      Support disclosure and decision-ready outputs.
+                      Generate standardised reports and decision-ready outputs
                     </p>
                   </div>
                 </div>
@@ -251,11 +251,11 @@ export default function HomePage() {
                 Call to action
               </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                Are you looking to fund, build, or support Nature-Based Solutions?
+                Are you looking to fund, showcase, or support Nature-Based Solutions?
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-white/80">
-                Whether you are an investor, provider, policymaker, or ecosystem
-                partner, this platform helps you understand biodiversity value,
+                Whether you are an investor, provider, policymaker, or enabling intermediary,
+                this platform helps you understand biodiversity value,
                 assess environmental risk, and move toward trusted action.
               </p>
 
@@ -265,12 +265,6 @@ export default function HomePage() {
                   className={`${buttonBase} ${buttonPrimary}`}
                 >
                   Contact support
-                </Link>
-                <Link
-                  href="/vulnerability-index"
-                  className={`${buttonBase} ${buttonSecondary}`}
-                >
-                  Explore the Vulnerability Index
                 </Link>
               </div>
             </div>

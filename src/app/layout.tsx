@@ -13,7 +13,7 @@ import HeaderAuthClient from "@/components/HeaderAuthClient";
 import NavClient from "@/components/NavClient";
 
 export const metadata: Metadata = {
-  title: "BIOFIN Dashboard",
+  title: "BIOFIN-EU Dashboard",
   description: "Unlocking finance to protect and restore biodiversity",
 };
 
@@ -46,10 +46,6 @@ export default function RootLayout({
 
                 {/* LEFT GROUP */}
                 <div className="flex items-center gap-8">
-                  <Link
-                    href="/"
-                    className="flex items-center gap-3 transition-opacity duration-200 hover:opacity-90"
-                  >
                     <Image
                       src="/biofin_logo.jpg"
                       alt="BIOFIN"
@@ -61,10 +57,9 @@ export default function RootLayout({
 
                     <div className="flex flex-col leading-tight">
                       <span className="text-white font-semibold text-sm tracking-wide">
-                        BioFIN Dashboard
+                        BIOFIN-EU Dashboard
                       </span>
                     </div>
-                  </Link>
 
                   <NavClient />
                 </div>
