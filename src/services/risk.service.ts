@@ -41,17 +41,21 @@ export async function getPriorityManagementActions(country_code: string, polygon
   // });
 
   // 1. Fetch priority data
-  const priorityRes = await fetch(`${BASE}/management-actions/priority/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+    const body: Record<string, unknown> = {
       country_code: country_code,
-      // wkt_polygon: polygon,
       risk_model: "EddamiriEtAl2026",
       risk_type: "Full",
       sri_logic_type: "fuzzy",
       sri_correction_method: "HFI",
-    }),
+    };
+
+    if (polygon) {
+      body.wkt_polygon = polygon;
+    }
+  const priorityRes = await fetch(`${BASE}/management-actions/priority/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
   if (!priorityRes.ok) throw new Error(`Priority fetch error: ${priorityRes.status}`);
   const data: PriorityActionsCaseResponse = await priorityRes.json();
@@ -61,4 +65,32 @@ export async function getPriorityManagementActions(country_code: string, polygon
   console.log(data);
   return data;
 }
+
+export async function getPriorityManagementActionsByID(entry_id: string) {
+  // const data = await apiFetch<PriorityActionsCaseResponse>(`${BASE}/management-actions/priority/`, {
+  //   method: "POST",
+  //   body: JSON.stringify({
+  //     country_code: country_code,
+  //     // wkt_polygon: polygon,
+  //     risk_model: "EddamiriEtAl2026",
+  //     risk_type: "Full",
+  //     sri_logic_type: "fuzzy",
+  //     sri_correction_method: "HFI",
+  //   }),
+  // });
+
+  // 1. Fetch priority data by id
+  const priorityRes = await fetch(`${BASE}/management-actions/get/${entry_id}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!priorityRes.ok) throw new Error(`Priority fetch error: ${priorityRes.status}`);
+  const data: PriorityActionsCaseResponse = await priorityRes.json();
+
+  const riskRes = await getRiskScoreByID(data.risk);
+  data.riskData = riskRes
+  console.log(data);
+  return data;
+}
+
 
