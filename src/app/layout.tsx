@@ -83,12 +83,21 @@ export default function RootLayout({
             {/* FOOTER */}
             <footer className="relative z-10 border-t border-white/10 bg-black/20 backdrop-blur-md">
               <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 text-sm">
-                <p className="text-white/70 leading-relaxed">
-                  Funded by the European Union. Views and opinions expressed are
-                  however those of the author(s) only and do not necessarily
-                  reflect those of the European Union or the European Research
-                  Executive Agency (REA).
-                </p>
+                <div className="flex items-start gap-4">
+                  <Image
+                    src="/eu-flag.svg"
+                    alt="Flag of the European Union"
+                    width={48}
+                    height={32}
+                    className="h-8 w-12 flex-none rounded-sm object-cover"
+                  />
+                  <p className="text-white/70 leading-relaxed">
+                    Funded by the European Union. Views and opinions expressed are
+                    however those of the author(s) only and do not necessarily
+                    reflect those of the European Union or the European Research
+                    Executive Agency (REA).
+                  </p>
+                </div>
 
                 <div className="text-white/50">
                   © {new Date().getFullYear()} ® BIOFIN-EU
