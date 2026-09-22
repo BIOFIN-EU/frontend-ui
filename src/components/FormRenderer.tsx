@@ -12,6 +12,18 @@ function isVisible(field: FieldSchema, values: Record<string, any>) {
   return true;
 }
 
+export function RequirementBadge({ required }: { required: boolean }) {
+  return required ? (
+    <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-200 ring-1 ring-amber-400/25">
+      Required
+    </span>
+  ) : (
+    <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/40 ring-1 ring-white/10">
+      Optional
+    </span>
+  );
+}
+
 function Field({
   field,
   register,
@@ -43,9 +55,12 @@ function Field({
 
       return (
         <div className="space-y-1">
-          <label htmlFor={field.id} className="text-sm font-semibold text-white">
-            {field.label}
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              {field.label}
+            </label>
+            <RequirementBadge required={!!field.required} />
+          </div>
           <input
             {...common}
             type="text"
@@ -60,9 +75,12 @@ function Field({
     case "number":
       return (
         <div className="space-y-1">
-          <label htmlFor={field.id} className="text-sm font-semibold text-white">
-            {field.label}
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              {field.label}
+            </label>
+            <RequirementBadge required={!!field.required} />
+          </div>
           <input
             {...common}
             type="number"
@@ -76,9 +94,12 @@ function Field({
     case "textarea":
       return (
         <div className="space-y-1">
-          <label htmlFor={field.id} className="text-sm font-semibold text-white">
-            {field.label}
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              {field.label}
+            </label>
+            <RequirementBadge required={!!field.required} />
+          </div>
           <textarea {...common} rows={4} className={inputClass} />
           {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
@@ -100,9 +121,12 @@ function Field({
     case "select":
       return (
         <div className="space-y-1">
-          <label htmlFor={field.id} className="text-sm font-semibold text-white">
-            {field.label}
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              {field.label}
+            </label>
+            <RequirementBadge required={!!field.required} />
+          </div>
 
           <input type="hidden" {...common} />
 
@@ -131,7 +155,10 @@ function Field({
     case "radio":
       return (
         <div className="space-y-2">
-          <div className="text-sm font-semibold text-white">{field.label}</div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-sm font-semibold text-white">{field.label}</div>
+            <RequirementBadge required={!!field.required} />
+          </div>
           {(field.options || []).map((o) => (
             <label key={o.value} className="flex items-center gap-2 text-white/80">
               <input
@@ -149,13 +176,16 @@ function Field({
     case "checkbox":
       return (
         <div className="space-y-1">
-          <label className="flex items-center gap-2 text-white">
-            <input
-              type="checkbox"
-              {...register(field.id, { required: !!field.required })}
-            />
-            <span className="text-sm font-semibold">{field.label}</span>
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label className="flex items-center gap-2 text-white">
+              <input
+                type="checkbox"
+                {...register(field.id, { required: !!field.required })}
+              />
+              <span className="text-sm font-semibold">{field.label}</span>
+            </label>
+            <RequirementBadge required={!!field.required} />
+          </div>
           {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );
@@ -163,9 +193,12 @@ function Field({
     case "file":
       return (
         <div className="space-y-2">
-          <label htmlFor={field.id} className="text-sm font-semibold text-white">
-            {field.label}
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              {field.label}
+            </label>
+            <RequirementBadge required={!!field.required} />
+          </div>
 
           <div
             className={`rounded-2xl border bg-black/20 p-4 ring-1 ring-white/5 ${
@@ -205,7 +238,10 @@ export function FormRenderer({
 }: {
   stepSchema: StepSchema;
   defaultValues: Record<string, any>;
-  onSaveDraft: (values: Record<string, any>) => Promise<void>;
+  onSaveDraft: (
+    values: Record<string, any>,
+    opts?: { silent?: boolean }
+  ) => Promise<void>;
   onNext: (values: Record<string, any>) => Promise<void>;
   onPrev?: () => void;
   isFirst: boolean;
@@ -216,9 +252,15 @@ export function FormRenderer({
   const form = useForm({ defaultValues, mode: "onChange" });
   const values = form.watch();
 
+  // Autosave-on-type: saves silently in the background (no confirmation
+  // message) so unsaved progress isn't lost if the user navigates away.
+  // Only an explicit click of the "Save draft" button below shows the
+  // "Draft saved" confirmation.
   React.useEffect(() => {
     const t = setTimeout(() => {
-      if (Object.keys(values || {}).length > 0) onSaveDraft(values);
+      if (Object.keys(values || {}).length > 0) {
+        onSaveDraft(values, { silent: true });
+      }
     }, 900);
     return () => clearTimeout(t);
   }, [JSON.stringify(values)]);

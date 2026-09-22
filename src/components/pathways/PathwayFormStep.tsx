@@ -167,11 +167,16 @@ export function PathwayFormStep({
     }
   }
 
-  async function handleSaveDraft(values: Record<string, any>) {
+  async function handleSaveDraft(
+    values: Record<string, any>,
+    opts?: { silent?: boolean }
+  ) {
     try {
       await workflowService.saveDraft(state.case_id, stepCode, values);
-      setDraftMessage("Draft saved");
-      setTimeout(() => setDraftMessage(""), 2000);
+      if (!opts?.silent) {
+        setDraftMessage("Draft saved");
+        setTimeout(() => setDraftMessage(""), 2000);
+      }
     } catch (err) {
       console.error("save draft failed", err);
     }

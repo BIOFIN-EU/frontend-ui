@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { getLookupOptions, type LookupOption } from "@/services/lookups.service";
 import type { WorkflowField, WorkflowState, WorkflowStep } from "@/types/case-dashboard";
+import { RequirementBadge } from "@/components/FormRenderer";
 import type { PathwayStepMode } from "./PathwayStepScreen";
 
 type Props = {
@@ -267,9 +268,12 @@ export function PathwayAssignmentStep({
           >
             {rowFields.map((field) => (
               <div key={field.name}>
-                <label className="mb-2 block text-sm font-medium text-white/80">
-                  {field.display_name}
-                </label>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <label className="block text-sm font-medium text-white/80">
+                    {field.display_name}
+                  </label>
+                  <RequirementBadge required={!!field.required} />
+                </div>
 
                 {field.type === "select" ? (
                   <select

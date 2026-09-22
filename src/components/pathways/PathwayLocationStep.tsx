@@ -5,6 +5,7 @@ import { workflowService } from "@/services/workflow.service";
 import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
 import type { CaseLocationEntry } from "@/types/workflow";
 import RiskMap from "@/components/maps/RiskMap";
+import { RequirementBadge } from "@/components/FormRenderer";
 import type { PathwayStepMode } from "./PathwayStepScreen";
 
 type Props = {
@@ -490,9 +491,12 @@ export function PathwayLocationStep({
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div className="space-y-3">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-white/70">
-                      Name (optional)
-                    </label>
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <label className="block text-xs font-medium text-white/70">
+                        Name
+                      </label>
+                      <RequirementBadge required={false} />
+                    </div>
                     <input
                       value={entry.friendly_name}
                       onClick={(e) => e.stopPropagation()}
@@ -507,9 +511,12 @@ export function PathwayLocationStep({
                   {entry.location_type === "point" ? (
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="mb-1 block text-xs font-medium text-white/70">
-                          Latitude
-                        </label>
+                        <div className="mb-1 flex items-center justify-between gap-2">
+                          <label className="block text-xs font-medium text-white/70">
+                            Latitude
+                          </label>
+                          <RequirementBadge required={true} />
+                        </div>
                         <input
                           type="number"
                           step="any"
@@ -524,9 +531,12 @@ export function PathwayLocationStep({
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium text-white/70">
-                          Longitude
-                        </label>
+                        <div className="mb-1 flex items-center justify-between gap-2">
+                          <label className="block text-xs font-medium text-white/70">
+                            Longitude
+                          </label>
+                          <RequirementBadge required={true} />
+                        </div>
                         <input
                           type="number"
                           step="any"
@@ -543,9 +553,12 @@ export function PathwayLocationStep({
                     </div>
                   ) : (
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-white/70">
-                        Polygon WKT
-                      </label>
+                      <div className="mb-1 flex items-center justify-between gap-2">
+                        <label className="block text-xs font-medium text-white/70">
+                          Polygon WKT
+                        </label>
+                        <RequirementBadge required={true} />
+                      </div>
                       <textarea
                         value={entry.geometry_wkt}
                         onClick={(e) => e.stopPropagation()}
@@ -560,9 +573,12 @@ export function PathwayLocationStep({
                   )}
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-white/70">
-                      Notes (optional)
-                    </label>
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <label className="block text-xs font-medium text-white/70">
+                        Notes
+                      </label>
+                      <RequirementBadge required={false} />
+                    </div>
                     <textarea
                       value={entry.notes}
                       onClick={(e) => e.stopPropagation()}
