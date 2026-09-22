@@ -3,6 +3,7 @@ export type CaseListItem = {
   name?: string | null;
   description?: string | null;
   caseType?: string | null;
+  caseTypeName?: string | null;
   status?: string | null;
   createdBy?: string | null;
   createdAt: string;

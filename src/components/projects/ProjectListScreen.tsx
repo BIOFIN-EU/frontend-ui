@@ -33,38 +33,25 @@ function formatStatusLabel(status: string) {
   return status.replaceAll("_", " ");
 }
 
-function InfoBlock({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
-        {label}
-      </p>
-
-      <p className="mt-2 text-sm leading-6 text-white/90">
-        {value}
-      </p>
-    </div>
-  );
-}
-
 export function ProjectListScreen({ cases }: Props) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const caseTypes = useMemo(
-    () =>
-      Array.from(
-        new Set(cases.map((item) => item.caseType).filter(Boolean))
-      ).sort(),
-    [cases]
-  );
+  const caseTypeOptions = useMemo(() => {
+    const byCode = new Map<string, string>();
+
+    cases.forEach((item) => {
+      if (!item.caseType) return;
+      if (!byCode.has(item.caseType)) {
+        byCode.set(item.caseType, item.caseTypeName || item.caseType);
+      }
+    });
+
+    return Array.from(byCode.entries())
+      .map(([code, name]) => ({ code, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [cases]);
 
   const statuses = useMemo(
     () =>
@@ -145,7 +132,7 @@ export function ProjectListScreen({ cases }: Props) {
             </p>
 
             <p className="mt-3 text-3xl font-semibold text-white">
-              {caseTypes.length}
+              {caseTypeOptions.length}
             </p>
           </div>
 
@@ -199,9 +186,9 @@ export function ProjectListScreen({ cases }: Props) {
                   label: "All",
                   value: "all",
                 },
-                ...caseTypes.map((ct) => ({
-                  label: ct,
-                  value: ct,
+                ...caseTypeOptions.map(({ code, name }) => ({
+                  label: name,
+                  value: code,
                 })),
               ]}
             />
@@ -230,79 +217,63 @@ export function ProjectListScreen({ cases }: Props) {
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
         {filteredCases.length === 0 ? (
-          <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-8 text-sm text-white/60">
-            No projects found.
-          </div>
+          <div className="p-8 text-sm text-white/60">No projects found.</div>
         ) : (
-          filteredCases.map((item) => (
-            <Link
-              key={item.caseId}
-              href={`/projects/${item.caseId}`}
-              className="group block overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.03] p-0 shadow-[0_16px_50px_rgba(0,0,0,0.22)] backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:border-emerald-400/30 hover:shadow-[0_24px_70px_rgba(0,0,0,0.32)]"
-            >
-              <div className="h-1 w-full bg-gradient-to-r from-emerald-400/80 via-emerald-300/40 to-transparent" />
+          <div className="divide-y divide-white/8">
+            {filteredCases.map((item) => (
+              <div
+                key={item.caseId}
+                className="group flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 transition hover:bg-white/[0.04]"
+              >
+                <span className="shrink-0 rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-[11px] font-semibold text-white/60">
+                  #{item.caseId}
+                </span>
 
-              <div className="p-6">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="inline-flex items-center rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-white/65">
-                        Project #{item.caseId}
-                      </span>
+                <span
+                  className={`inline-flex w-28 shrink-0 items-center justify-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusClasses(
+                    item.status
+                  )}`}
+                >
+                  {formatStatusLabel(item.status)}
+                </span>
 
-                      <span
-                        className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${getStatusClasses(
-                          item.status
-                        )}`}
-                      >
-                        {formatStatusLabel(item.status)}
-                      </span>
-                    </div>
+                <Link
+                  href={`/projects/${item.caseId}`}
+                  className="min-w-0 flex-1 basis-64"
+                >
+                  <p className="truncate text-sm font-semibold text-white transition group-hover:text-emerald-200">
+                    {item.name || "Untitled project"}
+                  </p>
+                  <p className="truncate text-xs text-white/45">
+                    {item.caseTypeName || item.caseType || "Unknown type"}
+                    {item.description ? ` · ${item.description}` : ""}
+                  </p>
+                </Link>
 
-                    <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white transition group-hover:text-emerald-100">
-                      {item.name || "Untitled project"}
-                    </h2>
+                <span className="hidden shrink-0 text-xs text-white/40 sm:block">
+                  Updated {formatDate(item.updatedAt)}
+                </span>
 
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-white/60 line-clamp-2">
-                      {item.description || "No description provided."}
-                    </p>
-                  </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Link
+                    href={`/pathways/${item.caseId}`}
+                    className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-white/90"
+                  >
+                    Edit
+                  </Link>
 
-                  <div className="flex items-center gap-2 text-sm font-medium text-white/35 transition group-hover:text-emerald-200">
-                    <span>Open</span>
-
-                    <span className="transition-transform duration-200 group-hover:translate-x-1">
-                      →
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  <InfoBlock
-                    label="Project type"
-                    value={item.caseType || "Unknown"}
-                  />
-
-                  <InfoBlock
-                    label="Created"
-                    value={formatDate(item.createdAt)}
-                  />
-
-                  <InfoBlock
-                    label="Updated"
-                    value={formatDate(item.updatedAt)}
-                  />
-
-                  <InfoBlock
-                    label="Last updated by"
-                    value={item.updatedBy || "Unknown"}
-                  />
+                  <Link
+                    href={`/projects/${item.caseId}`}
+                    className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-emerald-950 transition hover:bg-emerald-400"
+                  >
+                    Open
+                  </Link>
                 </div>
               </div>
-            </Link>
-          ))
+            ))}
+          </div>
         )}
       </section>
     </div>

@@ -35,8 +35,15 @@ export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
         </div>
       </div>
 
-      {canManageUsers && (
-        <div className="mt-5">
+      <div className="mt-5 space-y-2">
+        <Link
+          href={`/pathways/${caseId}`}
+          className="flex w-full items-center justify-center rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
+        >
+          Edit project
+        </Link>
+
+        {canManageUsers && (
           <Link
             href={accessHref}
             className={[
@@ -48,8 +55,8 @@ export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
           >
             Manage project access
           </Link>
-        </div>
-      )}
+        )}
+      </div>
 
       <dl className="mt-5 space-y-4 border-t border-white/10 pt-5 text-sm">
         <div>
@@ -57,7 +64,7 @@ export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
             Project type
           </dt>
           <dd className="mt-1 break-words font-medium text-white/80">
-            {state.caseType || "—"}
+            {state.caseTypeName || state.caseType || "—"}
           </dd>
         </div>
 

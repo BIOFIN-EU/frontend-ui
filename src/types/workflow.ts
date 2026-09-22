@@ -65,6 +65,7 @@ export type CaseLocationEntry = {
 export type CaseDashboardState = {
   caseId: number;
   caseType: string;
+  caseTypeName?: string | null;
   status: string;
   createdBy: string;
   createdAt: string;
