@@ -34,6 +34,26 @@ export type DashboardDocument = {
   created_at: string;
 };
 
+export type CaseLocationCountry = {
+  id: number;
+  code: string;
+  name: string;
+};
+
+export type CaseLocationEntry = {
+  case_location_id: number;
+  friendly_name: string | null;
+  location_type: "polygon" | "point";
+  geometry_wkt: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  area_sqm: number | null;
+  area_hectares: number | null;
+  area_is_manual: boolean;
+  notes: string | null;
+  country: CaseLocationCountry | null;
+};
+
 export type CaseDashboardState = {
   caseId: number;
   caseType: string;
@@ -44,5 +64,6 @@ export type CaseDashboardState = {
   updatedAt: string;
   workflow_config: DashboardWorkflowConfig;
   documents?: DashboardDocument[];
+  location?: CaseLocationEntry[];
   [key: string]: unknown;
 };

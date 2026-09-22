@@ -4,7 +4,9 @@ export type WorkflowFieldType =
   | "number"
   | "select"
   | "file"
-  | "hidden";
+  | "hidden"
+  | "assignment_table"
+  | "location_table";
 
 export type WorkflowFieldOption = {
   value: string;
@@ -27,7 +29,14 @@ export type WorkflowStep = {
   activity: string;
   next: string | null;
   fields: WorkflowField[];
-  ui_mode?: "form" | "map_form" | "file_form" | "review" | "read_only";
+  ui_mode?:
+    | "form"
+    | "map_form"
+    | "assignment_table"
+    | "file_form"
+    | "review"
+    | "read_only"
+    | "location_table";
   submit_mode?: "json" | "multipart" | "none";
 };
 
@@ -43,6 +52,26 @@ export type WorkflowDocument = {
   created_at: string;
 };
 
+export type CaseLocationCountry = {
+  id: number;
+  code: string;
+  name: string;
+};
+
+export type CaseLocationEntry = {
+  case_location_id: number;
+  friendly_name: string | null;
+  location_type: "polygon" | "point";
+  geometry_wkt: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  area_sqm: number | null;
+  area_hectares: number | null;
+  area_is_manual: boolean;
+  notes: string | null;
+  country: CaseLocationCountry | null;
+};
+
 export type WorkflowState = {
   case_id: number;
   current_step: string;
@@ -51,6 +80,7 @@ export type WorkflowState = {
   validation_errors: Record<string, string | string[]>;
   workflow_code: string;
   documents: WorkflowDocument[];
+  location: CaseLocationEntry[];
 };
 
 export type CreateWorkflowResponse = {

@@ -3,13 +3,27 @@ import type {
   CreateWorkflowResponse,
   WorkflowDocument,
   WorkflowState,
-} from "@/types/workflow";
+} from "@/types/case-dashboard";
 
 const BASE = "/api/case_workflow";
 
 type SubmitStepResponse = {
   message: string;
   state: WorkflowState;
+};
+
+export type DetectCountryRequest = {
+  location_type: "polygon" | "point";
+  geometry_wkt: string | null;
+  latitude: number | null;
+  longitude: number | null;
+};
+
+export type DetectCountryResponse = {
+  country_id: number;
+  country_code: string;
+  country_name: string;
+  is_multiple: boolean;
 };
 
 export const workflowService = {
@@ -80,6 +94,18 @@ export const workflowService = {
     return apiFetch(
       `${BASE}/cases/${caseId}/documents/${caseDocumentId}/download-url`,
       { method: "GET" }
+    );
+  },
+
+  async detectCountry(
+    payload: DetectCountryRequest
+  ): Promise<DetectCountryResponse> {
+    return apiFetch<DetectCountryResponse>(
+      `${BASE}/locations/detect-country`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
     );
   },
 

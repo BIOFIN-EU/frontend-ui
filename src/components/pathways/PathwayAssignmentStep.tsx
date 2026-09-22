@@ -126,7 +126,7 @@ export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
         assignments,
       });
 
-      onStateUpdated(updated.state ?? updated);
+      onStateUpdated(updated);
     } catch (err: any) {
       setFieldErrors(err.fieldErrors || {});
     } finally {

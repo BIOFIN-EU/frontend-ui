@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import RiskMap from "@/components/maps/RiskMap";
 import type {
   CaseDashboardState,
+  CaseLocationEntry,
   DashboardField,
   DashboardStep,
 } from "@/types/workflow";
@@ -125,6 +126,10 @@ function isStepComplete(
     return Array.isArray(value) && value.length > 0;
   }
 
+  if (orderedStep.step.ui_mode === "location_table") {
+    return Array.isArray(state.location) && state.location.length > 0;
+  }
+
   const requiredFields = (orderedStep.step.fields || []).filter(
     (field) => field.required
   );
@@ -138,41 +143,134 @@ function isStepComplete(
   );
 }
 
-function PolygonFieldCard({
-  field,
-  value,
-  mapKey,
+function locationMapWkt(location: CaseLocationEntry): string {
+  if (location.location_type === "polygon") {
+    return location.geometry_wkt ?? "";
+  }
+
+  if (location.latitude != null && location.longitude != null) {
+    return `POINT(${location.longitude} ${location.latitude})`;
+  }
+
+  return "";
+}
+
+function formatLocationArea(location: CaseLocationEntry): string {
+  if (location.area_hectares == null) return "—";
+
+  const ha = location.area_hectares.toLocaleString(undefined, {
+    maximumFractionDigits: 4,
+  });
+
+  if (location.area_sqm == null) return `${ha} ha`;
+
+  const sqm = location.area_sqm.toLocaleString(undefined, {
+    maximumFractionDigits: 1,
+  });
+
+  return `${ha} ha (${sqm} sqm)`;
+}
+
+function formatLocationValue(location: CaseLocationEntry): string {
+  if (location.location_type === "point") {
+    if (location.latitude == null || location.longitude == null) return "—";
+    return `Lat: ${location.latitude}, Long: ${location.longitude}`;
+  }
+
+  return location.geometry_wkt?.trim() || "—";
+}
+
+function LocationCard({
+  location,
+  index,
 }: {
-  field: DashboardField;
-  value: unknown;
-  mapKey: string;
+  location: CaseLocationEntry;
+  index: number;
 }) {
-  const polygonWkt = typeof value === "string" ? value : "";
+  const mapWkt = locationMapWkt(location);
 
   return (
-    <div className="space-y-4 md:col-span-2">
-      <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-sm font-medium text-white">{field.display_name}</p>
+    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-sm font-medium text-white">
+          {location.friendly_name?.trim() || `Location ${index + 1}`}
+        </p>
 
-          {field.required && (
-            <span className="rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-200 ring-1 ring-amber-400/25">
-              Required
-            </span>
-          )}
+        <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/60 ring-1 ring-white/10">
+          {location.location_type}
+        </span>
+      </div>
+
+      <div className="mt-3 overflow-hidden rounded-xl border border-white/10">
+        {mapWkt ? (
+          <RiskMap
+            polygonWkt={mapWkt}
+            mode={location.location_type}
+            readOnly
+            heightClassName="h-[220px]"
+          />
+        ) : (
+          <div className="flex h-[220px] items-center justify-center bg-black/30 text-sm text-white/40">
+            No geometry
+          </div>
+        )}
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <div>
+          <p className="text-xs font-medium text-white/40">Country</p>
+          <p className="mt-1 text-sm text-white/80">
+            {location.country?.name ?? "—"}
+          </p>
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
-          <RiskMap key={mapKey} polygonWkt={polygonWkt} />
+        <div>
+          <p className="text-xs font-medium text-white/40">Area</p>
+          <p className="mt-1 text-sm text-white/80">
+            {formatLocationArea(location)}
+          </p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-sm font-medium text-white">Polygon WKT</p>
-        <pre className="mt-3 whitespace-pre-wrap break-words text-sm text-white/70">
-          {polygonWkt || "—"}
-        </pre>
+      <div className="mt-3">
+        <p className="text-xs font-medium text-white/40">
+          {location.location_type === "polygon" ? "Polygon WKT" : "Coordinates"}
+        </p>
+        <p className="mt-1 max-h-24 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-black/30 p-2 font-mono text-xs text-white/70">
+          {formatLocationValue(location)}
+        </p>
       </div>
+
+      {location.notes && (
+        <div className="mt-3">
+          <p className="text-xs font-medium text-white/40">Notes</p>
+          <p className="mt-1 whitespace-pre-wrap break-words text-sm text-white/70">
+            {location.notes}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LocationsSection({ locations }: { locations: CaseLocationEntry[] }) {
+  if (!locations.length) {
+    return (
+      <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/50 md:col-span-2">
+        No locations found.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-4 md:col-span-2 md:grid-cols-2">
+      {locations.map((location, index) => (
+        <LocationCard
+          key={location.case_location_id ?? index}
+          location={location}
+          index={index}
+        />
+      ))}
     </div>
   );
 }
@@ -362,6 +460,8 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {activeStep.step.ui_mode === "assignment_table" ? (
             <AssignmentTableCard assignments={assignments} />
+          ) : activeStep.step.ui_mode === "location_table" ? (
+            <LocationsSection locations={state.location ?? []} />
           ) : (
             (activeStep.step.fields || [])
             .filter((field) => field.type !== "content")
@@ -372,17 +472,6 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
                 field,
                 activeStep.code
               );
-
-              if (field.name === "polygon_wkt") {
-                return (
-                  <PolygonFieldCard
-                    key={field.name}
-                    field={field}
-                    value={value}
-                    mapKey={`${state.caseId}-${activeStep.code}-${field.name}`}
-                  />
-                );
-              }
 
               return (
                 <StandardFieldCard

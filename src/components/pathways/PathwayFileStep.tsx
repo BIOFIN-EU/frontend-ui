@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import type { WorkflowState } from "@/types/workflow";
+import type { WorkflowState } from "@/types/case-dashboard";
 import { FormRenderer } from "@/components/FormRenderer";
 
 type Props = {

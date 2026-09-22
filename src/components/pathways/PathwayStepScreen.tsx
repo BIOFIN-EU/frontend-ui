@@ -4,8 +4,8 @@ import Link from "next/link";
 import type { WorkflowState } from "@/types/case-dashboard";
 import { PathwayFormStep } from "./PathwayFormStep";
 import { PathwayFileStep } from "./PathwayFileStep";
-import { PathwayMapStep } from "./PathwayMapStep";
 import { PathwayAssignmentStep } from "./PathwayAssignmentStep";
+import { PathwayLocationStep } from "./PathwayLocationStep";
 
 type Props = {
   state: WorkflowState;
@@ -17,7 +17,14 @@ function inferMode(step: WorkflowState["step"]) {
   if (!step) return "form";
 
   if (step.fields.some((f) => f.type === "file")) return "file_form";
-  if (step.fields.some((f) => f.name === "polygon_wkt")) return "map_form";
+  if (
+    step.fields.some(
+      (f) => f.type === "location_table" || f.name === "locations"
+    )
+  )
+    return "location_table";
+  if (step.fields.some((f) => f.type === "assignment_table"))
+    return "assignment_table";
 
   return "form";
 }
@@ -61,9 +68,9 @@ export function PathwayStepScreen({
   const step = state.step;
   const mode = step.ui_mode ?? inferMode(step);
 
-  if (mode === "map_form") {
+  if (mode === "location_table") {
     return (
-      <PathwayMapStep
+      <PathwayLocationStep
         state={state}
         onStateUpdated={onStateUpdated}
       />

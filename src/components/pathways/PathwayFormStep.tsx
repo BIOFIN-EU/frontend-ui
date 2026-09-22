@@ -113,7 +113,7 @@ export function PathwayFormStep({ state, onStateUpdated }: Props) {
     });
 
     const updated = await workflowService.submitJsonStep(state.case_id, payload);
-    onStateUpdated(updated.state ?? updated);
+    onStateUpdated(updated);
   } catch (err: any) {
     setFieldErrors(err.fieldErrors || {});
   }
