@@ -63,7 +63,12 @@ function Field({
           <label htmlFor={field.id} className="text-sm font-semibold text-white">
             {field.label}
           </label>
-          <input {...common} type="number" className={inputClass} />
+          <input
+            {...common}
+            type="number"
+            className={inputClass}
+            onWheel={(e) => e.currentTarget.blur()}
+          />
           {error && <p className="text-sm text-red-300">{error}</p>}
         </div>
       );
