@@ -1,16 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/auth.context";
+import { closeAccount } from "@/services/auth.service";
 
 function initialFromEmail(email?: string) {
   return (email?.trim()?.[0] ?? "?").toUpperCase();
 }
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const [confirming, setConfirming] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const [closeError, setCloseError] = useState("");
 
   if (!user) return null;
+
+  async function handleCloseAccount() {
+    setClosing(true);
+    setCloseError("");
+
+    try {
+      await closeAccount();
+      await logout();
+    } catch (err) {
+      setCloseError(
+        err instanceof Error ? err.message : "Failed to close account."
+      );
+      setClosing(false);
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -64,15 +84,42 @@ export default function ProfilePage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold text-red-100">Close account</p>
-              <p className="mt-1 text-xs text-red-100/70">This action is permanent.</p>
+              <p className="mt-1 text-xs text-red-100/70">
+                {confirming
+                  ? "Are you sure? This action is permanent and cannot be undone."
+                  : "This action is permanent."}
+              </p>
+              {closeError && (
+                <p className="mt-2 text-xs text-red-300">{closeError}</p>
+              )}
             </div>
 
-            <button
-              className="inline-flex items-center justify-center rounded-xl bg-red-500/15 px-4 py-2 text-sm font-semibold text-red-100 ring-1 ring-red-400/35 transition hover:bg-red-500/20"
-              onClick={() => alert("Hook this up to your close account flow.")}
-            >
-              Close account
-            </button>
+            {confirming ? (
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  className="inline-flex items-center justify-center rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={() => setConfirming(false)}
+                  disabled={closing}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="inline-flex items-center justify-center rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={handleCloseAccount}
+                  disabled={closing}
+                >
+                  {closing ? "Closing..." : "Confirm close"}
+                </button>
+              </div>
+            ) : (
+              <button
+                className="inline-flex shrink-0 items-center justify-center rounded-xl bg-red-500/15 px-4 py-2 text-sm font-semibold text-red-100 ring-1 ring-red-400/35 transition hover:bg-red-500/20"
+                onClick={() => setConfirming(true)}
+              >
+                Close account
+              </button>
+            )}
           </div>
         </div>
       </section>

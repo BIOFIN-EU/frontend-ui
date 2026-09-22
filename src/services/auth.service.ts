@@ -48,6 +48,12 @@ export async function changePassword(currentPassword: string, newPassword: strin
   });
 }
 
+export async function closeAccount() {
+  return apiFetch(`${BASE}/close-account`, {
+    method: "POST",
+  });
+}
+
 export async function logout() {
   const refreshToken = getRefreshToken();
 

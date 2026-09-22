@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { Select } from "@/components/ui/Select";
+import { apiFetch } from "@/lib/api";
 
 type ContactReason =
   | "I am an Nature-based Solutions Funder"
@@ -462,15 +463,10 @@ export default function SupportPage() {
     setSuccess(null);
 
     try {
-      const response = await fetch("https://api.example.com/contact", {
+      await apiFetch("/api/support/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, reason, comment }),
       });
-
-      if (!response.ok) {
-        throw new Error("Something went wrong while submitting the form.");
-      }
 
       setSuccess("Your message has been sent.");
       setName("");
