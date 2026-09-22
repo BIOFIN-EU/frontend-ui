@@ -46,19 +46,21 @@ export default function RootLayout({
 
                 {/* LEFT GROUP */}
                   <div className="flex items-center gap-4">
-                    <Image
-                      src="/biofin_arrow.png"
-                      alt="BIOFIN-EU"
-                      width={100}
-                      height={50}
-                      priority
-                      className="h-11 w-auto object-contain"
-                    />
+
+                    <Link href="/" className="navLink">
+
+                      <Image
+                          src="/biofin-logo-final.png"
+                          alt="BIOFIN-EU"
+                          width={100}
+                          height={50}
+                          priority
+                          className="h-11 w-auto object-contain"
+                      />
+                      </Link>
+
 
                     <div className="flex flex-col leading-tight">
-                      <span className="text-white font-semibold text-sm tracking-wide">
-                        BIOFIN-EU Dashboard
-                      </span>
                     </div>
 
                   <NavClient />

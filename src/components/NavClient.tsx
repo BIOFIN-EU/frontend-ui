@@ -8,7 +8,7 @@ export default function NavClient() {
 
   return (
     <nav className="nav">
-      <Link href="/" className="navLink">Home</Link>
+      {/*<Link href="/" className="navLink">Home</Link>*/}
       <Link
           href="https://biofin-project.eu/"
           className="navLink"

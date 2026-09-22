@@ -139,10 +139,6 @@ export default function HomePage() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
         <section className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
           <div className="flex min-w-0 flex-col justify-center space-y-6 lg:pr-4">
-            <div className="inline-flex w-fit items-center rounded-full border border-emerald-300/25 bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-100 shadow-[0_8px_24px_rgba(0,0,0,0.18)] ring-1 ring-emerald-300/15">
-              Nature-based finance platform
-            </div>
-
             <div className="space-y-4">
               <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Invest in biodiversity with confidence.
@@ -208,33 +204,204 @@ export default function HomePage() {
                     </p>
                   </div>
                 </div>
-
-                <div className="h-40 overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]">
-                  <svg viewBox="0 0 500 140" className="h-full w-full">
+                <div
+                    className="h-40 overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]">
+                  <svg
+                      viewBox="0 0 500 140"
+                      className="h-full w-full"
+                      role="img"
+                      aria-label="Project classification, biodiversity assessment and finance-ready reporting workflow"
+                  >
                     <defs>
-                      <linearGradient id="heroA" x1="0" x2="1">
-                        <stop offset="0%" stopColor="rgba(52,211,153,0.18)" />
-                        <stop offset="100%" stopColor="rgba(59,130,246,0.65)" />
+                      <linearGradient id="workflowLine" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#34d399"/>
+                        <stop offset="52%" stopColor="#2dd4bf"/>
+                        <stop offset="100%" stopColor="#60a5fa"/>
                       </linearGradient>
-                      <linearGradient id="heroB" x1="0" x2="1">
-                        <stop offset="0%" stopColor="rgba(168,85,247,0.14)" />
-                        <stop offset="100%" stopColor="rgba(52,211,153,0.5)" />
-                      </linearGradient>
+
+                      <radialGradient id="workflowGlow">
+                        <stop offset="0%" stopColor="#34d399" stopOpacity="0.14"/>
+                        <stop offset="100%" stopColor="#34d399" stopOpacity="0"/>
+                      </radialGradient>
+
+                      <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="5" result="blur"/>
+                        <feMerge>
+                          <feMergeNode in="blur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+
+                      <marker
+                          id="arrowHead"
+                          viewBox="0 0 10 10"
+                          refX="8"
+                          refY="5"
+                          markerWidth="5"
+                          markerHeight="5"
+                          orient="auto-start-reverse"
+                      >
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#47c9bd"/>
+                      </marker>
                     </defs>
+
+                    {/* Subtle background grid */}
+                    <g stroke="rgba(255,255,255,0.035)" strokeWidth="1">
+                      <path d="M0 35 H500 M0 70 H500 M0 105 H500"/>
+                      <path d="M100 0 V140 M200 0 V140 M300 0 V140 M400 0 V140"/>
+                    </g>
+
+                    {/* Background glow */}
+                    <ellipse
+                        cx="250"
+                        cy="70"
+                        rx="230"
+                        ry="85"
+                        fill="url(#workflowGlow)"
+                    />
+
+                    {/* Connecting workflow */}
                     <path
-                      d="M0 95 C40 90, 70 72, 110 74 C150 76, 165 55, 205 58 C245 61, 275 44, 315 48 C355 53, 385 28, 425 36 C460 43, 485 24, 500 20"
-                      fill="none"
-                      stroke="url(#heroA)"
-                      strokeWidth="3"
+                        d="M114 70 C145 42 177 42 208 70"
+                        fill="none"
+                        stroke="url(#workflowLine)"
+                        strokeWidth="2"
+                        strokeOpacity="0.8"
+                        markerEnd="url(#arrowHead)"
                     />
                     <path
-                      d="M0 108 C55 102, 85 96, 120 85 C155 74, 190 92, 235 80 C280 68, 320 85, 360 73 C400 61, 440 66, 500 48"
-                      fill="none"
-                      stroke="url(#heroB)"
-                      strokeWidth="3"
+                        d="M292 70 C323 42 355 42 386 70"
+                        fill="none"
+                        stroke="url(#workflowLine)"
+                        strokeWidth="2"
+                        strokeOpacity="0.8"
+                        markerEnd="url(#arrowHead)"
                     />
-                    <circle cx="315" cy="48" r="5" fill="rgba(52,211,153,0.95)" />
-                    <circle cx="425" cy="36" r="5" fill="rgba(96,165,250,0.95)" />
+
+                    {/* Stage 1: classify project */}
+                    <g transform="translate(75 70)">
+                      <circle
+                          r="39"
+                          fill="#0d3232"
+                          stroke="#167466"
+                          strokeWidth="1.5"
+                      />
+                      <circle r="31" fill="none" stroke="rgba(52,211,153,0.12)"/>
+
+                      {/* Land layers */}
+                      <path
+                          d="M-18 9 L0 18 L18 9 L0 0 Z"
+                          fill="none"
+                          stroke="#7ee2c1"
+                          strokeWidth="2"
+                          strokeLinejoin="round"
+                      />
+                      <path
+                          d="M-18 1 L0 10 L18 1"
+                          fill="none"
+                          stroke="#7ee2c1"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                      />
+
+                      {/* Leaf */}
+                      <path
+                          d="M1 -19 C12 -19 18 -12 16 -2 C6 0 0 -7 1 -19 Z"
+                          fill="#34d399"
+                          fillOpacity="0.75"
+                      />
+                      <path
+                          d="M3 -16 L13 -5"
+                          stroke="#d1fae5"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                      />
+                    </g>
+
+                    {/* Stage 2: biodiversity assessment */}
+                    <g transform="translate(250 70)">
+                      <circle
+                          r="39"
+                          fill="#112b35"
+                          stroke="#278f87"
+                          strokeWidth="1.5"
+                      />
+                      <circle r="31" fill="none" stroke="rgba(45,212,191,0.12)"/>
+
+                      {/* Magnifying glass */}
+                      <circle
+                          cx="-4"
+                          cy="-5"
+                          r="13"
+                          fill="none"
+                          stroke="#8be4d5"
+                          strokeWidth="2.5"
+                      />
+                      <path
+                          d="M6 5 L17 16"
+                          stroke="#8be4d5"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                      />
+
+                      {/* Biodiversity leaf inside lens */}
+                      <path
+                          d="M-8 1 C-9 -9 -2 -14 6 -13 C7 -5 2 1 -8 1 Z"
+                          fill="#34d399"
+                          fillOpacity="0.85"
+                      />
+                      <path
+                          d="M-6 -1 L3 -10"
+                          stroke="#d1fae5"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                      />
+                    </g>
+
+                    {/* Stage 3: finance-ready report */}
+                    <g transform="translate(425 70)">
+                      <circle
+                          r="39"
+                          fill="#14283e"
+                          stroke="#397fc0"
+                          strokeWidth="1.5"
+                      />
+                      <circle r="31" fill="none" stroke="rgba(96,165,250,0.13)"/>
+
+                      {/* Report */}
+                      <path
+                          d="M-15 -20 H8 L18 -10 V20 H-15 Z"
+                          fill="none"
+                          stroke="#93c5fd"
+                          strokeWidth="2"
+                          strokeLinejoin="round"
+                      />
+                      <path
+                          d="M8 -20 V-10 H18"
+                          fill="none"
+                          stroke="#93c5fd"
+                          strokeWidth="2"
+                          strokeLinejoin="round"
+                      />
+
+                      {/* Successful output */}
+                      <path
+                          d="M-7 8 L-1 13 L10 1"
+                          fill="none"
+                          stroke="#34d399"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          filter="url(#softGlow)"
+                      />
+                      <path
+                          d="M-7 -8 H6 M-7 -2 H10"
+                          stroke="#93c5fd"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeOpacity="0.7"
+                      />
+                    </g>
                   </svg>
                 </div>
               </div>
