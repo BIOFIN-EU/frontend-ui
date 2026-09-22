@@ -15,6 +15,8 @@ type Props = {
   initialValues?: unknown;
   onStateUpdated: (state: WorkflowState) => void;
   onEditSaved?: () => void;
+  onBack?: () => void;
+  isFirstStep?: boolean;
 };
 
 type LocationType = "polygon" | "point";
@@ -218,6 +220,8 @@ export function PathwayLocationStep({
   initialValues = null,
   onStateUpdated,
   onEditSaved,
+  onBack,
+  isFirstStep = true,
 }: Props) {
   const isLast = !step.next;
 
@@ -643,13 +647,25 @@ export function PathwayLocationStep({
       </div>
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          type="button"
-          onClick={addEntry}
-          className="rounded-xl border border-emerald-400/30 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10"
-        >
-          Add another location
-        </button>
+        <div className="flex items-center gap-3">
+          {!isFirstStep && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="rounded-xl bg-white/8 px-4 py-2 text-sm text-white transition hover:bg-white/15"
+            >
+              Back
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={addEntry}
+            className="rounded-xl border border-emerald-400/30 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10"
+          >
+            Add another location
+          </button>
+        </div>
 
         <div className="flex items-center gap-3">
           {draftMessage && (
