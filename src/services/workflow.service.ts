@@ -140,7 +140,12 @@ export const workflowService = {
   async getDocumentDownloadUrl(
     caseId: number | string,
     caseDocumentId: number | string
-  ) {
+  ): Promise<{
+    case_document_id: number;
+    original_filename: string;
+    download_url: string;
+    expires_in_seconds: number;
+  }> {
     return apiFetch(
       `${BASE}/cases/${caseId}/documents/${caseDocumentId}/download-url`,
       { method: "GET" }

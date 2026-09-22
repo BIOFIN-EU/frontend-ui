@@ -44,7 +44,7 @@ export type WorkflowStep = {
 };
 
 export type WorkflowDocument = {
-  id: number;
+  case_document_id: number;
   case_id: number;
   step_code: string;
   field_name: string;

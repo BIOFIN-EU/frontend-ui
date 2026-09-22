@@ -25,6 +25,19 @@ function isStepDataFilled(
     return Array.isArray(locations) && locations.length > 0;
   }
 
+  // File-upload steps have no payload[stepCode] entry at all - their
+  // committed data lives in the top-level `documents` array, matched by
+  // step_code, same as ProjectDashboardScreen's file-field handling.
+  if (step?.ui_mode === "file_form") {
+    const documents = payload.documents;
+    return (
+      Array.isArray(documents) &&
+      documents.some(
+        (doc) => doc && typeof doc === "object" && (doc as any).step_code === code
+      )
+    );
+  }
+
   const value = payload[code];
 
   if (value == null) return false;

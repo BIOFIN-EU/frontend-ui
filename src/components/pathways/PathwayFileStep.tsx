@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
 import { FormRenderer } from "@/components/FormRenderer";
+import { DocumentCard } from "@/components/documents/DocumentCard";
 import type { PathwayStepMode } from "./PathwayStepScreen";
 
 type Props = {
@@ -14,6 +15,8 @@ type Props = {
   initialValues?: unknown;
   onStateUpdated: (state: WorkflowState) => void;
   onEditSaved?: () => void;
+  onBack?: () => void;
+  isFirstStep?: boolean;
 };
 
 export function PathwayFileStep({
@@ -22,9 +25,17 @@ export function PathwayFileStep({
   stepCode,
   mode = "submit",
   onStateUpdated,
+  onBack,
+  isFirstStep = true,
 }: Props) {
   const fileField = step.fields.find((f) => f.type === "file");
   const [error, setError] = useState("");
+
+  const matchingDoc = fileField
+    ? state.documents.find(
+        (doc) => doc.field_name === fileField.name && doc.step_code === stepCode
+      )
+    : undefined;
 
   const stepSchema = useMemo(
     () => ({
@@ -80,21 +91,21 @@ export function PathwayFileStep({
   // read-only, reusing the same document-matching logic as the project
   // dashboard.
   if (mode === "edit") {
-    const matchingDoc = fileField
-      ? state.documents.find(
-          (doc) => doc.field_name === fileField.name && doc.step_code === stepCode
-        )
-      : undefined;
-
     return (
       <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
         <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
           Uploaded file
         </p>
 
-        <p className="mt-2 text-sm text-white">
-          {matchingDoc?.original_filename ?? "No file has been uploaded for this step yet."}
-        </p>
+        <div className="mt-3">
+          {matchingDoc ? (
+            <DocumentCard caseId={state.case_id} document={matchingDoc} />
+          ) : (
+            <p className="text-sm text-white">
+              No file has been uploaded for this step yet.
+            </p>
+          )}
+        </div>
 
         <p className="mt-4 text-xs text-white/50">
           File uploads can&apos;t be changed from here once submitted.
@@ -104,14 +115,28 @@ export function PathwayFileStep({
   }
 
   return (
-    <div>
+    <div className="space-y-4">
+      {matchingDoc && (
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/40">
+            Already uploaded
+          </p>
+          <DocumentCard caseId={state.case_id} document={matchingDoc} />
+          <p className="mt-2 text-xs text-white/50">
+            Uploading a new file below will replace this one.
+          </p>
+        </div>
+      )}
+
       <FormRenderer
         stepSchema={stepSchema}
         defaultValues={defaultValues}
         onNext={handleNext}
         onSaveDraft={async () => {}}
-        isFirst={false}
+        onPrev={onBack}
+        isFirst={isFirstStep}
         isLast={!step.next}
+        submitLabel={matchingDoc ? "Replace file" : undefined}
       />
 
       {error && (

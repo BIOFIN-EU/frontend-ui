@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import RiskMap from "@/components/maps/RiskMap";
+import { DocumentCard } from "@/components/documents/DocumentCard";
 import type {
   CaseDashboardState,
   CaseLocationEntry,
+  DashboardDocument,
   DashboardField,
   DashboardStep,
 } from "@/types/workflow";
@@ -275,6 +277,38 @@ function LocationsSection({ locations }: { locations: CaseLocationEntry[] }) {
   );
 }
 
+function DocumentFieldCard({
+  field,
+  caseId,
+  document,
+}: {
+  field: DashboardField;
+  caseId: number | string;
+  document: DashboardDocument | undefined;
+}) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-sm font-medium text-white">{field.display_name}</p>
+
+        {field.required && (
+          <span className="rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-200 ring-1 ring-amber-400/25">
+            Required
+          </span>
+        )}
+      </div>
+
+      <div className="mt-3">
+        {document ? (
+          <DocumentCard caseId={caseId} document={document} />
+        ) : (
+          <p className="text-sm text-white/50">No file uploaded.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function StandardFieldCard({
   field,
   value,
@@ -466,6 +500,23 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
             (activeStep.step.fields || [])
             .filter((field) => field.type !== "content")
             .map((field) => {
+              if (field.type === "file") {
+                const document = (state.documents ?? []).find(
+                  (doc) =>
+                    doc.field_name === field.name &&
+                    doc.step_code === activeStep.code
+                );
+
+                return (
+                  <DocumentFieldCard
+                    key={field.name}
+                    field={field}
+                    caseId={state.caseId}
+                    document={document}
+                  />
+                );
+              }
+
               const value = getFieldValue(
                 state,
                 activeStepData,
