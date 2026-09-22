@@ -196,67 +196,6 @@ export default function PathwaysPage() {
 
         <div className="relative grid gap-3 lg:grid-cols-3 lg:gap-5">
           {steps.map((step) => (
-function SupportIllustration() {
-  return (
-      <svg viewBox="0 0 520 260" className="h-full w-full" role="img"
-           aria-label="Nature-based solutions support network">
-        <defs>
-          <linearGradient id="supportLine" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#34d399"/>
-            <stop offset="55%" stopColor="#2dd4bf"/>
-            <stop offset="100%" stopColor="#60a5fa"/>
-          </linearGradient>
-          <radialGradient id="supportGlow">
-            <stop offset="0%" stopColor="#34d399" stopOpacity="0.2"/>
-            <stop offset="100%" stopColor="#34d399" stopOpacity="0"/>
-          </radialGradient>
-        </defs>
-
-        <g stroke="rgba(255,255,255,0.035)" strokeWidth="1">
-          <path d="M0 52H520 M0 104H520 M0 156H520 M0 208H520"/>
-          <path d="M104 0V260 M208 0V260 M312 0V260 M416 0V260"/>
-        </g>
-        <ellipse cx="260" cy="130" rx="230" ry="120" fill="url(#supportGlow)"/>
-        <path d="M82 178 C132 134 171 118 222 125M298 125 C350 116 388 133 438 178M260 91V38" fill="none"
-              stroke="url(#supportLine)" strokeWidth="2" strokeOpacity="0.7"/>
-
-        <circle cx="260" cy="130" r="48" fill="#0d3232" stroke="#34d399" strokeWidth="1.5"/>
-        <circle cx="260" cy="130" r="37" fill="none" stroke="rgba(52,211,153,0.14)"/>
-        <g transform="translate(260 130) scale(1.6)">
-          <path
-              d="M1 -19 C12 -19 18 -12 16 -2 C6 0 0 -7 1 -19 Z"
-              fill="#34d399"
-              fillOpacity="0.75"
-          />
-          <path
-              d="M3 -16 L13 -5"
-              stroke="#d1fae5"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-          />
-        </g>
-
-        <g transform="translate(260 30)">
-          <circle r="18" fill="#14283e" stroke="#60a5fa" strokeWidth="1.5"/>
-          <path d="M-7 2 -2 7 8-5" fill="none" stroke="#93c5fd" strokeWidth="2.2" strokeLinecap="round"
-                strokeLinejoin="round"/>
-        </g>
-        <g transform="translate(72 186)">
-          <circle r="24" fill="#102f30" stroke="#2dd4bf" strokeWidth="1.5"/>
-          <circle cx="-5" cy="-5" r="6" fill="none" stroke="#99f6e4" strokeWidth="1.7"/>
-          <circle cx="8" cy="2" r="5" fill="none" stroke="#99f6e4" strokeWidth="1.7"/>
-          <path d="M-16 13c1-7 6-11 11-11s10 4 11 11M4 13c1-5 4-8 8-8 3 0 6 2 8 6" fill="none" stroke="#99f6e4"
-                strokeWidth="1.7" strokeLinecap="round"/>
-        </g>
-        <g transform="translate(448 186)">
-          <circle r="24" fill="#14283e" stroke="#60a5fa" strokeWidth="1.5"/>
-          <path d="M-10-13H6l8 8v18h-24ZM6-13v8h8" fill="none" stroke="#93c5fd" strokeWidth="1.7"
-                strokeLinejoin="round"/>
-          <path d="M-5 5h11M-5 10h8" stroke="#34d399" strokeWidth="1.7" strokeLinecap="round"/>
-        </g>
-      </svg>
-  );
-}
             <article key={step.number} className="flex gap-4 rounded-2xl border border-white/[0.07] bg-black/10 p-4 sm:p-5 lg:block lg:border-0 lg:bg-transparent lg:p-3">
               <IconFrame>{step.icon}</IconFrame>
               <div className="min-w-0 lg:mt-5">
