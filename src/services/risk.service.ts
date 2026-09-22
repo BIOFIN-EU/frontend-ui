@@ -3,7 +3,7 @@ import {
   apiFetch,
 } from "@/lib/api";
 
-const BASE = "/api/risk-framework";
+const BASE = "/api/vulnerability";
 // const BASE = "http://localhost:8009/api/v1";
 // const BASE = "http://localhost:8000/api/vulnerability";
 
