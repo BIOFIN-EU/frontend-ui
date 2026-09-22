@@ -85,7 +85,7 @@ export default function IntermediariesPage() {
           </h2>
 
           <p className="mt-2 text-sm text-white/60">
-            Register your first intermediary to start assigning functions.
+            Register as an Intermediary and specify your credentials and support services.
           </p>
 
           <Link
