@@ -21,7 +21,7 @@ export async function getRiskScoreByID(riskCaseURI: string) {
   // const data = await apiFetch<RiskScoreCaseResponse>(`${BASE}${riskCaseURI}`, {method: "GET"});
 
   // 2. Fetch the risk data using the URL from the response
-  const riskRes = await fetch(`${BASE}${riskCaseURI.replace("/api/v1", "")}`);
+  const riskRes = await apiFetch(`${BASE}${riskCaseURI.replace("/api/v1", "")}`);
   if (!riskRes.ok) throw new Error(`Risk fetch error: ${riskRes.status}`);
   const riskJson = await riskRes.json();
   return riskJson;
@@ -52,7 +52,7 @@ export async function getPriorityManagementActions(country_code: string, polygon
     if (polygon) {
       body.wkt_polygon = polygon;
     }
-  const priorityRes = await fetch(`${BASE}/management-actions/priority/`, {
+  const priorityRes = await apiFetch(`${BASE}/management-actions/priority/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -80,7 +80,7 @@ export async function getPriorityManagementActionsByID(entry_id: string) {
   // });
 
   // 1. Fetch priority data by id
-  const priorityRes = await fetch(`${BASE}/management-actions/get/${entry_id}`, {
+  const priorityRes = await apiFetch(`${BASE}/management-actions/get/${entry_id}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
