@@ -5,6 +5,7 @@ export type WorkflowFieldType =
   | "select"
   | "file"
   | "hidden"
+  | "content"
   | "assignment_table"
   | "location_table";
 
@@ -22,6 +23,8 @@ export type WorkflowField = {
   options?: WorkflowFieldOption[];
   options_source?: string;
   widget?: string;
+  content?: string;
+  row_fields?: WorkflowField[];
 };
 
 export type WorkflowStep = {

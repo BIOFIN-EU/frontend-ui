@@ -201,6 +201,7 @@ export function FormRenderer({
   isFirst,
   isLast,
   fieldErrors = {},
+  submitLabel,
 }: {
   stepSchema: StepSchema;
   defaultValues: Record<string, any>;
@@ -210,6 +211,7 @@ export function FormRenderer({
   isFirst: boolean;
   isLast: boolean;
   fieldErrors?: Record<string, string>;
+  submitLabel?: string;
 }) {
   const form = useForm({ defaultValues, mode: "onChange" });
   const values = form.watch();
@@ -254,7 +256,7 @@ export function FormRenderer({
           type="submit"
           className="rounded-xl bg-emerald-400/20 px-4 py-2 text-sm font-semibold text-emerald-200"
         >
-          {isLast ? "Finish" : "Next"}
+          {submitLabel ?? (isLast ? "Finish" : "Next")}
         </button>
 
         <button

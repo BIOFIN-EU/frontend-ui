@@ -1,10 +1,18 @@
+export type DashboardFieldOption = {
+  value: string;
+  label: string;
+};
+
 export type DashboardField = {
   name: string;
   display_name: string;
   type: string;
   required?: boolean;
-  default?: string | number | null;
+  default?: string | number | boolean | null;
+  options?: DashboardFieldOption[];
   options_source?: string;
+  content?: string;
+  row_fields?: DashboardField[];
 };
 
 export type DashboardStep = {

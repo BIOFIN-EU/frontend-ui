@@ -3,20 +3,111 @@
 import { useEffect, useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { getLookupOptions, type LookupOption } from "@/services/lookups.service";
-import type { WorkflowState } from "@/types/case-dashboard";
+import type { WorkflowField, WorkflowState, WorkflowStep } from "@/types/case-dashboard";
+import type { PathwayStepMode } from "./PathwayStepScreen";
 
 type Props = {
   state: WorkflowState;
+  step: WorkflowStep;
+  stepCode: string;
+  mode?: PathwayStepMode;
+  initialValues?: unknown;
   onStateUpdated: (state: WorkflowState) => void;
+  onEditSaved?: () => void;
 };
 
 type AssignmentRow = Record<string, string>;
 
-export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
-  const step = state.step;
+function rowFromCommittedItem(
+  item: unknown,
+  rowFields: WorkflowField[]
+): AssignmentRow {
+  const row: AssignmentRow = {};
 
+  if (!item || typeof item !== "object") {
+    rowFields.forEach((field) => {
+      row[field.name] = "";
+    });
+    return row;
+  }
+
+  const record = item as Record<string, unknown>;
+
+  rowFields.forEach((field) => {
+    let raw = record[field.name];
+
+    // Committed data serializes FK/lookup fields under the base name (e.g.
+    // `intermediary`, `intermediary_function`), not the flat `*_id` name the
+    // row's own field config uses - fall back to that before giving up.
+    if (raw === undefined && field.name.endsWith("_id")) {
+      raw = record[field.name.slice(0, -"_id".length)];
+    }
+
+    if (raw != null && typeof raw !== "object") {
+      row[field.name] = String(raw);
+      return;
+    }
+
+    if (raw && typeof raw === "object") {
+      const nested = raw as Record<string, unknown>;
+      row[field.name] = String(nested.id ?? "");
+      return;
+    }
+
+    row[field.name] = "";
+  });
+
+  return row;
+}
+
+// The exact draft shape ({ assignments: [...] }, matching the submit
+// payload) is a judgment call pending the backend's actual draft contract.
+function normalizeInitialRows(
+  initialValues: unknown,
+  rowFields: WorkflowField[]
+): AssignmentRow[] | null {
+  if (!initialValues || !rowFields.length) return null;
+
+  if (
+    typeof initialValues === "object" &&
+    !Array.isArray(initialValues) &&
+    Array.isArray((initialValues as Record<string, unknown>).assignments)
+  ) {
+    const raw = (initialValues as Record<string, unknown>)
+      .assignments as unknown[];
+
+    return raw.map((item) => {
+      const row: AssignmentRow = {};
+      const record =
+        item && typeof item === "object" ? (item as Record<string, unknown>) : {};
+
+      rowFields.forEach((field) => {
+        const value = record[field.name];
+        row[field.name] = value != null ? String(value) : "";
+      });
+
+      return row;
+    });
+  }
+
+  if (Array.isArray(initialValues)) {
+    return initialValues.map((item) => rowFromCommittedItem(item, rowFields));
+  }
+
+  return null;
+}
+
+export function PathwayAssignmentStep({
+  state,
+  step,
+  stepCode,
+  mode = "submit",
+  initialValues = null,
+  onStateUpdated,
+  onEditSaved,
+}: Props) {
   const assignmentField = useMemo(() => {
-    return step?.fields.find((field) => field.type === "assignment_table");
+    return step.fields.find((field) => field.type === "assignment_table");
   }, [step]);
 
   const rowFields = useMemo(() => {
@@ -33,15 +124,13 @@ export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
   const [lookupOptions, setLookupOptions] = useState<
     Record<string, LookupOption[]>
   >({});
-  const [rows, setRows] = useState<AssignmentRow[]>([]);
+  const [rows, setRows] = useState<AssignmentRow[]>(() => {
+    const normalized = normalizeInitialRows(initialValues, rowFields);
+    return normalized && normalized.length > 0 ? normalized : [emptyRow];
+  });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!rowFields.length) return;
-
-    setRows([emptyRow]);
-  }, [rowFields, emptyRow]);
+  const [draftMessage, setDraftMessage] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -53,7 +142,7 @@ export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
 
       const results = await Promise.all(
         selectFields.map(async (field) => {
-          const options = await getLookupOptions(field.options_source);
+          const options = await getLookupOptions(field.options_source!);
           return [field.name, options] as const;
         })
       );
@@ -70,7 +159,7 @@ export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
     };
   }, [rowFields]);
 
-  const isLast = !step?.next;
+  const isLast = !step.next;
 
   function updateRow(index: number, fieldName: string, value: string) {
     setRows((current) =>
@@ -122,6 +211,12 @@ export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
         }, {});
       });
 
+      if (mode === "edit") {
+        await workflowService.editStep(state.case_id, stepCode, { assignments });
+        onEditSaved?.();
+        return;
+      }
+
       const updated = await workflowService.submitJsonStep(state.case_id, {
         assignments,
       });
@@ -134,7 +229,19 @@ export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
     }
   }
 
-  if (!step || !assignmentField || !rowFields.length) {
+  async function handleSaveDraft() {
+    try {
+      await workflowService.saveDraft(state.case_id, stepCode, {
+        assignments: rows,
+      });
+      setDraftMessage("Draft saved");
+      setTimeout(() => setDraftMessage(""), 2000);
+    } catch (err) {
+      console.error("save draft failed", err);
+    }
+  }
+
+  if (!assignmentField || !rowFields.length) {
     return <p className="text-sm text-white/70">No assignment step available.</p>;
   }
 
@@ -214,14 +321,36 @@ export function PathwayAssignmentStep({ state, onStateUpdated }: Props) {
           Add another assignment
         </button>
 
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="rounded-xl bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isSubmitting ? "Submitting..." : isLast ? "Finish" : "Next"}
-        </button>
+        <div className="flex items-center gap-3">
+          {draftMessage && (
+            <span className="text-xs font-medium text-emerald-300">
+              {draftMessage}
+            </span>
+          )}
+
+          <button
+            type="button"
+            onClick={handleSaveDraft}
+            className="rounded-xl bg-white/8 px-4 py-2 text-sm text-white transition hover:bg-white/15"
+          >
+            Save draft
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="rounded-xl bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSubmitting
+              ? "Submitting..."
+              : mode === "edit"
+                ? "Save changes"
+                : isLast
+                  ? "Finish"
+                  : "Next"}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -2,26 +2,33 @@
 
 import { useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import type { WorkflowState } from "@/types/case-dashboard";
+import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
 import { FormRenderer } from "@/components/FormRenderer";
+import type { PathwayStepMode } from "./PathwayStepScreen";
 
 type Props = {
   state: WorkflowState;
+  step: WorkflowStep;
+  stepCode: string;
+  mode?: PathwayStepMode;
+  initialValues?: unknown;
   onStateUpdated: (state: WorkflowState) => void;
+  onEditSaved?: () => void;
 };
 
-export function PathwayFileStep({ state, onStateUpdated }: Props) {
-  const step = state.step;
-
-  if (!step) {
-    return <p className="text-sm text-white/70">No step available.</p>;
-  }
-
+export function PathwayFileStep({
+  state,
+  step,
+  stepCode,
+  mode = "submit",
+  onStateUpdated,
+}: Props) {
   const fileField = step.fields.find((f) => f.type === "file");
   const [error, setError] = useState("");
 
   const stepSchema = useMemo(
     () => ({
+      step: 0,
       title: step.title,
       fields: step.fields.map((f) => ({
         id: f.name,
@@ -68,8 +75,32 @@ export function PathwayFileStep({ state, onStateUpdated }: Props) {
     onStateUpdated(updated);
   }
 
-  async function handleSaveDraft(_values: Record<string, any>) {
-    return;
+  // File uploads can't be edited via the PATCH edit endpoint (the backend
+  // rejects it for multipart steps), so a revisited file step is shown
+  // read-only, reusing the same document-matching logic as the project
+  // dashboard.
+  if (mode === "edit") {
+    const matchingDoc = fileField
+      ? state.documents.find(
+          (doc) => doc.field_name === fileField.name && doc.step_code === stepCode
+        )
+      : undefined;
+
+    return (
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+        <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
+          Uploaded file
+        </p>
+
+        <p className="mt-2 text-sm text-white">
+          {matchingDoc?.original_filename ?? "No file has been uploaded for this step yet."}
+        </p>
+
+        <p className="mt-4 text-xs text-white/50">
+          File uploads can&apos;t be changed from here once submitted.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -78,7 +109,7 @@ export function PathwayFileStep({ state, onStateUpdated }: Props) {
         stepSchema={stepSchema}
         defaultValues={defaultValues}
         onNext={handleNext}
-        onSaveDraft={handleSaveDraft}
+        onSaveDraft={async () => {}}
         isFirst={false}
         isLast={!step.next}
       />

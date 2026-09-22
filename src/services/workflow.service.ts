@@ -12,6 +12,18 @@ type SubmitStepResponse = {
   state: WorkflowState;
 };
 
+export type EditStepResponse = {
+  caseId: number;
+  step: string;
+  title: string;
+  data: Record<string, unknown>;
+};
+
+export type StepDraftResponse = {
+  data: Record<string, unknown> | null;
+  updated_at: string | null;
+};
+
 export type DetectCountryRequest = {
   location_type: "polygon" | "point";
   geometry_wkt: string | null;
@@ -78,6 +90,44 @@ export const workflowService = {
     );
 
     return response.state;
+  },
+
+  async editStep(
+    caseId: number | string,
+    stepCode: string,
+    payload: Record<string, unknown>
+  ): Promise<EditStepResponse> {
+    return apiFetch<EditStepResponse>(
+      `${BASE}/cases/${caseId}/steps/${stepCode}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      }
+    );
+  },
+
+  async saveDraft(
+    caseId: number | string,
+    stepCode: string,
+    data: Record<string, unknown>
+  ): Promise<StepDraftResponse> {
+    return apiFetch<StepDraftResponse>(
+      `${BASE}/cases/${caseId}/steps/${stepCode}/draft`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ data }),
+      }
+    );
+  },
+
+  async getDraft(
+    caseId: number | string,
+    stepCode: string
+  ): Promise<StepDraftResponse> {
+    return apiFetch<StepDraftResponse>(
+      `${BASE}/cases/${caseId}/steps/${stepCode}/draft`,
+      { method: "GET" }
+    );
   },
 
   async listCaseDocuments(caseId: number | string): Promise<WorkflowDocument[]> {

@@ -3,35 +3,78 @@
 import { useEffect, useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { getLookupOptions, type LookupOption } from "@/services/lookups.service";
-import type { WorkflowState } from "@/types/case-dashboard";
+import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
 import { FormRenderer } from "@/components/FormRenderer";
+import type { PathwayStepMode } from "./PathwayStepScreen";
 
 type Props = {
   state: WorkflowState;
+  step: WorkflowStep;
+  stepCode: string;
+  mode?: PathwayStepMode;
+  initialValues?: unknown;
   onStateUpdated: (state: WorkflowState) => void;
+  onEditSaved?: () => void;
+  onBack?: () => void;
+  isFirstStep?: boolean;
 };
 
+// Committed data serializes FK/lookup fields as a nested object for display
+// (e.g. `financing_type: {id, code, name}`, mirroring how `country` nests on
+// the location step) rather than the flat `financing_type_id` the step's own
+// field config expects for prefilling a select input. Fall back to the
+// nested shape's `.id` for any `*_id` field before giving up.
+function initialValueFor(initialValues: unknown, name: string): unknown {
+  if (
+    !initialValues ||
+    typeof initialValues !== "object" ||
+    Array.isArray(initialValues)
+  ) {
+    return undefined;
+  }
 
-export function PathwayFormStep({ state, onStateUpdated }: Props) {
-  const step = state.step;
+  const values = initialValues as Record<string, unknown>;
+  const flat = values[name];
+  if (flat !== undefined) return flat;
+
+  if (name.endsWith("_id")) {
+    const nested = values[name.slice(0, -"_id".length)];
+    if (nested && typeof nested === "object" && "id" in nested) {
+      return (nested as { id: unknown }).id;
+    }
+  }
+
+  return undefined;
+}
+
+export function PathwayFormStep({
+  state,
+  step,
+  stepCode,
+  mode = "submit",
+  initialValues = null,
+  onStateUpdated,
+  onEditSaved,
+  onBack,
+  isFirstStep = true,
+}: Props) {
   const [lookupOptions, setLookupOptions] = useState<Record<string, LookupOption[]>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [draftMessage, setDraftMessage] = useState("");
 
   useEffect(() => {
-    if (!step) return;
+    const selectFields = step.fields.filter(
+      (f) => f.type === "select" && f.options_source
+    );
+
+    if (selectFields.length === 0) {
+      setLookupOptions({});
+      return;
+    }
 
     let cancelled = false;
 
     async function loadLookups() {
-      const selectFields = step.fields.filter(
-        (f) => f.type === "select" && f.options_source
-      );
-
-      if (selectFields.length === 0) {
-        setLookupOptions({});
-        return;
-      }
-
       const results = await Promise.all(
         selectFields.map(async (f) => {
           try {
@@ -55,12 +98,9 @@ export function PathwayFormStep({ state, onStateUpdated }: Props) {
     };
   }, [step]);
 
-  if (!step) {
-    return <p className="text-sm text-white/70">No step available.</p>;
-  }
-
   const stepSchema = useMemo(
     () => ({
+      step: 0,
       title: step.title,
       fields: step.fields.map((f) => ({
         id: f.name,
@@ -81,57 +121,79 @@ export function PathwayFormStep({ state, onStateUpdated }: Props) {
     const values: Record<string, any> = {};
 
     step.fields.forEach((f) => {
-      values[f.name] = f.default ?? "";
+      const prefilled = initialValueFor(initialValues, f.name);
+      values[f.name] = prefilled !== undefined ? prefilled : (f.default ?? "");
     });
 
     return values;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   async function handleNext(values: Record<string, any>) {
-  setFieldErrors({});
+    setFieldErrors({});
 
-  try {
-    const payload = { ...values };
+    try {
+      const payload = { ...values };
 
-    step.fields.forEach((f) => {
-      const value = payload[f.name];
+      step.fields.forEach((f) => {
+        const value = payload[f.name];
 
-      if (value === "" || value == null) {
-        payload[f.name] = null;
+        if (value === "" || value == null) {
+          payload[f.name] = null;
+          return;
+        }
+
+        if (f.type === "number") {
+          payload[f.name] = Number(value);
+          return;
+        }
+
+        if (f.type === "select" && f.name.endsWith("_id")) {
+          payload[f.name] = Number(value);
+          return;
+        }
+      });
+
+      if (mode === "edit") {
+        await workflowService.editStep(state.case_id, stepCode, payload);
+        onEditSaved?.();
         return;
       }
 
-      if (f.type === "number") {
-        payload[f.name] = Number(value);
-        return;
-      }
-
-      if (f.type === "select" && f.name.endsWith("_id")) {
-        payload[f.name] = Number(value);
-        return;
-      }
-    });
-
-    const updated = await workflowService.submitJsonStep(state.case_id, payload);
-    onStateUpdated(updated);
-  } catch (err: any) {
-    setFieldErrors(err.fieldErrors || {});
+      const updated = await workflowService.submitJsonStep(state.case_id, payload);
+      onStateUpdated(updated);
+    } catch (err: any) {
+      setFieldErrors(err.fieldErrors || {});
+    }
   }
-}
 
-  async function handleSaveDraft(_values: Record<string, any>) {
-    return;
+  async function handleSaveDraft(values: Record<string, any>) {
+    try {
+      await workflowService.saveDraft(state.case_id, stepCode, values);
+      setDraftMessage("Draft saved");
+      setTimeout(() => setDraftMessage(""), 2000);
+    } catch (err) {
+      console.error("save draft failed", err);
+    }
   }
 
   return (
-    <FormRenderer
-      stepSchema={stepSchema}
-      defaultValues={defaultValues}
-      onNext={handleNext}
-      onSaveDraft={handleSaveDraft}
-      isFirst={false}
-      isLast={!step.next}
-      fieldErrors={fieldErrors}
-    />
+    <div>
+      <FormRenderer
+        stepSchema={stepSchema}
+        defaultValues={defaultValues}
+        onNext={handleNext}
+        onSaveDraft={handleSaveDraft}
+        onPrev={onBack}
+        isFirst={isFirstStep}
+        isLast={!step.next}
+        fieldErrors={fieldErrors}
+        submitLabel={mode === "edit" ? "Save changes" : undefined}
+      />
+
+      {draftMessage && (
+        <p className="mt-2 text-xs font-medium text-emerald-300">{draftMessage}</p>
+      )}
+    </div>
   );
 }

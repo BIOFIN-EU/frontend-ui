@@ -1,21 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import type { WorkflowState } from "@/types/case-dashboard";
+import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
 import { PathwayFormStep } from "./PathwayFormStep";
 import { PathwayFileStep } from "./PathwayFileStep";
 import { PathwayAssignmentStep } from "./PathwayAssignmentStep";
 import { PathwayLocationStep } from "./PathwayLocationStep";
 
+export type PathwayStepMode = "submit" | "edit";
+
 type Props = {
   state: WorkflowState;
   onStateUpdated: (state: WorkflowState) => void;
   onReload: () => Promise<void>;
+  /** Step config to render. Defaults to `state.step` (the live current step). */
+  stepConfig?: WorkflowStep | null;
+  /** Step code matching `stepConfig`. Defaults to `state.current_step`. */
+  stepCode?: string;
+  /** "submit" advances the live workflow; "edit" updates a past step in place. */
+  mode?: PathwayStepMode;
+  /** Committed-or-draft values to prefill the step's form with. */
+  initialValues?: unknown;
+  /** Called after a successful edit-mode save. */
+  onEditSaved?: () => void;
+  /** Navigate to the immediately-previous step, if any. */
+  onBack?: () => void;
+  /** True when there is no previous step to go back to. */
+  isFirstStep?: boolean;
 };
 
-function inferMode(step: WorkflowState["step"]) {
-  if (!step) return "form";
-
+function inferMode(step: WorkflowStep) {
   if (step.fields.some((f) => f.type === "file")) return "file_form";
   if (
     step.fields.some(
@@ -33,8 +47,15 @@ export function PathwayStepScreen({
   state,
   onStateUpdated,
   onReload,
+  stepConfig = null,
+  stepCode,
+  mode = "submit",
+  initialValues = null,
+  onEditSaved,
+  onBack,
+  isFirstStep = true,
 }: Props) {
-  if (state.status === "completed" || !state.step) {
+  if (mode === "submit" && (state.status === "completed" || !state.step)) {
     return (
       <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -65,40 +86,38 @@ export function PathwayStepScreen({
     );
   }
 
-  const step = state.step;
-  const mode = step.ui_mode ?? inferMode(step);
+  const step = stepConfig ?? state.step;
 
-  if (mode === "location_table") {
-    return (
-      <PathwayLocationStep
-        state={state}
-        onStateUpdated={onStateUpdated}
-      />
-    );
+  if (!step) {
+    return <p className="text-sm text-white/70">No step available.</p>;
   }
 
-  if (mode === "file_form") {
-    return (
-      <PathwayFileStep
-        state={state}
-        onStateUpdated={onStateUpdated}
-      />
-    );
+  const effectiveStepCode = stepCode ?? state.current_step;
+  const uiMode = step.ui_mode ?? inferMode(step);
+
+  const commonProps = {
+    state,
+    step,
+    stepCode: effectiveStepCode,
+    mode,
+    initialValues,
+    onStateUpdated,
+    onEditSaved,
+    onBack,
+    isFirstStep,
+  };
+
+  if (uiMode === "location_table") {
+    return <PathwayLocationStep {...commonProps} />;
   }
 
-  if (mode === "assignment_table") {
-  return (
-    <PathwayAssignmentStep
-      state={state}
-      onStateUpdated={onStateUpdated}
-    />
-  );
-}
+  if (uiMode === "file_form") {
+    return <PathwayFileStep {...commonProps} />;
+  }
 
-  return (
-    <PathwayFormStep
-      state={state}
-      onStateUpdated={onStateUpdated}
-    />
-  );
+  if (uiMode === "assignment_table") {
+    return <PathwayAssignmentStep {...commonProps} />;
+  }
+
+  return <PathwayFormStep {...commonProps} />;
 }
