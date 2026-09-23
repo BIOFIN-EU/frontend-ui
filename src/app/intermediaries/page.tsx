@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 import {
   listIntermediaries,
@@ -60,7 +61,7 @@ export default function IntermediariesPage() {
 
         <Link
           href="/intermediaries/new"
-          className="rounded-xl bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300"
+          className={`${buttonBase} ${buttonPrimary}`}
         >
           Register intermediary
         </Link>
@@ -90,7 +91,7 @@ export default function IntermediariesPage() {
 
           <Link
             href="/intermediaries/new"
-            className="mt-5 inline-flex rounded-xl bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300"
+            className={`mt-5 ${buttonBase} ${buttonPrimary}`}
           >
             Register intermediary
           </Link>

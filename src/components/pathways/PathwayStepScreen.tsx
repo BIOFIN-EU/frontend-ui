@@ -6,6 +6,7 @@ import { PathwayFormStep } from "./PathwayFormStep";
 import { PathwayFileStep } from "./PathwayFileStep";
 import { PathwayAssignmentStep } from "./PathwayAssignmentStep";
 import { PathwayLocationStep } from "./PathwayLocationStep";
+import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 export type PathwayStepMode = "submit" | "edit";
 
@@ -76,7 +77,7 @@ export function PathwayStepScreen({
           <div className="shrink-0">
             <Link
               href={`/projects/${state.case_id}`}
-              className="inline-flex items-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300"
+              className={`${buttonBase} ${buttonPrimary}`}
             >
               View project #{state.case_id}
             </Link>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { CaseUserAccess } from "@/types/case-access";
 import { addCaseUser } from "@/services/case-access.service";
+import { buttonBase, buttonBaseSm, buttonPrimary } from "@/lib/ui";
 
 type CaseAccessManagementProps = {
   caseId: number;
@@ -53,7 +54,7 @@ export function ProjectAccessManagement({
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+          className={`${buttonBaseSm} ${buttonPrimary}`}
         >
           Add user
         </button>
@@ -83,7 +84,7 @@ export function ProjectAccessManagement({
 
           <button
             onClick={handleAddUser}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white"
+            className={`${buttonBase} ${buttonPrimary}`}
           >
             Save
           </button>

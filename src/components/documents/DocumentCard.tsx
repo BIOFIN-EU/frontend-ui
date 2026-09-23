@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { formatDate } from "@/lib/format";
+import { buttonBaseSm, buttonGhost } from "@/lib/ui";
 
 export type DocumentCardDoc = {
   case_document_id: number;
@@ -68,7 +69,7 @@ export function DocumentCard({
         type="button"
         onClick={handleDownload}
         disabled={downloading}
-        className="shrink-0 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
+        className={`shrink-0 disabled:cursor-not-allowed disabled:opacity-60 ${buttonBaseSm} ${buttonGhost}`}
       >
         {downloading ? "Loading..." : "Download"}
       </button>

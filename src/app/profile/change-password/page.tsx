@@ -6,6 +6,7 @@ import Link from "next/link";
 import * as auth from "@/services/auth.service";
 import { useAuth } from "@/context/auth.context";
 import { ApiError } from "@/lib/api";
+import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -155,7 +156,7 @@ export default function ChangePasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center justify-center rounded-xl bg-emerald-400/15 px-5 py-3 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-300/30 shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition hover:bg-emerald-400/20 hover:ring-emerald-200/40 active:translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-60"
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
           >
             {loading ? "Updating…" : "Change password"}
           </button>

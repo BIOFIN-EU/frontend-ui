@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CaseDashboardState } from "@/types/workflow";
 import { formatDate } from "@/lib/format";
+import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 type Props = {
   caseId: string;
@@ -38,7 +39,7 @@ export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
       <div className="mt-5 space-y-2">
         <Link
           href={`/pathways/${caseId}`}
-          className="flex w-full items-center justify-center rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
+          className={`w-full ${buttonBase} ${buttonPrimary}`}
         >
           Edit project
         </Link>
@@ -47,7 +48,7 @@ export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
           <Link
             href={accessHref}
             className={[
-              "flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition",
+              `w-full ${buttonBase}`,
               accessActive
                 ? "bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20"
                 : "bg-white text-slate-950 hover:bg-white/90",

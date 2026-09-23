@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { Select } from "@/components/ui/Select";
 import { apiFetch } from "@/lib/api";
+import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 type ContactReason =
   | "I am an Nature-based Solutions Funder"
@@ -488,7 +489,7 @@ export default function SupportPage() {
           <header className="max-w-2xl space-y-3">
             <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Support</h1>
             <p className="max-w-xl text-base leading-7 text-white/70">Need help or want to get in touch? We&apos;re here to support you.</p>
-            <a href="#contact-form" className="mt-4 inline-flex items-center gap-2 rounded-xl border border-emerald-300/35 bg-emerald-400/15 px-5 py-3 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/20">
+            <a href="#contact-form" className={`mt-4 gap-2 ${buttonBase} ${buttonPrimary}`}>
               Get in touch <span aria-hidden="true">→</span>
             </a>
           </header>
@@ -553,7 +554,7 @@ export default function SupportPage() {
           {error && <div role="alert" className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">{error}</div>}
           {success && <div role="status" className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">{success}</div>}
 
-          <button type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400/15 px-5 py-3 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-300/30 transition hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit">
+          <button type="submit" disabled={loading} className={`gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit ${buttonBase} ${buttonPrimary}`}>
             <MailIcon />
             {loading ? "Sending…" : "Send message"}
           </button>

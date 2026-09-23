@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { formatDate } from "@/lib/format";
 import type { CaseListItem } from "@/types/case-list";
 import { Select } from "@/components/ui/Select";
+import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary } from "@/lib/ui";
 
 type Props = {
   cases: CaseListItem[];
@@ -109,7 +110,7 @@ export function ProjectListScreen({ cases }: Props) {
 
           <Link
             href="/pathways"
-            className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500"
+            className={`${buttonBase} ${buttonPrimary}`}
           >
             Create New Project
           </Link>
@@ -259,14 +260,14 @@ export function ProjectListScreen({ cases }: Props) {
                 <div className="flex shrink-0 items-center gap-2">
                   <Link
                     href={`/pathways/${item.caseId}`}
-                    className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-white/90"
+                    className={`${buttonBaseSm} ${buttonGhost}`}
                   >
                     Edit
                   </Link>
 
                   <Link
                     href={`/projects/${item.caseId}`}
-                    className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-emerald-950 transition hover:bg-emerald-400"
+                    className={`${buttonBaseSm} ${buttonPrimary}`}
                   >
                     Open
                   </Link>

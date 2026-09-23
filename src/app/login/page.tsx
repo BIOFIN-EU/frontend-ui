@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation"; // 👈 merged
 import { useAuth } from "@/context/auth.context";
 import Link from "next/link";
+import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -102,7 +103,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center justify-center rounded-xl bg-emerald-400/15 px-5 py-3 text-sm font-semibold text-emerald-100 ring-1 ring-emerald-300/30 shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition hover:bg-emerald-400/20 hover:ring-emerald-200/40 active:translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-60"
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
           >
             {loading ? "Logging in…" : "Login"}
           </button>

@@ -6,6 +6,7 @@ import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
 import type { CaseLocationEntry } from "@/types/workflow";
 import RiskMap from "@/components/maps/RiskMap";
 import { RequirementBadge } from "@/components/FormRenderer";
+import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
 import type { PathwayStepMode } from "./PathwayStepScreen";
 
 type Props = {
@@ -481,7 +482,7 @@ export function PathwayLocationStep({
                       removeEntry(entry.key);
                     }}
                     disabled={entries.length === 1}
-                    className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/70 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                    className={`disabled:cursor-not-allowed disabled:opacity-40 ${buttonBaseSm} ${buttonGhost}`}
                   >
                     Remove
                   </button>
@@ -668,7 +669,7 @@ export function PathwayLocationStep({
             <button
               type="button"
               onClick={onBack}
-              className="rounded-xl bg-white/8 px-4 py-2 text-sm text-white transition hover:bg-white/15"
+              className={`${buttonBase} ${buttonGhost}`}
             >
               Back
             </button>
@@ -677,7 +678,7 @@ export function PathwayLocationStep({
           <button
             type="button"
             onClick={addEntry}
-            className="rounded-xl border border-emerald-400/30 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10"
+            className={`${buttonBase} ${buttonSecondary}`}
           >
             Add another location
           </button>
@@ -693,7 +694,7 @@ export function PathwayLocationStep({
           <button
             type="button"
             onClick={handleSaveDraft}
-            className="rounded-xl bg-white/8 px-4 py-2 text-sm text-white transition hover:bg-white/15"
+            className={`${buttonBase} ${buttonGhost}`}
           >
             Save draft
           </button>
@@ -702,7 +703,7 @@ export function PathwayLocationStep({
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="rounded-xl bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
           >
             {isSubmitting
               ? "Submitting..."

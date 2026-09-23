@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { getLookupOptions, type LookupOption } from "@/services/lookups.service";
 import { createIntermediary } from "@/services/intermediaries.service";
+import { buttonBase, buttonGhost, buttonPrimary } from "@/lib/ui";
 
 const FUNCTION_LOOKUP_KEY = "intermediary_function";
 
@@ -264,7 +265,7 @@ export function IntermediaryCreateForm() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-xl border border-white/10 px-5 py-2 text-sm font-semibold text-white/70 transition hover:bg-white/10"
+            className={`${buttonBase} ${buttonGhost}`}
           >
             Cancel
           </button>
@@ -272,7 +273,7 @@ export function IntermediaryCreateForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-xl bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
           >
             {isSubmitting ? "Creating..." : "Create intermediary"}
           </button>

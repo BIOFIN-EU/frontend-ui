@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import type { FieldSchema, StepSchema } from "@/types/forms";
+import { buttonBase, buttonGhost, buttonPrimary } from "@/lib/ui";
 import { Select } from "@/components/ui/Select";
 
 function isVisible(field: FieldSchema, values: Record<string, any>) {
@@ -212,7 +213,7 @@ function Field({
                 const file = e.target.files?.[0] ?? null;
                 setValue(field.id, file, { shouldValidate: true, shouldDirty: true });
               }}
-              className="block w-full text-sm text-white file:mr-4 file:rounded-xl file:border-0 file:bg-emerald-400/15 file:px-4 file:py-2 file:font-semibold file:text-emerald-100 hover:file:bg-emerald-400/20"
+              className="block w-full text-sm text-white file:mr-4 file:rounded-xl file:border file:border-emerald-300 file:bg-emerald-400/15 file:px-4 file:py-2 file:font-semibold file:!text-white hover:file:bg-emerald-300"
             />
           </div>
 
@@ -288,7 +289,7 @@ export function FormRenderer({
           <button
             type="button"
             onClick={onPrev}
-            className="rounded-xl bg-white/8 px-4 py-2 text-sm text-white"
+            className={`${buttonBase} ${buttonGhost}`}
           >
             Back
           </button>
@@ -296,7 +297,7 @@ export function FormRenderer({
 
         <button
           type="submit"
-          className="rounded-xl bg-emerald-400/20 px-4 py-2 text-sm font-semibold text-emerald-200"
+          className={`${buttonBase} ${buttonPrimary}`}
         >
           {submitLabel ?? (isLast ? "Finish" : "Next")}
         </button>
@@ -304,7 +305,7 @@ export function FormRenderer({
         <button
           type="button"
           onClick={form.handleSubmit(async (vals) => onSaveDraft(vals))}
-          className="ml-auto rounded-xl bg-white/8 px-4 py-2 text-sm text-white"
+          className={`ml-auto ${buttonBase} ${buttonGhost}`}
         >
           Save draft
         </button>

@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth.context";
 import { workflowService } from "@/services/workflow.service";
+import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 const pathways = [
   {
@@ -265,7 +266,7 @@ export default function PathwaysPage() {
               </div>
 
               <div className="mt-auto pt-7">
-                <button onClick={() => handleStartPathway(pathway.code)} disabled={creatingCode === pathway.code} className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-300/25 bg-emerald-400/15 px-5 py-3 text-sm font-semibold text-emerald-50 transition hover:border-emerald-200/40 hover:bg-emerald-400/25 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+                <button onClick={() => handleStartPathway(pathway.code)} disabled={creatingCode === pathway.code} className={`w-full gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto ${buttonBase} ${buttonPrimary}`}>
                   {creatingCode === pathway.code
                     ? "Creating project..."
                     : "Create project"}

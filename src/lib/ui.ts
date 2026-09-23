@@ -8,3 +8,15 @@ export const buttonPrimary =
 
 export const buttonSecondary =
   "border border-white/30 bg-transparent !text-white hover:bg-white/10";
+
+export const buttonDanger =
+  "border border-red-400 bg-red-500 !text-white hover:bg-red-400";
+
+// Lower-emphasis actions (Cancel, Back, Save draft) - same family, quieter.
+export const buttonGhost =
+  "border border-white/10 bg-white/10 !text-white hover:bg-white/20";
+
+// Compact sizing for inline/dense contexts (table rows, cards) where the
+// full-height buttonBase would be too chunky. Same color variants apply.
+export const buttonBaseSm =
+  "inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition duration-200";
