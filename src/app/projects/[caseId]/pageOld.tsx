@@ -9,6 +9,8 @@ import type { CaseDashboardState } from "@/types/workflow";
 import { ProjectDashboardScreen } from "@/components/projects/ProjectDashboardScreen";
 import { ProjectDashboardMenu } from "@/components/projects/ProjectDashboardMenu";
 import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";
+import { BiodiversityRiskInsight } from "@/components/vulnerability-index/BiodiversityRiskInsight";
+
 
 export default function CaseDashboardPage() {
   const params = useParams<{ caseId: string }>();
@@ -25,6 +27,68 @@ export default function CaseDashboardPage() {
 
   const myAccess = users.find((u) => u.user_id === user?.id);
   const canManageUsers = Boolean(myAccess?.can_assign_users);
+
+
+const HARDCODED_EXPLANATION_BLOCKS = [
+  {
+    template:
+      "This region contains a {{protected_area}} with {{critical_habitat}} status and exhibits a {{species_richness}}. These characteristics collectively indicate a {{biodiversity_loss}}.",
+    placeholders: {
+      protected_area: {
+        text: "Protected Area",
+        data_type: "protected_area_assessment",
+      },
+      critical_habitat: {
+        text: "likely Critical Habitat",
+        data_type: "critical_habitat_status",
+      },
+      species_richness: {
+        text: "low Species Richness Index",
+        data_type: "species_richness_metrics",
+      },
+      biodiversity_loss: {
+        text: "high likelihood of Biodiversity Loss",
+        data_type: "biodiversity_loss_assessment",
+      },
+    },
+  },
+  {
+    template:
+      "Furthermore, based on {{climate_projections}} and {{urban_expansion}} modelling, this area demonstrates {{climate_resilience}} in the face of a future worst-case scenario for climate-change.",
+    placeholders: {
+      climate_projections: {
+        text: "future climate projections",
+        data_type: "climate_projection_models",
+      },
+      urban_expansion: {
+        text: "projected urban expansion",
+        data_type: "urban_expansion_forecast",
+      },
+      climate_resilience: {
+        text: "low climate-resilience",
+        data_type: "climate_resilience_metrics",
+      },
+    },
+  },
+  {
+    template:
+      "Given these converging factors ({{biodiversity_loss_factors}} and {{climate_resilience_factor}}), we suggest that the following {{management_actions}} should be prioritised: Active Restoration (AR) and Passive Protection (PP). Capital allocation toward nature-positive activities within these intervention types should improve biodiversity outcomes while strengthening long-term resilience against future climate and urbanisation pressures.",
+    placeholders: {
+      biodiversity_loss_factors: {
+        text: "high likelihood of Biodiversity Loss",
+        data_type: "biodiversity_loss_assessment",
+      },
+      climate_resilience_factor: {
+        text: "low climate-resilience",
+        data_type: "climate_resilience_metrics",
+      },
+      management_actions: {
+        text: "Management Actions",
+        data_type: "management_priorities",
+      },
+    },
+  },
+];
 
   async function loadState() {
     try {
@@ -70,7 +134,8 @@ export default function CaseDashboardPage() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
-            Review and edit project data
+            Review submitted workflow data, biodiversity risk context, and project
+            access settings.
           </p>
         </div>
       </header>
@@ -92,7 +157,24 @@ export default function CaseDashboardPage() {
           <main className="min-w-0 space-y-8">
             <ProjectDashboardScreen key={String(caseId)} state={state} />
 
-            {!usersLoading && canManageUsers}
+            {!usersLoading && canManageUsers && (
+              <BiodiversityRiskInsight
+              value={state.raster_data?.summary_stats?.mean_raster_value ?? 0.29889303158720826}
+              thresholds={
+                state.risk_ling_thresholds ?? {
+                  low: 0.09285714285714287,
+                  "medium-low": 0.25000000000000006,
+                  medium: 0.5,
+                  "medium-high": 0.7500000000000001,
+                  high: 0.9458333333333333,
+                }
+              }
+              explanationBlocks={
+                state.xai_summary?.xai_humam_text?.detailed_explanation ??
+                HARDCODED_EXPLANATION_BLOCKS
+              }
+            />
+            )}
           </main>
 
           <aside className="min-w-0 xl:sticky xl:top-24">
