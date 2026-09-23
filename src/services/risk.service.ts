@@ -21,9 +21,7 @@ export async function getRiskScoreByID(riskCaseURI: string) {
   // const data = await apiFetch<RiskScoreCaseResponse>(`${BASE}${riskCaseURI}`, {method: "GET"});
 
   // 2. Fetch the risk data using the URL from the response
-  const riskRes = await apiFetch(`${BASE}${riskCaseURI.replace("/api/v1", "")}`);
-  if (!riskRes.ok) throw new Error(`Risk fetch error: ${riskRes.status}`);
-  const riskJson = await riskRes.json();
+  const riskJson = await apiFetch<RiskScoreCaseResponse>(`${BASE}${riskCaseURI.replace("/api/v1", "")}`);
   return riskJson;
 }
 
@@ -52,13 +50,10 @@ export async function getPriorityManagementActions(country_code: string, polygon
     if (polygon) {
       body.wkt_polygon = polygon;
     }
-  const priorityRes = await apiFetch(`${BASE}/management-actions/priority/`, {
+  const data = await apiFetch<PriorityActionsCaseResponse>(`${BASE}/management-actions/priority/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!priorityRes.ok) throw new Error(`Priority fetch error: ${priorityRes.status}`);
-  const data: PriorityActionsCaseResponse = await priorityRes.json();
 
   const riskRes = await getRiskScoreByID(data.risk);
   data.riskData = riskRes
