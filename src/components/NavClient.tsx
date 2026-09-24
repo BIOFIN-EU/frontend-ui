@@ -14,9 +14,6 @@ export default function NavClient() {
 
             {isAuthed && (
                 <>
-                    <Link href="/vulnerability-index" className="navLink">
-                        Vulnerability Index
-                    </Link>
 
                     <Link href="/pathways" className="navLink">
                         Project Pathways
