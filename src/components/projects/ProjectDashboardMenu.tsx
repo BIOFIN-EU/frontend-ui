@@ -60,7 +60,7 @@ export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
         )}
 
         <Link
-          href={`/vulnerability/${caseId}`}
+          href={`/projects/${caseId}/vulnerability`}
           className={[`w-full ${buttonBase}, bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 bg-blue text-slate-950 hover:bg-white/90`]}
         >
           Vulnerability
