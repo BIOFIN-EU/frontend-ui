@@ -64,3 +64,31 @@ export async function getPriorityManagementActionsByID(entry_id: string) {
 }
 
 
+
+export async function getPriorityManagementActionsByCaseID(case_id: string) {
+  // 1. Fetch priority data by id
+  const caseData = await apiFetch(`/api/risk/cases/${case_id}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  // 2. Ensure we have an array to work with
+  if (!Array.isArray(caseData)) {
+    return caseData;
+  }
+
+  // 3. For each entry, enrich its result with riskData
+  await Promise.all(
+    caseData.map(async (entry: any) => {
+      const data = entry.result;
+
+      const riskRes = await getRiskScoreByID(data.risk);
+      data.riskData = riskRes;
+    })
+  );
+
+  console.log(caseData);
+  return caseData;
+}
+
+
