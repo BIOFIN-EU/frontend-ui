@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import bertraghboyBay from "../../public/images/bertraghboy-bay.jpg";
 import { buttonBase, buttonPrimary, buttonSecondary } from "@/lib/ui";
 
 const pillars = [
@@ -133,8 +135,32 @@ function TileGraphic({ type }: { type: string }) {
 
 export default function HomePage() {
   return (
-    <div className="relative isolate overflow-hidden bg-slate-950">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.14),transparent_30%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_28%),radial-gradient(circle_at_bottom,rgba(168,85,247,0.12),transparent_30%)]" />
+    <div className="relative isolate">
+      {/*
+        Hero photo (Bertraghboy Bay, Connemara). Breaks out of the layout's
+        max-w-7xl container to full viewport width (the layout wrapper clips
+        horizontal overflow), starts under main's top padding, and fades into
+        the page background so the call-to-action section sits on the fade.
+      */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-6 left-1/2 -z-10 h-[720px] w-screen -translate-x-1/2 overflow-hidden sm:h-[780px] lg:h-[840px]"
+      >
+        <Image
+          src={bertraghboyBay}
+          alt=""
+          fill
+          priority
+          placeholder="blur"
+          sizes="100vw"
+          className="object-cover object-[65%_45%]"
+        />
+        {/* Text legibility: even scrim on small screens, left-weighted from lg up where the copy sits left */}
+        <div className="absolute inset-0 bg-[#07141b]/70 lg:hidden" />
+        <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,rgba(7,20,27,0.92)_0%,rgba(7,20,27,0.78)_35%,rgba(7,20,27,0.4)_65%,rgba(7,20,27,0.25)_100%)] lg:block" />
+        {/* Soft top edge under the header, and a fade into the page background */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,20,27,0.45)_0%,transparent_22%,transparent_50%,rgba(8,24,33,0.75)_78%,#081821_100%)]" />
+      </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
         <section className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
