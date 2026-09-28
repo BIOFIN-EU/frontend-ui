@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 
 import { useAuth } from "@/context/auth.context";
@@ -26,42 +25,20 @@ export default function CaseAccessPage() {
     );
   }
 
+  // The Access tab is hidden for these users; this covers a direct link.
   if (!canManageUsers) {
     return (
-      <div className="space-y-4">
-        <Link
-          href={`/projects/${caseId}`}
-          className="text-sm font-semibold text-emerald-200 hover:text-emerald-100"
-        >
-          ← Back to dashboard
-        </Link>
-
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
-          You do not have permission to manage users for this case.
-        </div>
+      <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+        You do not have permission to manage users for this case.
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <header className="space-y-3">
-        <Link
-          href={`/projects/${caseId}`}
-          className="text-sm font-semibold text-emerald-200 hover:text-emerald-100"
-        >
-          ← Back to dashboard
-        </Link>
-
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-            Project #{caseId}
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">
-            Project access management
-          </h1>
-        </div>
-      </header>
+      <h2 className="text-2xl font-semibold tracking-tight text-white">
+        Project access management
+      </h2>
 
       <ProjectAccessManagement
         caseId={numericCaseId}

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import { formatDate } from "@/lib/format";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
@@ -9,15 +8,10 @@ import { buttonBase, buttonPrimary } from "@/lib/ui";
 type Props = {
   caseId: string;
   state: CaseDashboardState;
-  canManageUsers: boolean;
 };
 
-export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
-  const pathname = usePathname();
-
-  const accessHref = `/projects/${caseId}/access`;
-  const accessActive = pathname === accessHref;
-
+// Vulnerability Index and Access are project tabs (ProjectTabs), not buttons here.
+export function ProjectDashboardMenu({ caseId, state }: Props) {
   return (
     <div className="h-fit rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
       <div>
@@ -43,29 +37,6 @@ export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
         >
           Edit project
         </Link>
-
-        {canManageUsers && (
-          <Link
-            href={accessHref}
-            className={[
-              `w-full ${buttonBase}`,
-              accessActive
-                ? "bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20"
-                : "bg-white text-slate-950 hover:bg-white/90",
-            ].join(" ")}
-          >
-            Manage project access
-          </Link>
-
-        )}
-
-        <Link
-          href={`/projects/${caseId}/vulnerability`}
-          className={`w-full ${buttonBase} bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 hover:bg-white/90`}
-        >
-          Vulnerability
-        </Link>
-
       </div>
 
       <dl className="mt-5 space-y-4 border-t border-white/10 pt-5 text-sm">

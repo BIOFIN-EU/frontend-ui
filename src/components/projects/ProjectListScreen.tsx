@@ -262,6 +262,16 @@ export function ProjectListScreen({ cases }: Props) {
                 </span>
 
                 <div className="flex shrink-0 items-center gap-2">
+                  {/* Risk results only exist once a project is completed. */}
+                  {item.status === "completed" && (
+                    <Link
+                      href={`/projects/${item.caseId}/vulnerability`}
+                      className={`${buttonBaseSm} ${buttonGhost}`}
+                    >
+                      Vulnerability Index
+                    </Link>
+                  )}
+
                   <Link
                     href={`/pathways/${item.caseId}`}
                     className={`${buttonBaseSm} ${buttonGhost}`}

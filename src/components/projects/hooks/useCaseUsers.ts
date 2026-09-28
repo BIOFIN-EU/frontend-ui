@@ -13,6 +13,10 @@ export function useCaseUsers(caseId: number) {
       try {
         const data = await listCaseUsers(caseId);
         if (mounted) setUsers(data);
+      } catch {
+        // No access list (e.g. not logged in): treat as no users, so
+        // nothing that depends on permissions is shown.
+        if (mounted) setUsers([]);
       } finally {
         if (mounted) setLoading(false);
       }
