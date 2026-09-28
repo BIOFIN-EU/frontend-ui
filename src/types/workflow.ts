@@ -33,6 +33,9 @@ export type WorkflowField = {
   widget?: string;
   content?: string;
   row_fields?: WorkflowField[];
+  // Name of another field in the same row whose value filters this field's
+  // lookup options (e.g. an intermediary's functions).
+  filter_by?: string;
 };
 
 export type WorkflowUiMode =

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { getLookupOptions } from "@/services/lookups.service";
 import type { LookupOption } from "@/types/lookups";
@@ -20,6 +20,20 @@ type Props = {
 };
 
 type AssignmentRow = Record<string, string>;
+
+/**
+ * The row field whose value filters this field's options, if any. Cases
+ * started before the config gained `filter_by` still carry their old step
+ * config, so the intermediary -> function rule is also inferred.
+ */
+function filterFieldOf(field: WorkflowField): string | undefined {
+  if (field.filter_by) return field.filter_by;
+  return field.options_source === "intermediary_function" ? "intermediary_id" : undefined;
+}
+
+function filteredKey(field: WorkflowField, parentValue: string) {
+  return `${field.options_source}:${parentValue}`;
+}
 
 function rowFromCommittedItem(
   item: unknown,
@@ -127,6 +141,11 @@ export function PathwayAssignmentStep({
   const [lookupOptions, setLookupOptions] = useState<
     Record<string, LookupOption[]>
   >({});
+  // Options of dependent fields, keyed by filteredKey(field, parent value).
+  const [filteredOptions, setFilteredOptions] = useState<
+    Record<string, LookupOption[]>
+  >({});
+  const pendingFilteredKeys = useRef(new Set<string>());
   const [rows, setRows] = useState<AssignmentRow[]>(() => {
     const normalized = normalizeInitialRows(initialValues, rowFields);
     return normalized && normalized.length > 0 ? normalized : [emptyRow];
@@ -162,14 +181,108 @@ export function PathwayAssignmentStep({
     };
   }, [rowFields]);
 
+  // Load each dependent field's options for the parent values in use.
+  useEffect(() => {
+    const needed: { key: string; field: WorkflowField; filterBy: string; parentValue: string }[] = [];
+
+    for (const row of rows) {
+      for (const field of rowFields) {
+        const filterBy = filterFieldOf(field);
+        const parentValue = filterBy ? row[filterBy] : "";
+        if (!filterBy || !parentValue || !field.options_source) continue;
+
+        const key = filteredKey(field, parentValue);
+        if (key in filteredOptions || pendingFilteredKeys.current.has(key)) continue;
+
+        pendingFilteredKeys.current.add(key);
+        needed.push({ key, field, filterBy, parentValue });
+      }
+    }
+
+    for (const { key, field, filterBy, parentValue } of needed) {
+      getLookupOptions(field.options_source!, { [filterBy]: parentValue })
+        .then((options) => {
+          setFilteredOptions((current) => ({ ...current, [key]: options }));
+        })
+        .finally(() => {
+          pendingFilteredKeys.current.delete(key);
+        });
+    }
+  }, [rows, rowFields, filteredOptions]);
+
   const isLast = !step.next;
 
   function updateRow(index: number, fieldName: string, value: string) {
     setRows((current) =>
-      current.map((row, i) =>
-        i === index ? { ...row, [fieldName]: value } : row
-      )
+      current.map((row, i) => {
+        if (i !== index) return row;
+
+        const next = { ...row, [fieldName]: value };
+
+        // Changing a parent (e.g. the intermediary) clears a dependent value
+        // (its function) unless the new parent is known to offer it too.
+        for (const field of rowFields) {
+          if (filterFieldOf(field) !== fieldName || !next[field.name]) continue;
+
+          const options = value ? filteredOptions[filteredKey(field, value)] : undefined;
+          if (!options?.some((option) => option.value === next[field.name])) {
+            next[field.name] = "";
+          }
+        }
+
+        return next;
+      })
     );
+  }
+
+  /**
+   * Options, placeholder and disabled state for a select in a given row. A
+   * dependent field lists only its parent's options, plus the row's current
+   * value when that is no longer offered (an older assignment), so it stays
+   * visible instead of silently blanking.
+   */
+  function selectState(field: WorkflowField, row: AssignmentRow) {
+    const filterBy = filterFieldOf(field);
+    const allOptions = lookupOptions[field.name] ?? [];
+
+    if (!filterBy) {
+      return { options: allOptions, placeholder: `Select ${field.display_name}`, disabled: false };
+    }
+
+    const parentField = rowFields.find((candidate) => candidate.name === filterBy);
+    const parentLabel = (parentField?.display_name ?? filterBy).toLowerCase();
+    const parentValue = row[filterBy];
+
+    if (!parentValue) {
+      return { options: [], placeholder: `Select ${parentLabel} first`, disabled: true };
+    }
+
+    const options = filteredOptions[filteredKey(field, parentValue)];
+    if (options === undefined) {
+      return { options: [], placeholder: "Loading…", disabled: true };
+    }
+
+    const current = row[field.name];
+    const withCurrent =
+      current && !options.some((option) => option.value === current)
+        ? [
+            ...options,
+            {
+              value: current,
+              label: `${allOptions.find((option) => option.value === current)?.label ?? current} (no longer provided)`,
+            },
+          ]
+        : options;
+
+    if (withCurrent.length === 0) {
+      return {
+        options: [],
+        placeholder: `No ${field.display_name.toLowerCase()}s registered for this ${parentLabel}`,
+        disabled: true,
+      };
+    }
+
+    return { options: withCurrent, placeholder: `Select ${field.display_name}`, disabled: false };
   }
 
   function addRow() {
@@ -277,22 +390,26 @@ export function PathwayAssignmentStep({
                   <RequirementBadge required={!!field.required} />
                 </div>
 
-                {field.type === "select" ? (
-                  <select
-                    value={row[field.name] ?? ""}
-                    onChange={(e) =>
-                      updateRow(index, field.name, e.target.value)
-                    }
-                    className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:border-emerald-400"
-                  >
-                    <option value="">Select {field.display_name}</option>
-                    {(lookupOptions[field.name] ?? []).map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
+                {field.type === "select" ? (() => {
+                  const { options, placeholder, disabled } = selectState(field, row);
+                  return (
+                    <select
+                      value={row[field.name] ?? ""}
+                      onChange={(e) =>
+                        updateRow(index, field.name, e.target.value)
+                      }
+                      disabled={disabled}
+                      className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:border-emerald-400 disabled:cursor-not-allowed disabled:text-white/45"
+                    >
+                      <option value="">{placeholder}</option>
+                      {options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  );
+                })() : (
                   <input
                     value={row[field.name] ?? ""}
                     onChange={(e) =>
