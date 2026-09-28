@@ -52,7 +52,7 @@ jobs:
           # Settings -> Secrets and variables -> Actions -> Variables.
           build-args: |
             NEXT_PUBLIC_API_BASE_URL=${{ vars.NEXT_PUBLIC_API_BASE_URL }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           # Reuse unchanged layers (e.g. npm ci when package-lock.json is
           # unchanged) from earlier runs via the GitHub Actions cache.
           cache-from: type=gha
