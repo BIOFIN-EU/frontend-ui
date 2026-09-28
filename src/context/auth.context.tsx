@@ -9,7 +9,7 @@ import React, {
   useCallback,
 } from "react";
 import * as auth from "@/services/auth.service";
-import { registerAuthFailureHandler } from "@/lib/api";
+import { getAccessToken, getRefreshToken, registerAuthFailureHandler } from "@/lib/api";
 
 type User = auth.MeResponse;
 
@@ -35,6 +35,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refreshUser = useCallback(async () => {
+    // No tokens means a logged-out visitor: skip the /me call entirely.
+    if (!getAccessToken() && !getRefreshToken()) {
+      clearAuthState();
+      setIsInitializing(false);
+      return;
+    }
+
     try {
       const me = await auth.me();
       setUser(me);

@@ -33,8 +33,11 @@ export async function register(email: string, password: string) {
 }
 
 export async function me() {
+  // Silent: a failed session check means "logged out", which the auth
+  // context handles; it isn't an error to show the user.
   return apiFetch<MeResponse>(`${BASE}/me`, {
     method: "GET",
+    silent: true,
   });
 }
 

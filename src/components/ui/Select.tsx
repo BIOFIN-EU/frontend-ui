@@ -23,6 +23,18 @@ type Props = {
   options: Option[];
 };
 
+// Hooks can't run inside Listbox's render-prop callback, so the "reposition
+// when opened" effect lives in this child, rendered from that callback.
+function RepositionOnOpen({ open, reposition }: { open: boolean; reposition: () => void }) {
+  useLayoutEffect(() => {
+    if (open) reposition();
+    // Only re-run when the listbox opens; reposition is recreated every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  return null;
+}
+
 export function Select({ value, onChange, options }: Props) {
   const selected = useMemo(
     () => options.find((o) => o.value === value),
@@ -75,12 +87,9 @@ export function Select({ value, onChange, options }: Props) {
   return (
     <Listbox value={value} onChange={onChange}>
       {({ open }) => {
-        useLayoutEffect(() => {
-          if (open) updatePosition();
-        }, [open]);
-
         return (
           <>
+            <RepositionOnOpen open={open} reposition={updatePosition} />
             <div className="relative">
               <Listbox.Button
                 ref={buttonRef}

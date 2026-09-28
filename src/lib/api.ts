@@ -30,10 +30,18 @@ export class ApiError extends Error {
   }
 }
 
-let globalErrorHandler: ((message: string) => void) | null = null;
+// status is null when the request never got a response (network down, CORS).
+export type GlobalApiErrorHandler = (message: string, status: number | null) => void;
+
+export type ApiFetchOptions = RequestInit & {
+  // Don't raise the global error toast for this request; the caller handles it.
+  silent?: boolean;
+};
+
+let globalErrorHandler: GlobalApiErrorHandler | null = null;
 let authFailureHandler: (() => void) | null = null;
 
-export function registerGlobalApiErrorHandler(handler: (message: string) => void) {
+export function registerGlobalApiErrorHandler(handler: GlobalApiErrorHandler) {
   globalErrorHandler = handler;
 }
 
@@ -133,6 +141,18 @@ function extractFieldErrors(data: any): Record<string, string> {
   return {};
 }
 
+/**
+ * Only unexpected failures get the global toast:
+ * - 401, and the gateway's 403 "Not authenticated" (FastAPI HTTPBearer with no
+ *   token) just mean "not logged in"; auth state handles those.
+ * - 422 is a validation error the form already shows next to its fields.
+ */
+function shouldShowGlobalError(status: number, data: any): boolean {
+  if (status === 401 || status === 422) return false;
+  if (status === 403 && data?.detail === "Not authenticated") return false;
+  return true;
+}
+
 let refreshPromise: Promise<void> | null = null;
 
 async function refreshAccessToken() {
@@ -174,9 +194,10 @@ async function ensureRefreshedOnce() {
 
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit = {},
+  apiOptions: ApiFetchOptions = {},
   retry = true
 ): Promise<T> {
+  const { silent = false, ...options } = apiOptions;
   const token = getAccessToken();
   const url = `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
 
@@ -196,10 +217,22 @@ export async function apiFetch<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const res = await fetch(url, {
-    ...options,
-    headers,
-  });
+  let res: Response;
+
+  try {
+    res = await fetch(url, {
+      ...options,
+      headers,
+    });
+  } catch (err) {
+    const message = "Can't reach the server. Check your connection and try again.";
+
+    if (!silent) {
+      globalErrorHandler?.(message, null);
+    }
+
+    throw new ApiError(message, 0, {}, err);
+  }
 
   console.log("apiFetch response", {
     url,
@@ -214,7 +247,7 @@ export async function apiFetch<T>(
 
       console.log("Token refresh successful, retrying request");
 
-      return apiFetch<T>(path, options, false);
+      return apiFetch<T>(path, apiOptions, false);
     } catch (err) {
       console.error("Token refresh failed", err);
 
@@ -237,8 +270,8 @@ export async function apiFetch<T>(
 
     const error = new ApiError(message, res.status, fieldErrors, data);
 
-    if (res.status !== 401) {
-      globalErrorHandler?.(message);
+    if (!silent && shouldShowGlobalError(res.status, data)) {
+      globalErrorHandler?.(message, res.status);
     }
 
     throw error;
