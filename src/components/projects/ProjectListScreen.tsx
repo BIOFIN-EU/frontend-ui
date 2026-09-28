@@ -57,7 +57,11 @@ export function ProjectListScreen({ cases }: Props) {
   const statuses = useMemo(
     () =>
       Array.from(
-        new Set(cases.map((item) => item.status).filter(Boolean))
+        new Set(
+          cases
+            .map((item) => item.status)
+            .filter((status): status is string => Boolean(status))
+        )
       ).sort(),
     [cases]
   );
@@ -234,10 +238,10 @@ export function ProjectListScreen({ cases }: Props) {
 
                 <span
                   className={`inline-flex w-28 shrink-0 items-center justify-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusClasses(
-                    item.status
+                    item.status ?? ""
                   )}`}
                 >
-                  {formatStatusLabel(item.status)}
+                  {formatStatusLabel(item.status ?? "unknown")}
                 </span>
 
                 <Link

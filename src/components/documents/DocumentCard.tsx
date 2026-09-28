@@ -4,13 +4,10 @@ import { useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { formatDate } from "@/lib/format";
 import { buttonBaseSm, buttonGhost } from "@/lib/ui";
+import type { CaseDocument } from "@/types/case-document";
 
-export type DocumentCardDoc = {
-  case_document_id: number;
-  original_filename: string;
-  size_bytes?: number | null;
-  created_at?: string | null;
-};
+export type DocumentCardDoc = Pick<CaseDocument, "case_document_id" | "original_filename"> &
+  Partial<Pick<CaseDocument, "size_bytes" | "created_at">>;
 
 function formatFileSize(bytes?: number | null): string {
   if (bytes == null) return "";

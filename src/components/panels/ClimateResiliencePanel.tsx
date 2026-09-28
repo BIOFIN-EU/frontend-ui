@@ -1,6 +1,7 @@
 // components/panels/ClimateResiliencePanel.tsx
 import React from "react";
 import { X, Thermometer, BookOpen, Link as LinkIcon, Calendar, TrendingUp, Activity, BarChart3 } from "lucide-react";
+import type { CategoryMetaMap, RasterSummaryStats, ResilienceSummary } from "@/types/risk";
 
 interface ClimateResiliencePanelProps {
   dataType: string;
@@ -11,24 +12,9 @@ interface ClimateResiliencePanelProps {
     period: string;
     country_code: string;
   };
-  recommendationsMeta?: Record<string, {
-    label: string;
-    label_short: string;
-    description: string;
-    color: string;
-    examples: string;
-  }>;
-  biodiversityRiskData?: {
-    mean_raster_value: number;
-    std_raster_value: number;
-  };
-  resiliencyData?: {
-    mean_raster_value: number;
-    std_raster_value: number;
-    climate_scenario?: string;
-    climate_model?: string;
-    periods?: string[];
-  };
+  recommendationsMeta?: CategoryMetaMap;
+  biodiversityRiskData?: RasterSummaryStats;
+  resiliencyData?: ResilienceSummary;
 }
 
 export default function ClimateResiliencePanel({
@@ -75,8 +61,8 @@ export default function ClimateResiliencePanel({
   };
 
   // Format mean value for display
-  const formatMeanValue = (value: number | undefined) => {
-    if (value === undefined || value === -1) return "N/A";
+  const formatMeanValue = (value: number | null | undefined) => {
+    if (value == null || value === -1) return "N/A";
     return value.toFixed(3);
   };
 

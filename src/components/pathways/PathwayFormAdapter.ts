@@ -1,4 +1,4 @@
-import type { WorkflowStep } from "@/types/case-dashboard";
+import type { WorkflowStep } from "@/types/workflow";
 import type { StepSchema } from "@/types/forms";
 
 

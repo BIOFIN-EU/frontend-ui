@@ -3,17 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import RiskMap from "@/components/maps/RiskMap";
 import { DocumentCard } from "@/components/documents/DocumentCard";
-import type {
-  CaseDashboardState,
-  CaseLocationEntry,
-  DashboardDocument,
-  DashboardField,
-  DashboardStep,
-} from "@/types/workflow";
+import type { CaseDashboardState } from "@/types/case-dashboard";
+import type { CaseLocationEntry } from "@/types/case-location";
+import type { CaseDocument } from "@/types/case-document";
+import type { WorkflowField, WorkflowStep } from "@/types/workflow";
 
 type OrderedStep = {
   code: string;
-  step: DashboardStep;
+  step: WorkflowStep;
 };
 
 function getOrderedSteps(state: CaseDashboardState): OrderedStep[] {
@@ -26,7 +23,7 @@ function getOrderedSteps(state: CaseDashboardState): OrderedStep[] {
   while (currentCode && !visited.has(currentCode)) {
     visited.add(currentCode);
 
-    const step = workflow.steps?.[currentCode];
+    const step: WorkflowStep | undefined = workflow.steps?.[currentCode];
     if (!step) break;
 
     ordered.push({ code: currentCode, step });
@@ -52,7 +49,7 @@ function getStepData(
 function getFieldValue(
   state: CaseDashboardState,
   stepData: Record<string, unknown> | null,
-  field: DashboardField,
+  field: WorkflowField,
   stepCode: string
 ): unknown {
     // Temporary workaround until consent is stored
@@ -282,9 +279,9 @@ function DocumentFieldCard({
   caseId,
   document,
 }: {
-  field: DashboardField;
+  field: WorkflowField;
   caseId: number | string;
-  document: DashboardDocument | undefined;
+  document: CaseDocument | undefined;
 }) {
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-4">
@@ -313,7 +310,7 @@ function StandardFieldCard({
   field,
   value,
 }: {
-  field: DashboardField;
+  field: WorkflowField;
   value: unknown;
 }) {
   return (

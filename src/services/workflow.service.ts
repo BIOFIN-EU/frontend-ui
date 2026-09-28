@@ -1,42 +1,15 @@
 import { apiFetch } from "@/lib/api";
+import type { CaseDocument, DocumentDownloadUrlResponse } from "@/types/case-document";
+import type { DetectCountryRequest, DetectCountryResponse } from "@/types/case-location";
 import type {
   CreateWorkflowResponse,
-  WorkflowDocument,
+  EditStepResponse,
+  StepDraftResponse,
+  SubmitStepResponse,
   WorkflowState,
-} from "@/types/case-dashboard";
+} from "@/types/workflow";
 
 const BASE = "/api/case_workflow";
-
-type SubmitStepResponse = {
-  message: string;
-  state: WorkflowState;
-};
-
-export type EditStepResponse = {
-  caseId: number;
-  step: string;
-  title: string;
-  data: Record<string, unknown>;
-};
-
-export type StepDraftResponse = {
-  data: Record<string, unknown> | null;
-  updated_at: string | null;
-};
-
-export type DetectCountryRequest = {
-  location_type: "polygon" | "point";
-  geometry_wkt: string | null;
-  latitude: number | null;
-  longitude: number | null;
-};
-
-export type DetectCountryResponse = {
-  country_id: number;
-  country_code: string;
-  country_name: string;
-  is_multiple: boolean;
-};
 
 export const workflowService = {
   async startWorkflow(workflowCode: string): Promise<CreateWorkflowResponse> {
@@ -130,8 +103,8 @@ export const workflowService = {
     );
   },
 
-  async listCaseDocuments(caseId: number | string): Promise<WorkflowDocument[]> {
-    return apiFetch<WorkflowDocument[]>(
+  async listCaseDocuments(caseId: number | string): Promise<CaseDocument[]> {
+    return apiFetch<CaseDocument[]>(
       `${BASE}/cases/${caseId}/documents`,
       { method: "GET" }
     );
@@ -140,12 +113,7 @@ export const workflowService = {
   async getDocumentDownloadUrl(
     caseId: number | string,
     caseDocumentId: number | string
-  ): Promise<{
-    case_document_id: number;
-    original_filename: string;
-    download_url: string;
-    expires_in_seconds: number;
-  }> {
+  ): Promise<DocumentDownloadUrlResponse> {
     return apiFetch(
       `${BASE}/cases/${caseId}/documents/${caseDocumentId}/download-url`,
       { method: "GET" }

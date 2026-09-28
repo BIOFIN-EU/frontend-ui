@@ -1,11 +1,8 @@
 import { apiFetch } from "@/lib/api";
+import type { LookupOption } from "@/types/lookups";
 
 const BASE = "/api/lookups";
 
-export type LookupOption = {
-  value: string;
-  label: string;
-};
 
 export async function getLookupOptions(
   lookupKey: string

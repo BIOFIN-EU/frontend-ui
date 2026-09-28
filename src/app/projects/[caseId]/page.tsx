@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 
 import { useAuth } from "@/context/auth.context";
 import { caseDashboardService } from "@/services/case-dashboard.service";
-import type { CaseDashboardState } from "@/types/workflow";
+import type { CaseDashboardState } from "@/types/case-dashboard";
 import { ProjectDashboardScreen } from "@/components/projects/ProjectDashboardScreen";
 import { ProjectDashboardMenu } from "@/components/projects/ProjectDashboardMenu";
 import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";

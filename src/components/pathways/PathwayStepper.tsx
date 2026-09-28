@@ -1,6 +1,6 @@
 "use client";
 
-import type { DashboardStep, DashboardWorkflowConfig } from "@/types/workflow";
+import type { WorkflowConfig, WorkflowStep } from "@/types/workflow";
 
 export type PathwayStepStatus = "done" | "current" | "upcoming";
 
@@ -11,11 +11,11 @@ export type OrderedStep = {
 };
 
 function isStepDataFilled(
-  workflowConfig: DashboardWorkflowConfig,
+  workflowConfig: WorkflowConfig,
   payload: Record<string, unknown>,
   code: string
 ): boolean {
-  const step: DashboardStep | undefined = workflowConfig.steps?.[code];
+  const step: WorkflowStep | undefined = workflowConfig.steps?.[code];
 
   // Multi-location steps store their committed data under the top-level
   // `location` key regardless of the step's own code, mirroring how the
@@ -48,7 +48,7 @@ function isStepDataFilled(
 }
 
 export function buildOrderedSteps(
-  workflowConfig: DashboardWorkflowConfig | null | undefined,
+  workflowConfig: WorkflowConfig | null | undefined,
   payload: Record<string, unknown>,
   currentStepCode: string
 ): OrderedStep[] {
@@ -62,7 +62,7 @@ export function buildOrderedSteps(
   while (code && !visited.has(code)) {
     visited.add(code);
 
-    const step: DashboardStep | undefined = workflowConfig.steps?.[code];
+    const step: WorkflowStep | undefined = workflowConfig.steps?.[code];
     if (!step) break;
 
     const status: PathwayStepStatus =
@@ -80,7 +80,7 @@ export function buildOrderedSteps(
 }
 
 type Props = {
-  workflowConfig: DashboardWorkflowConfig | null | undefined;
+  workflowConfig: WorkflowConfig | null | undefined;
   payload: Record<string, unknown>;
   currentStepCode: string;
   activeStepCode: string;

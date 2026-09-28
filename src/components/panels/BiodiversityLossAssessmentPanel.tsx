@@ -1,9 +1,7 @@
 // components/panels/BiodiversityLossAssessmentPanel.tsx
 import React from "react";
 import { X, ShieldAlert } from "lucide-react";
-
-// Types
-type Thresholds = Record<string, number>;
+import type { RiskThresholds as Thresholds } from "@/types/risk";
 
 function getRiskLabel(value: number, thresholds: Thresholds) {
   const ordered = Object.entries(thresholds).sort((a, b) => a[1] - b[1]);
@@ -165,13 +163,13 @@ interface BiodiversityLossAssessmentPanelProps {
   dataType: string;
   onClose: () => void;
   riskMean?: number;
-  thresholds?: Record<string, number>;
+  thresholds?: Thresholds;
   caseData?: {
     risk_model: string;
     period: string;
     risk_type: string;
     sri_logic_type: string;
-    sri_correction_method: string;
+    sri_correction_method: string | null;
   };
 }
 
@@ -212,7 +210,11 @@ export default function BiodiversityLossAssessmentPanel({
       {/* Content */}
       <div className="h-[calc(100%-80px)] overflow-y-auto p-6 space-y-6 pb-32">
         {/* Threshold Scale Component - now using passed data */}
-        <ThresholdScale value={riskValue} thresholds={riskThresholds} />
+        {riskValue !== undefined && riskThresholds ? (
+          <ThresholdScale value={riskValue} thresholds={riskThresholds} />
+        ) : (
+          <p className="text-sm text-white/60">No risk score is available for this location.</p>
+        )}
 
         {/* Additional Assessment Info */}
         <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">

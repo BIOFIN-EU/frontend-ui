@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
+import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import { FormRenderer } from "@/components/FormRenderer";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import type { PathwayStepMode } from "./PathwayStepScreen";

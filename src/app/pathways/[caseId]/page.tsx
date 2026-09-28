@@ -5,12 +5,12 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/context/auth.context";
 import { workflowService } from "@/services/workflow.service";
 import { caseDashboardService } from "@/services/case-dashboard.service";
-import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
-import type { CaseDashboardState, DashboardStep } from "@/types/workflow";
+import type { WorkflowState, WorkflowStep } from "@/types/workflow";
+import type { CaseDashboardState } from "@/types/case-dashboard";
 import { PathwayStepScreen } from "@/components/pathways/PathwayStepScreen";
 import { PathwayStepper, buildOrderedSteps } from "@/components/pathways/PathwayStepper";
 
-function dashboardStepToWorkflowStep(step: DashboardStep): WorkflowStep {
+function dashboardStepToWorkflowStep(step: WorkflowStep): WorkflowStep {
   return {
     title: step.title,
     activity: step.activity ?? "",
@@ -57,7 +57,7 @@ export default function WorkflowCasePage() {
       setLoading(true);
       const data = await workflowService.getCaseState(caseId);
       setState(data);
-      setViewingStepCode((current) => current || data.current_step);
+      setViewingStepCode((current) => current || (data.current_step ?? ""));
       setError("");
     } catch (err) {
       console.error("load workflow state failed", err);
@@ -171,13 +171,13 @@ export default function WorkflowCasePage() {
 
   function handleStateUpdated(updated: WorkflowState) {
     setState(updated);
-    setViewingStepCode(updated.current_step);
+    setViewingStepCode(updated.current_step ?? "");
     loadDashboard();
   }
 
   function handleEditSaved() {
     if (!state) return;
-    setViewingStepCode(state.current_step);
+    setViewingStepCode(state.current_step ?? "");
     setSavedMessage("Changes saved");
     loadDashboard();
     setTimeout(() => setSavedMessage(""), 2500);
@@ -220,7 +220,7 @@ export default function WorkflowCasePage() {
             <PathwayStepper
               workflowConfig={workflowConfig}
               payload={dashboardState ?? {}}
-              currentStepCode={state.current_step}
+              currentStepCode={state.current_step ?? ""}
               activeStepCode={effectiveStepCode}
               onSelectStep={(code) => setViewingStepCode(code)}
             />

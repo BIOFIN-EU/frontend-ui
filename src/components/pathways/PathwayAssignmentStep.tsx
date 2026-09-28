@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import { getLookupOptions, type LookupOption } from "@/services/lookups.service";
-import type { WorkflowField, WorkflowState, WorkflowStep } from "@/types/case-dashboard";
+import { getLookupOptions } from "@/services/lookups.service";
+import type { LookupOption } from "@/types/lookups";
+import type { WorkflowField, WorkflowState, WorkflowStep } from "@/types/workflow";
 import { RequirementBadge } from "@/components/FormRenderer";
 import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
 import type { PathwayStepMode } from "./PathwayStepScreen";

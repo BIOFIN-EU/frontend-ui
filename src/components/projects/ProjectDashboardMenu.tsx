@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { CaseDashboardState } from "@/types/workflow";
+import type { CaseDashboardState } from "@/types/case-dashboard";
 import { formatDate } from "@/lib/format";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
 
@@ -61,7 +61,7 @@ export function ProjectDashboardMenu({ caseId, state, canManageUsers }: Props) {
 
         <Link
           href={`/projects/${caseId}/vulnerability`}
-          className={[`w-full ${buttonBase}, bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 bg-blue text-slate-950 hover:bg-white/90`]}
+          className={`w-full ${buttonBase} bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 hover:bg-white/90`}
         >
           Vulnerability
         </Link>

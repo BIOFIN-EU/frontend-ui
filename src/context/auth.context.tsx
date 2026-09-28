@@ -9,9 +9,10 @@ import React, {
   useCallback,
 } from "react";
 import * as auth from "@/services/auth.service";
+import type { MeResponse } from "@/types/auth";
 import { getAccessToken, getRefreshToken, registerAuthFailureHandler } from "@/lib/api";
 
-type User = auth.MeResponse;
+type User = MeResponse;
 
 type AuthCtx = {
   isAuthed: boolean;

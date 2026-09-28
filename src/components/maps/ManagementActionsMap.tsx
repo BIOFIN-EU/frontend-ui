@@ -14,24 +14,16 @@ import type Geometry from "ol/geom/Geometry";
 import Overlay from "ol/Overlay";
 import ScaleLine from "ol/control/ScaleLine";
 import { defaults as defaultControls } from "ol/control/defaults.js";
-
-type RecommendationsMeta = {
-  [key: string]: {
-    label: string;
-    description: string;
-    color: string;
-    examples: string;
-  };
-};
+import type { CategoryMetaMap, CategoryPolygons } from "@/types/risk";
 
 type Props = {
   polygonWkt: string;
-  recommendationsPolygons: Record<string, string>;
-  recommendationsMeta: RecommendationsMeta;
-  resiliencePolygons: Record<string, string>;   // new
-  resilienceMeta: RecommendationsMeta;         // new
-  riskPolygons: Record<string, string>;
-  riskMeta: RecommendationsMeta;
+  recommendationsPolygons: CategoryPolygons;
+  recommendationsMeta: CategoryMetaMap;
+  resiliencePolygons: CategoryPolygons;
+  resilienceMeta: CategoryMetaMap;
+  riskPolygons: CategoryPolygons;
+  riskMeta: CategoryMetaMap;
 };
 
 const wktFormat = new WKT();
@@ -128,7 +120,6 @@ export default function ManagementActionsMap({
       style: (feature) => {
         const color = feature.get('color') || '#cccccc';
         return new Style({
-          stroke: null, // Explicitly remove any stroke
           fill: new Fill({
             color: `${color}FF`, // Add 0.5 alpha
           }),
@@ -159,7 +150,6 @@ export default function ManagementActionsMap({
       style: (feature) => {
         const color = feature.get('color') || '#cccccc';
         return new Style({
-          stroke: null,
           fill: new Fill({
             color: `${color}FF`,
           }),
@@ -193,7 +183,6 @@ export default function ManagementActionsMap({
       style: (feature) => {
         const color = feature.get('color') || '#cccccc';
         return new Style({
-          stroke: null,
           fill: new Fill({
             color: `${color}FF`,
           }),
@@ -321,7 +310,6 @@ export default function ManagementActionsMap({
     }
 
     mapInstanceRef.current = map;
-    window.mapInstance = map;
 
     return () => {
       map.setTarget(undefined);

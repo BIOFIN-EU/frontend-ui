@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api";
-import type { CaseDashboardState } from "@/types/workflow";
+import type { CaseDashboardState } from "@/types/case-dashboard";
 
 const BASE = "/api/case_workflow/cases";
 

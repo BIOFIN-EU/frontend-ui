@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { getLookupOptions, type LookupOption } from "@/services/lookups.service";
+import { getLookupOptions } from "@/services/lookups.service";
+import type { LookupOption } from "@/types/lookups";
 import { createIntermediary } from "@/services/intermediaries.service";
 import { buttonBase, buttonGhost, buttonPrimary } from "@/lib/ui";
 

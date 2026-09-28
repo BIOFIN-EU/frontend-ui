@@ -1,78 +1,106 @@
-export type DashboardFieldOption = {
+// Workflow config and runtime state, mirroring physical-api
+// (app/workflow_configs/workflows.json and the /api/case_workflow endpoints).
+// Used by both the pathway (form) screens and the project dashboard.
+import type { CaseDocument } from "./case-document";
+import type { CaseLocationEntry } from "./case-location";
+
+export type WorkflowFieldType =
+  | "text"
+  | "textarea"
+  | "number"
+  | "select"
+  | "checkbox"
+  | "file"
+  | "hidden"
+  | "content"
+  | "assignment_table"
+  | "location_table";
+
+export type WorkflowFieldOption = {
   value: string;
   label: string;
 };
 
-export type DashboardField = {
+export type WorkflowField = {
   name: string;
   display_name: string;
-  type: string;
+  type: WorkflowFieldType;
+  // Omitted on display-only fields such as "content".
   required?: boolean;
   default?: string | number | boolean | null;
-  options?: DashboardFieldOption[];
+  options?: WorkflowFieldOption[];
   options_source?: string;
+  widget?: string;
   content?: string;
-  row_fields?: DashboardField[];
+  row_fields?: WorkflowField[];
 };
 
-export type DashboardStep = {
+export type WorkflowUiMode =
+  | "form"
+  | "map_form"
+  | "assignment_table"
+  | "file_form"
+  | "review"
+  | "read_only"
+  | "location_table";
+
+export type WorkflowSubmitMode = "json" | "multipart" | "none";
+
+export type WorkflowStep = {
   title: string;
-  activity?: string;
-  next?: string | null;
-  ui_mode?: string;
-  submit_mode?: string;
-  fields?: DashboardField[];
+  activity: string;
+  next: string | null;
+  fields: WorkflowField[];
+  ui_mode?: WorkflowUiMode;
+  submit_mode?: WorkflowSubmitMode;
 };
 
-export type DashboardWorkflowConfig = {
+export type WorkflowConfig = {
   code: string;
+  name?: string;
   start_step: string;
-  steps: Record<string, DashboardStep>;
+  steps: Record<string, WorkflowStep>;
 };
 
-export type DashboardDocument = {
-  case_document_id: number;
+export type WorkflowStatus = "draft" | "in_progress" | "completed" | "failed";
+
+export type WorkflowState = {
   case_id: number;
-  step_code: string;
-  field_name: string;
-  original_filename: string;
-  upload_token: string;
-  content_type: string;
-  size_bytes: number;
-  created_at: string;
+  // null once the workflow has completed.
+  current_step: string | null;
+  status: WorkflowStatus;
+  step: WorkflowStep | null;
+  validation_errors: Record<string, string | string[]>;
+  workflow_code: string;
+  documents: CaseDocument[];
+  location: CaseLocationEntry[];
 };
 
-export type CaseLocationCountry = {
-  id: number;
+export type CreateWorkflowResponse = {
+  case_id: number;
+  workflow_id: string;
+  workflow_code: string;
+};
+
+export type AvailableWorkflow = {
   code: string;
-  name: string;
+  title: string;
+  description?: string;
 };
 
-export type CaseLocationEntry = {
-  case_location_id: number;
-  friendly_name: string | null;
-  location_type: "polygon" | "point";
-  geometry_wkt: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  area_sqm: number | null;
-  area_hectares: number | null;
-  area_is_manual: boolean;
-  notes: string | null;
-  country: CaseLocationCountry | null;
+export type SubmitStepResponse = {
+  message: string;
+  state: WorkflowState;
 };
 
-export type CaseDashboardState = {
+export type EditStepResponse = {
   caseId: number;
-  caseType: string;
-  caseTypeName?: string | null;
-  status: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  workflow_config: DashboardWorkflowConfig;
-  documents?: DashboardDocument[];
-  location?: CaseLocationEntry[];
-  [key: string]: unknown;
+  step: string;
+  title: string;
+  data: Record<string, unknown>;
+};
+
+export type StepDraftResponse = {
+  data: Record<string, unknown> | null;
+  updated_at: string | null;
 };

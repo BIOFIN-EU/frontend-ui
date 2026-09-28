@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
+import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import { PathwayFormStep } from "./PathwayFormStep";
 import { PathwayFileStep } from "./PathwayFileStep";
 import { PathwayAssignmentStep } from "./PathwayAssignmentStep";
@@ -93,7 +93,7 @@ export function PathwayStepScreen({
     return <p className="text-sm text-white/70">No step available.</p>;
   }
 
-  const effectiveStepCode = stepCode ?? state.current_step;
+  const effectiveStepCode = stepCode ?? state.current_step ?? "";
   const uiMode = step.ui_mode ?? inferMode(step);
 
   const commonProps = {

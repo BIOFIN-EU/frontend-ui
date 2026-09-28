@@ -7,7 +7,7 @@ interface SpeciesRichnessPanelProps {
   onClose: () => void;
   caseData?: {
     sri_logic_type: string;
-    sri_correction_method: string;
+    sri_correction_method: string | null;
     sri: string;
     sri_species_list: string;
     country_code: string;

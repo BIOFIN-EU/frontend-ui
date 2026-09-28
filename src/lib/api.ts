@@ -1,15 +1,12 @@
 // src/lib/api.ts
+import type { TokenResponse } from "@/types/auth";
+
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 if (!baseUrl) {
   throw new Error("NEXT_PUBLIC_API_BASE_URL is not set");
 }
 
-export type TokenResponse = {
-  access_token: string;
-  refresh_token: string;
-  expires_in_hours: number;
-};
 
 export class ApiError extends Error {
   status: number;

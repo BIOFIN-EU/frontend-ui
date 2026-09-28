@@ -4,16 +4,11 @@ import {
   clearTokens,
   getRefreshToken,
   setTokens,
-  TokenResponse,
 } from "@/lib/api";
+import type { MeResponse, TokenResponse } from "@/types/auth";
 
 const BASE = "/api/auth";
 
-export type MeResponse = {
-  id: string;
-  name?: string;
-  email?: string;
-};
 
 export async function login(email: string, password: string) {
   const data = await apiFetch<TokenResponse>(`${BASE}/login`, {

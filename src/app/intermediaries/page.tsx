@@ -4,10 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
 
-import {
-  listIntermediaries,
-  type Intermediary,
-} from "@/services/intermediaries.service";
+import { listIntermediaries } from "@/services/intermediaries.service";
+import type { Intermediary } from "@/types/intermediaries";
 
 export default function IntermediariesPage() {
   const [intermediaries, setIntermediaries] = useState<Intermediary[]>([]);

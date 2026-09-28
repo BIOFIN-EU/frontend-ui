@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import type { WorkflowState, WorkflowStep } from "@/types/case-dashboard";
-import type { CaseLocationEntry } from "@/types/workflow";
+import type { WorkflowState, WorkflowStep } from "@/types/workflow";
+import type { CaseLocationEntry } from "@/types/case-location";
 import RiskMap from "@/components/maps/RiskMap";
 import { RequirementBadge } from "@/components/FormRenderer";
 import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
