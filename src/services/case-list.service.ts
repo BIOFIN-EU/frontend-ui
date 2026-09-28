@@ -11,6 +11,15 @@ export const caseListService = {
     );
   },
 
+  // Soft delete (requires can_delete). Silent: the confirm dialog shows the
+  // error itself instead of the global toast.
+  async deleteCase(caseId: number | string): Promise<void> {
+    await apiFetch<null>(`${BASE}/cases/${caseId}`, {
+      method: "DELETE",
+      silent: true,
+    });
+  },
+
   extractErrorMessage(error: unknown): string {
     if (error instanceof Error) return error.message;
     return "Failed to load cases";

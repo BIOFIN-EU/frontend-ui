@@ -5,11 +5,16 @@ import { useMemo, useState } from "react";
 import { formatDate } from "@/lib/format";
 import type { CaseListItem } from "@/types/case-list";
 import { Select } from "@/components/ui/Select";
+import { DeleteProjectDialog } from "@/components/projects/DeleteProjectDialog";
 import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary } from "@/lib/ui";
 
 type Props = {
   cases: CaseListItem[];
+  onDeleted?: (caseId: number) => void;
 };
+
+const deleteButtonClasses =
+  "border border-red-400/30 bg-red-500/10 !text-red-200 hover:bg-red-500/20";
 
 function safeLower(value: unknown) {
   return typeof value === "string" ? value.toLowerCase() : "";
@@ -34,7 +39,8 @@ function formatStatusLabel(status: string) {
   return status.replaceAll("_", " ");
 }
 
-export function ProjectListScreen({ cases }: Props) {
+export function ProjectListScreen({ cases, onDeleted }: Props) {
+  const [pendingDelete, setPendingDelete] = useState<CaseListItem | null>(null);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -264,24 +270,53 @@ export function ProjectListScreen({ cases }: Props) {
 
                 <div className="flex shrink-0 items-center gap-2">
                   <Link
+                    href={`/projects/${item.caseId}`}
+                    className={`${buttonBaseSm} ${buttonPrimary}`}
+                  >
+                    Open
+                  </Link>
+
+                  <Link
                     href={`/pathways/${item.caseId}`}
                     className={`${buttonBaseSm} ${buttonGhost}`}
                   >
                     Edit
                   </Link>
 
-                  <Link
-                    href={`/projects/${item.caseId}`}
-                    className={`${buttonBaseSm} ${buttonPrimary}`}
-                  >
-                    Open
-                  </Link>
+                  {/* Destructive action last. Rows the user can't delete keep an
+                      invisible same-size slot so Open and Edit line up on every row. */}
+                  {item.canDelete ? (
+                    <button
+                      type="button"
+                      onClick={() => setPendingDelete(item)}
+                      className={`${buttonBaseSm} ${deleteButtonClasses}`}
+                    >
+                      Delete
+                    </button>
+                  ) : (
+                    <span aria-hidden="true" className={`${buttonBaseSm} ${deleteButtonClasses} invisible`}>
+                      Delete
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
       </section>
+
+      {pendingDelete && (
+        <DeleteProjectDialog
+          open
+          caseId={pendingDelete.caseId}
+          projectName={pendingDelete.name}
+          onClose={() => setPendingDelete(null)}
+          onDeleted={() => {
+            onDeleted?.(pendingDelete.caseId);
+            setPendingDelete(null);
+          }}
+        />
+      )}
     </div>
   );
 }

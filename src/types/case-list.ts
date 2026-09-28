@@ -9,4 +9,6 @@ export type CaseListItem = {
   createdAt: string;
   updatedBy?: string | null;
   updatedAt: string;
+  // The current user's can_delete on this case.
+  canDelete?: boolean;
 };

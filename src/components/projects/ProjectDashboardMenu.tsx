@@ -8,10 +8,12 @@ import { buttonBase, buttonPrimary } from "@/lib/ui";
 type Props = {
   caseId: string;
   state: CaseDashboardState;
+  // Shown only when set (the user has can_delete).
+  onDelete?: () => void;
 };
 
 // Vulnerability Index and Access are project tabs (ProjectTabs), not buttons here.
-export function ProjectDashboardMenu({ caseId, state }: Props) {
+export function ProjectDashboardMenu({ caseId, state, onDelete }: Props) {
   return (
     <div className="h-fit rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
       <div>
@@ -37,6 +39,16 @@ export function ProjectDashboardMenu({ caseId, state }: Props) {
         >
           Edit project
         </Link>
+
+        {onDelete && (
+          <button
+            type="button"
+            onClick={onDelete}
+            className={`w-full ${buttonBase} border border-red-400/30 bg-red-500/10 !text-red-200 hover:bg-red-500/20`}
+          >
+            Delete project
+          </button>
+        )}
       </div>
 
       <dl className="mt-5 space-y-4 border-t border-white/10 pt-5 text-sm">
