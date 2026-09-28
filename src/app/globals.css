@@ -61,6 +61,11 @@ a {
   text-decoration: none;
 }
 
+/* In-page links (e.g. #contact-form) stop below the sticky header. */
+html {
+  scroll-padding-top: 5rem;
+}
+
 /* Improve keyboard accessibility without changing your look */
 :focus-visible {
   outline: 2px solid rgba(121, 215, 193, 0.55);

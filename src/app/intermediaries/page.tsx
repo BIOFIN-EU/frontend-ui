@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { PageBackdrop } from "@/components/PageBackdrop";
+import { photoCredits } from "@/lib/photo-credits";
+import forest from "../../../public/images/forest-dieny-portinanni.jpg";
 
 import { listIntermediaries } from "@/services/intermediaries.service";
 import type { Intermediary } from "@/types/intermediaries";
@@ -45,14 +48,21 @@ export default function IntermediariesPage() {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="relative isolate space-y-8">
+      <PageBackdrop
+        image={forest}
+        credit={photoCredits.forest}
+        heightClassName="h-[460px] lg:h-[520px]"
+        objectPositionClassName="object-[50%_35%]"
+      />
+
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">
             Intermediaries
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
             View registered intermediaries and the functions assigned to them.
           </p>
         </div>
@@ -66,7 +76,7 @@ export default function IntermediariesPage() {
       </header>
 
       {loading && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
+        <div className="rounded-2xl border border-white/10 bg-[#07141b]/80 backdrop-blur-md p-6 text-white/75">
           Loading intermediaries...
         </div>
       )}
@@ -78,12 +88,12 @@ export default function IntermediariesPage() {
       )}
 
       {!loading && !error && intermediaries.length === 0 && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
+        <div className="rounded-2xl border border-white/10 bg-[#07141b]/80 backdrop-blur-md p-8 text-center">
           <h2 className="text-xl font-semibold text-white">
             No intermediaries yet
           </h2>
 
-          <p className="mt-2 text-sm text-white/60">
+          <p className="mt-2 text-sm text-white/75">
             Register as an Intermediary and specify your credentials and support services.
           </p>
 
@@ -116,7 +126,7 @@ export default function IntermediariesPage() {
             return (
               <article
                 key={intermediary.id}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+                className="rounded-2xl border border-white/10 bg-[#07141b]/80 backdrop-blur-md p-6"
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
@@ -124,51 +134,51 @@ export default function IntermediariesPage() {
                       {intermediary.name}
                     </h2>
 
-                    <div className="mt-3 grid gap-2 text-sm text-white/60 sm:grid-cols-2">
+                    <div className="mt-3 grid gap-2 text-sm text-white/75 sm:grid-cols-2">
                       {intermediary.email && (
                         <p>
-                          <span className="text-white/40">Email:</span>{" "}
+                          <span className="text-white/60">Email:</span>{" "}
                           {intermediary.email}
                         </p>
                       )}
 
                       {intermediary.phone && (
                         <p>
-                          <span className="text-white/40">Phone:</span>{" "}
+                          <span className="text-white/60">Phone:</span>{" "}
                           {intermediary.phone}
                         </p>
                       )}
 
                       {intermediary.address && (
                         <p className="sm:col-span-2">
-                          <span className="text-white/40">Address:</span>{" "}
+                          <span className="text-white/60">Address:</span>{" "}
                           {intermediary.address}
                         </p>
                       )}
                     </div>
 
                     {intermediary.contact_details && (
-                      <p className="mt-4 text-sm leading-6 text-white/60">
-                        <span className="text-white/40">Contact:</span>{" "}
+                      <p className="mt-4 text-sm leading-6 text-white/75">
+                        <span className="text-white/60">Contact:</span>{" "}
                         {intermediary.contact_details}
                       </p>
                     )}
 
                     {intermediary.notes && (
-                      <p className="mt-3 text-sm leading-6 text-white/60">
-                        <span className="text-white/40">Notes:</span>{" "}
+                      <p className="mt-3 text-sm leading-6 text-white/75">
+                        <span className="text-white/60">Notes:</span>{" "}
                         {intermediary.notes}
                       </p>
                     )}
                   </div>
 
                   <div className="min-w-0 lg:max-w-md">
-                    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-white/40">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-white/60">
                       Functions
                     </p>
 
                     {intermediary.functions.length === 0 ? (
-                      <p className="text-sm text-white/50">
+                      <p className="text-sm text-white/65">
                         No functions assigned.
                       </p>
                     ) : (

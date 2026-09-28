@@ -41,7 +41,10 @@ export default function RootLayout({
             </div>
 
             {/* HEADER */}
-            <header className="relative z-20 border-b border-white/10 bg-[#08151d]/80 backdrop-blur-xl">
+            {/* Sticky: stays at the top while the page scrolls. Works because the
+                wrapper uses overflow-x-clip, which (unlike overflow-hidden) does
+                not create a scroll container. */}
+            <header className="sticky top-0 z-20 border-b border-white/10 bg-[#08151d]/80 backdrop-blur-xl">
               <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
 
                 {/* LEFT GROUP */}

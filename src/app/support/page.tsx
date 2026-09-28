@@ -4,6 +4,9 @@ import { useState, type ReactNode } from "react";
 import { Select } from "@/components/ui/Select";
 import { apiFetch } from "@/lib/api";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { PageBackdrop } from "@/components/PageBackdrop";
+import { photoCredits } from "@/lib/photo-credits";
+import ballycastle from "../../../public/images/ballycastle-county-mayo.jpg";
 
 type ContactReason =
   | "I am an Nature-based Solutions Funder"
@@ -482,8 +485,16 @@ export default function SupportPage() {
   }
 
   return (
-    <div className="space-y-8 pb-10">
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#07101f] shadow-[0_24px_80px_rgba(0,0,0,0.4)]">
+    <div className="relative isolate space-y-8 pb-10">
+      <PageBackdrop
+        image={ballycastle}
+        credit={photoCredits.ballycastle}
+        heightClassName="h-[560px] lg:h-[620px]"
+        objectPositionClassName="object-[50%_40%]"
+        scrim="light"
+      />
+
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#07101f]/55 shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop-blur-sm">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(16,185,129,0.12),transparent_35%),radial-gradient(circle_at_90%_60%,rgba(59,130,246,0.10),transparent_38%)]" />
         <div className="relative grid min-h-[280px] items-center gap-8 px-7 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-10">
           <header className="max-w-2xl space-y-3">

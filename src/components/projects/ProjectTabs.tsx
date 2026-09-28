@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ShieldCheck, Users } from "lucide-react";
+import { LayoutDashboard, Leaf, Users } from "lucide-react";
 
 type Props = {
   caseId: string;
@@ -18,7 +18,7 @@ export function ProjectTabs({ caseId, canManageUsers }: Props) {
     {
       href: `${base}/vulnerability`,
       label: "Vulnerability Index",
-      icon: ShieldCheck,
+      icon: Leaf,
       active: pathname.startsWith(`${base}/vulnerability`),
     },
     ...(canManageUsers

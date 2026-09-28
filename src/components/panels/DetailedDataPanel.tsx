@@ -1,5 +1,6 @@
 // components/panels/DetailedDataPanel.tsx - Keep it simple and generic
 import React from "react";
+import { createPortal } from "react-dom";
 
 interface DetailedDataPanelProps {
   isOpen: boolean;
@@ -37,7 +38,9 @@ export default function DetailedDataPanel({
 
   if (!isOpen) return null;
 
-  return (
+  // Portalled to <body> so it layers above the sticky site header; inside
+  // <main> (z-10) the header (z-20) would cover the panel's top.
+  return createPortal(
     <>
       {/* Backdrop overlay */}
       <div
@@ -70,6 +73,7 @@ export default function DetailedDataPanel({
 
         {children}
       </div>
-    </>
+    </>,
+    document.body
   );
 }

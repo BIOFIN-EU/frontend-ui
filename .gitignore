@@ -13,3 +13,6 @@ dist/
 
 # OS
 .DS_Store
+
+# Full-size source photos (web copies live in public/images)
+originals/

@@ -232,7 +232,8 @@ export function ProjectListScreen({ cases }: Props) {
                 key={item.caseId}
                 className="group flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 transition hover:bg-white/[0.04]"
               >
-                <span className="shrink-0 rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-[11px] font-semibold text-white/60">
+                {/* Fixed width + tabular digits keep every column aligned whatever the ID length. */}
+                <span className="inline-flex w-16 shrink-0 justify-center rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-white/60">
                   #{item.caseId}
                 </span>
 
@@ -257,21 +258,11 @@ export function ProjectListScreen({ cases }: Props) {
                   </p>
                 </Link>
 
-                <span className="hidden shrink-0 text-xs text-white/40 sm:block">
+                <span className="hidden w-48 shrink-0 whitespace-nowrap text-right text-xs tabular-nums text-white/40 sm:block">
                   Updated {formatDate(item.updatedAt)}
                 </span>
 
                 <div className="flex shrink-0 items-center gap-2">
-                  {/* Risk results only exist once a project is completed. */}
-                  {item.status === "completed" && (
-                    <Link
-                      href={`/projects/${item.caseId}/vulnerability`}
-                      className={`${buttonBaseSm} ${buttonGhost}`}
-                    >
-                      Vulnerability Index
-                    </Link>
-                  )}
-
                   <Link
                     href={`/pathways/${item.caseId}`}
                     className={`${buttonBaseSm} ${buttonGhost}`}
