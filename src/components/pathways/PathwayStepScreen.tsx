@@ -6,6 +6,9 @@ import { PathwayFormStep } from "./PathwayFormStep";
 import { PathwayFileStep } from "./PathwayFileStep";
 import { PathwayAssignmentStep } from "./PathwayAssignmentStep";
 import { PathwayLocationStep } from "./PathwayLocationStep";
+import { HabitatTableStep } from "@/components/bng/HabitatTableStep";
+import { BngMetricStep } from "@/components/bng/BngMetricStep";
+import { UnitAllocationStep } from "@/components/bng/UnitAllocationStep";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 export type PathwayStepMode = "submit" | "edit";
@@ -108,17 +111,47 @@ export function PathwayStepScreen({
     isFirstStep,
   };
 
-  if (uiMode === "location_table") {
-    return <PathwayLocationStep {...commonProps} />;
-  }
+  const body =
+    uiMode === "location_table" ? (
+      <PathwayLocationStep {...commonProps} />
+    ) : uiMode === "file_form" ? (
+      <PathwayFileStep {...commonProps} />
+    ) : uiMode === "assignment_table" ? (
+      <PathwayAssignmentStep {...commonProps} />
+    ) : uiMode === "habitat_table" ? (
+      <HabitatTableStep {...commonProps} />
+    ) : uiMode === "bng_metric" ? (
+      <BngMetricStep {...commonProps} />
+    ) : uiMode === "bng_allocation" ? (
+      <UnitAllocationStep {...commonProps} />
+    ) : (
+      <PathwayFormStep {...commonProps} />
+    );
 
-  if (uiMode === "file_form") {
-    return <PathwayFileStep {...commonProps} />;
-  }
+  // Only steps that declare a stage/actor (e.g. the BNG workflows) get tags.
+  if (!step.stage && !step.actor) return body;
 
-  if (uiMode === "assignment_table") {
-    return <PathwayAssignmentStep {...commonProps} />;
-  }
+  return (
+    <div className="space-y-3">
+      <StepTags stage={step.stage} actor={step.actor} />
+      {body}
+    </div>
+  );
+}
 
-  return <PathwayFormStep {...commonProps} />;
+function StepTags({ stage, actor }: { stage?: string; actor?: string }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+      {stage && (
+        <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-white/70">
+          {stage}
+        </span>
+      )}
+      {actor && (
+        <span className="rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-emerald-100">
+          Actor: {actor}
+        </span>
+      )}
+    </div>
+  );
 }

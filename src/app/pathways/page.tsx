@@ -36,6 +36,36 @@ const pathways = [
       "Supporting Documents",
     ],
   },
+  {
+    code: "bng_habitat_bank_v1",
+    title: "BNG Habitat Bank",
+    subtitle: "Prototype · For landowners supplying biodiversity units",
+    description:
+      "Register land as a Biodiversity Net Gain habitat bank. Record the baseline and designed habitats, calculate the biodiversity units the site can sell, and secure it for 30 years with a management plan and legal agreement.",
+    features: [
+      "Site Registration & Boundary",
+      "Feasibility & Additionality",
+      "Baseline & Designed Habitats",
+      "Biodiversity Metric (simplified)",
+      "Management Plan & Legal Security",
+      "Biodiversity Gain Site Register",
+    ],
+  },
+  {
+    code: "bng_development_v1",
+    title: "BNG Development",
+    subtitle: "Prototype · For developments delivering 10% net gain",
+    description:
+      "Show how a development achieves Biodiversity Net Gain. Compare habitats before and after, apply the mitigation hierarchy, and cover any shortfall with units allocated from registered habitat banks, through to planning approval.",
+    features: [
+      "Development Site & Baseline",
+      "Post-development Metric",
+      "Mitigation Hierarchy",
+      "On-site or Off-site Decision",
+      "Habitat Bank Unit Allocation",
+      "Planning & Gain Plan Approval",
+    ],
+  },
 ];
 
 function IconFrame({ children }: { children: ReactNode }) {

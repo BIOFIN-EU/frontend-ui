@@ -14,7 +14,10 @@ export type WorkflowFieldType =
   | "hidden"
   | "content"
   | "assignment_table"
-  | "location_table";
+  | "location_table"
+  // Biodiversity Net Gain prototype
+  | "habitat_table"
+  | "bng_allocation";
 
 export type WorkflowFieldOption = {
   value: string;
@@ -43,6 +46,8 @@ export type WorkflowField = {
   // location_table only: help for the inputs of each location entry,
   // keyed by the entry property (e.g. friendly_name).
   entry_help_text?: Record<string, string>;
+  // habitat_table only: which parcels the table edits.
+  phase?: "baseline" | "proposed";
 };
 
 export type WorkflowUiMode =
@@ -52,7 +57,11 @@ export type WorkflowUiMode =
   | "file_form"
   | "review"
   | "read_only"
-  | "location_table";
+  | "location_table"
+  // Biodiversity Net Gain prototype
+  | "habitat_table"
+  | "bng_metric"
+  | "bng_allocation";
 
 export type WorkflowSubmitMode = "json" | "multipart" | "none";
 
@@ -63,6 +72,10 @@ export type WorkflowStep = {
   fields: WorkflowField[];
   ui_mode?: WorkflowUiMode;
   submit_mode?: WorkflowSubmitMode;
+  // Display tags: the process stage (e.g. "Habitat Bank / Landowner") and
+  // who performs the step (e.g. "Ecologist"). Shown when present.
+  stage?: string;
+  actor?: string;
 };
 
 export type WorkflowConfig = {

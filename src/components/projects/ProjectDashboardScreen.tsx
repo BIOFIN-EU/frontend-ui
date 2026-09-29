@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import RiskMap from "@/components/maps/RiskMap";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { FieldHelp } from "@/components/ui/FieldHelp";
+import { BngMetricPanel } from "@/components/bng/BngMetricPanel";
+import { AllocationsCard, BankAllocationsCard, HabitatParcelsCard } from "@/components/bng/BngDashboardCards";
+import type { BngMetricSummary } from "@/types/bng";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import type { CaseLocationEntry } from "@/types/case-location";
 import type { CaseDocument } from "@/types/case-document";
@@ -128,6 +131,16 @@ function isStepComplete(
 
   if (orderedStep.step.ui_mode === "location_table") {
     return Array.isArray(state.location) && state.location.length > 0;
+  }
+
+  // Biodiversity Net Gain steps
+  if (orderedStep.step.ui_mode === "habitat_table") {
+    const value = state[orderedStep.code];
+    return Array.isArray(value) && value.length > 0;
+  }
+
+  if (orderedStep.step.ui_mode === "bng_allocation") {
+    return state[orderedStep.code] != null;
   }
 
   const requiredFields = (orderedStep.step.fields || []).filter(
@@ -495,11 +508,28 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
           {activeStep.step.title}
         </h2>
 
+        {activeStep.step.ui_mode === "bng_metric" && (
+          <div className="mt-6 space-y-4">
+            <BngMetricPanel summary={state.bng_metric as BngMetricSummary | undefined} />
+            {(state.bng_metric as BngMetricSummary | undefined)?.role === "habitat_bank" && (
+              <BankAllocationsCard allocations={state.bng_allocated_to} />
+            )}
+          </div>
+        )}
+
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {activeStep.step.ui_mode === "assignment_table" ? (
             <AssignmentTableCard assignments={assignments} />
           ) : activeStep.step.ui_mode === "location_table" ? (
             <LocationsSection locations={state.location ?? []} />
+          ) : activeStep.step.ui_mode === "habitat_table" ? (
+            <div className="md:col-span-2">
+              <HabitatParcelsCard parcels={state[activeStep.code]} />
+            </div>
+          ) : activeStep.step.ui_mode === "bng_allocation" ? (
+            <div className="md:col-span-2">
+              <AllocationsCard data={state[activeStep.code]} />
+            </div>
           ) : (
             (activeStep.step.fields || [])
             .filter((field) => field.type !== "content")
