@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useAuth } from "@/context/auth.context";
 import { Select } from "@/components/ui/Select";
 import { apiFetch } from "@/lib/api";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
@@ -12,7 +13,11 @@ type ContactReason =
   | "I am an Nature-based Solutions Funder"
   | "I am an Nature-based Solutions Intermediary"
   | "I want to get funding for my Nature-based Solutions"
+  | "I want to leave feedback"
   | "";
+
+// ?reason=feedback (the profile page's "Leave feedback") preselects this.
+const FEEDBACK_REASON: ContactReason = "I want to leave feedback";
 
 function IconFrame({ children }: { children: ReactNode }) {
   return (
@@ -459,6 +464,21 @@ export default function SupportPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [isFeedback, setIsFeedback] = useState(false);
+
+  // From "Leave feedback": preselect the reason and fill in who is logged in.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("reason") !== "feedback") return;
+    setIsFeedback(true);
+    setReason(FEEDBACK_REASON);
+  }, []);
+
+  useEffect(() => {
+    if (!isFeedback || !user) return;
+    setName((current) => current || user.name || "");
+    setEmail((current) => current || user.email || "");
+  }, [isFeedback, user]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -472,7 +492,7 @@ export default function SupportPage() {
         body: JSON.stringify({ name, email, reason, comment }),
       });
 
-      setSuccess("Your message has been sent.");
+      setSuccess(reason === FEEDBACK_REASON ? "Thank you for your feedback." : "Your message has been sent.");
       setName("");
       setEmail("");
       setReason("");
@@ -530,7 +550,9 @@ export default function SupportPage() {
           <IconFrame><MailIcon /></IconFrame>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Contact form</p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">Get in touch</h2>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
+              {isFeedback ? "Leave feedback" : "Get in touch"}
+            </h2>
           </div>
         </div>
 
@@ -547,19 +569,20 @@ export default function SupportPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-white/70">I am contacting you as</label>
+            <label className="text-xs font-medium text-white/70">What is your message about?</label>
             <Select value={String(reason ?? "")} onChange={(nextValue) => setReason(nextValue as ContactReason)} options={[
               { label: "Select an option", value: "" },
-              { label: "Nature-based Solutions Funder", value: "I am an Nature-based Solutions Funder" },
-              { label: "Nature-based Solutions Intermediary", value: "I am an Nature-based Solutions Intermediary" },
-              { label: "Nature-based Solutions Provider", value: "I want to get funding for my Nature-based Solutions" },
-              { label: "Other", value: "I am someone else" }
+              { label: "I'm a Nature-based Solutions funder", value: "I am an Nature-based Solutions Funder" },
+              { label: "I'm a Nature-based Solutions intermediary", value: "I am an Nature-based Solutions Intermediary" },
+              { label: "I'm looking for funding for my Nature-based Solutions", value: "I want to get funding for my Nature-based Solutions" },
+              { label: "Feedback about the platform", value: FEEDBACK_REASON },
+              { label: "Something else", value: "I am someone else" }
             ]} />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="support-comment" className="text-xs font-medium text-white/70">Comment</label>
-            <textarea id="support-comment" value={comment} onChange={(e) => setComment(e.target.value)} required rows={5} className="w-full resize-y rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20" placeholder="Tell us more..." />
+            <textarea id="support-comment" value={comment} onChange={(e) => setComment(e.target.value)} required rows={5} className="w-full resize-y rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20" placeholder={reason === FEEDBACK_REASON ? "What works well, and what could be better?" : "Tell us more..."} />
           </div>
 
           {error && <div role="alert" className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">{error}</div>}

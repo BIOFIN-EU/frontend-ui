@@ -9,11 +9,11 @@ export type PhotoCredit = {
 export const photoCredits = {
   bertraghboyBay: {
     label: "Photo: Magnific",
-    href: "https://www.magnific.com/free-photo/",
+    href: "https://www.magnific.com/free-photo/bertraghboy-bay-covered-greenery-cloudy-sky-connemara-ireland_10991031.htm",
   },
   ballycastle: {
     label: "Photo: Magnific",
-    href: "https://www.magnific.com/free-photo/",
+    href: "https://www.magnific.com/free-photo/high-angle-shot-valley-sea-near-ballycastle-county-mayo-ireland_11342081.htm",
   },
   forest: {
     label: "Photo: Dieny Portinanni on Unsplash",
