@@ -103,7 +103,7 @@ export function PathwayStepper({
   if (steps.length === 0) return null;
 
   return (
-    <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md lg:sticky lg:top-24">
+    <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] lg:sticky lg:top-24">
       <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
         Steps
       </p>
