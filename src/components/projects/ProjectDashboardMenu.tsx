@@ -15,7 +15,7 @@ type Props = {
 // Vulnerability Index and Access are project tabs (ProjectTabs), not buttons here.
 export function ProjectDashboardMenu({ caseId, state, onDelete }: Props) {
   return (
-    <div className="h-fit rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+    <div className="h-fit rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
           Project summary

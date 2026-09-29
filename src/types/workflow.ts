@@ -17,7 +17,9 @@ export type WorkflowFieldType =
   | "location_table"
   // Biodiversity Net Gain prototype
   | "habitat_table"
-  | "bng_allocation";
+  | "bng_allocation"
+  // An ISO date (YYYY-MM-DD), entered and shown as dd/mm/yyyy.
+  | "date";
 
 export type WorkflowFieldOption = {
   value: string;
@@ -76,6 +78,11 @@ export type WorkflowStep = {
   // who performs the step (e.g. "Ecologist"). Shown when present.
   stage?: string;
   actor?: string;
+  // BNG: roles that may submit the step, whether a project manager may
+  // record it on their behalf, and approval steps that can be rejected.
+  roles?: string[];
+  allow_on_behalf?: boolean;
+  approval?: { reject_to: string; reject_label?: string };
 };
 
 export type WorkflowConfig = {

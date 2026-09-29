@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import RiskMap from "@/components/maps/RiskMap";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { FieldHelp } from "@/components/ui/FieldHelp";
+import { isoToDisplay } from "@/components/ui/DatePicker";
 import { BngCaseSummary } from "@/components/bng/BngCaseSummary";
 import { AllocationsCard, HabitatParcelsCard } from "@/components/bng/BngDashboardCards";
 import type { BngMetricSummary } from "@/types/bng";
@@ -346,7 +347,9 @@ function StandardFieldCard({
       </div>
 
       <p className="mt-3 break-words text-sm text-white/70">
-        {formatValue(value)}
+        {field.type === "date" && typeof value === "string" && value
+          ? isoToDisplay(value)
+          : formatValue(value)}
       </p>
     </div>
   );
@@ -447,7 +450,7 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
 
   return (
     <section className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md lg:sticky lg:top-24">
+      <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] lg:sticky lg:top-24">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
             Steps
@@ -503,14 +506,19 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
         </div>
       </aside>
 
-      <div className="min-h-[360px] min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <div className="min-h-[360px] min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
         <h2 className="text-2xl font-semibold tracking-tight text-white">
           {activeStep.step.title}
         </h2>
 
         {activeStep.step.ui_mode === "bng_metric" && (
           <div className="mt-6 space-y-4">
-            <BngCaseSummary caseId={state.caseId} summary={state.bng_metric as BngMetricSummary | undefined} />
+            <BngCaseSummary
+              caseId={state.caseId}
+              summary={state.bng_metric as BngMetricSummary | undefined}
+              steps={state.workflow_config?.steps}
+              signoffs={state.bng_signoffs}
+            />
           </div>
         )}
 

@@ -152,7 +152,17 @@ export type BngTransaction = {
   hedgerow_units: number;
   watercourse_units: number;
   total_price: number | null;
+  shares?: Record<BngRevenueParty, number> | null;
+  split?: Record<BngRevenueParty, number | null> | null;
   created_at: string | null;
+};
+
+export type BngRevenueParty = "landowner" | "investor" | "manager";
+
+export const BNG_REVENUE_PARTY_LABEL: Record<BngRevenueParty, string> = {
+  landowner: "Landowner",
+  investor: "Investor",
+  manager: "Habitat manager",
 };
 
 export type BngFinancials = {
@@ -163,6 +173,14 @@ export type BngFinancials = {
   committed_revenue: number | null;
   pipeline_revenue: number | null;
   potential_margin: number | null;
+  // Phase 3: the bank's current split, and what each party earned from
+  // retired units (at the split recorded with each sale).
+  revenue_shares?: Record<BngRevenueParty, number> | null;
+  revenue_distribution?: {
+    retired_revenue: number | null;
+    distributed: Record<BngRevenueParty, number | null>;
+    not_split: number | null;
+  };
 };
 
 export type BngAllocationStepData = {
@@ -184,4 +202,122 @@ export function formatMoney(value: number | null | undefined): string {
 export function formatUnits(value: number | null | undefined): string {
   if (value == null) return "—";
   return value.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ---------- Phase 3: roles, sign-offs, monitoring ----------
+
+export type BngRole = "landowner" | "investor" | "developer" | "ecologist" | "lpa";
+
+export const BNG_ROLES: BngRole[] = ["landowner", "investor", "developer", "ecologist", "lpa"];
+
+export const BNG_ROLE_LABEL: Record<BngRole, string> = {
+  landowner: "Landowner / Habitat Bank",
+  investor: "Investor",
+  developer: "Developer",
+  ecologist: "Ecologist",
+  lpa: "Local Planning Authority",
+};
+
+export function roleNames(roles: string[] | undefined): string {
+  const labels = (roles ?? []).map((role) => BNG_ROLE_LABEL[role as BngRole] ?? role);
+  if (labels.length <= 1) return labels.join("");
+  return `${labels.slice(0, -1).join(", ")} or ${labels[labels.length - 1]}`;
+}
+
+export type BngMyAccess = {
+  roles: BngRole[];
+  can_update: boolean;
+  can_record_on_behalf: boolean;
+};
+
+export type BngSignoff = {
+  id: number;
+  step_code: string;
+  user_id: string;
+  role: BngRole | null;
+  role_label: string | null;
+  on_behalf: boolean;
+  decision: "submitted" | "approved" | "rejected" | "edited";
+  comment: string | null;
+  created_at: string | null;
+};
+
+export type BngWaiting = {
+  case_id: number;
+  step_code: string;
+  step_title: string | null;
+  roles: BngRole[];
+};
+
+export type BngMonitoringStatus = "due" | "submitted" | "passed" | "failed" | "remediated";
+
+export const BNG_MONITORING_STATUS_LABEL: Record<BngMonitoringStatus, string> = {
+  due: "Due",
+  submitted: "Awaiting verification",
+  passed: "Passed",
+  failed: "Failed",
+  remediated: "Remediated",
+};
+
+export type BngRemedialAction = {
+  id: number;
+  description: string;
+  due_date: string | null;
+  status: "open" | "completed";
+  completion_notes: string | null;
+  completed_at: string | null;
+};
+
+export type BngMonitoringReport = {
+  id: number;
+  year: number;
+  due_date: string;
+  status: BngMonitoringStatus;
+  overdue: boolean;
+  habitats_on_track: boolean | null;
+  condition_summary: string | null;
+  management_carried_out: string | null;
+  submitted_at: string | null;
+  submitted_on_behalf: boolean;
+  verification_notes: string | null;
+  verified_at: string | null;
+  verified_as: BngRole | null;
+  verified_as_label: string | null;
+  verified_on_behalf: boolean;
+  remedial_actions: BngRemedialAction[];
+};
+
+export type BngMonitoringSummary = {
+  scheduled: boolean;
+  counts: Record<BngMonitoringStatus | "overdue", number>;
+  next_due: { year: number; due_date: string } | null;
+  open_remedial_actions: number;
+};
+
+export type BngMonitoring = {
+  summary: BngMonitoringSummary;
+  reports: BngMonitoringReport[];
+};
+
+export type BngReport = {
+  case_id: number;
+  case_type: string;
+  name: string | null;
+  metric: BngMetricSummary;
+  allocations: BngAllocation[];
+  transactions: BngTransaction[];
+  signoffs: BngSignoff[];
+  roles: Record<string, BngRole[]>;
+  step_titles: Record<string, string>;
+  financials?: BngFinancials;
+  monitoring?: BngMonitoring;
+};
+
+// A date without the time, as dd/mm/yyyy ("2027-01-15" is read as a local day).
+export function formatDay(value: string | null | undefined): string {
+  if (!value) return "—";
+  const date = new Date(value.length === 10 ? `${value}T00:00:00` : value);
+  if (Number.isNaN(date.getTime())) return value;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
 }

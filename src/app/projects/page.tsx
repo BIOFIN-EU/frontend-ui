@@ -6,6 +6,7 @@ import { useAuth } from "@/context/auth.context";
 import { caseListService } from "@/services/case-list.service";
 import type { CaseListItem } from "@/types/case-list";
 import { ProjectListScreen } from "@/components/projects/ProjectListScreen";
+import { BngWaitingBanner } from "@/components/bng/BngWaitingBanner";
 
 // useSearchParams needs a Suspense boundary for the production build.
 export default function CasesPage() {
@@ -92,6 +93,9 @@ function CasesPageInner() {
           {error}
         </div>
       )}
+
+      {/* BNG only: steps waiting for one of the user's roles (hidden when none). */}
+      {!loading && !error && <BngWaitingBanner cases={cases} />}
 
       {!loading && !error && (
         <ProjectListScreen

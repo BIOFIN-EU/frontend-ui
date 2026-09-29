@@ -6,6 +6,7 @@ import type { FieldSchema, StepSchema } from "@/types/forms";
 import { buttonBase, buttonGhost, buttonPrimary } from "@/lib/ui";
 import { Select } from "@/components/ui/Select";
 import { FieldHelp } from "@/components/ui/FieldHelp";
+import { DatePicker } from "@/components/ui/DatePicker";
 
 function isVisible(field: FieldSchema, values: Record<string, any>) {
   if (!field.visible_if) return true;
@@ -94,6 +95,31 @@ function Field({
             type="number"
             className={inputClass}
             onWheel={(e) => e.currentTarget.blur()}
+          />
+          {error && <p className="text-sm text-red-300">{error}</p>}
+        </div>
+      );
+
+    case "date":
+      // Stored as YYYY-MM-DD; the picker shows and accepts dd/mm/yyyy. The
+      // hidden input keeps the field registered (and its required rule).
+      return (
+        <div className="space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <span className="flex items-center gap-1.5">
+              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+                {field.label}
+              </label>
+              <FieldHelp text={field.help} label={field.label} />
+            </span>
+            <RequirementBadge required={!!field.required} />
+          </div>
+          <input type="hidden" {...register(field.id, { required: !!field.required })} />
+          <DatePicker
+            id={field.id}
+            value={values?.[field.id] ?? ""}
+            invalid={!!error}
+            onChange={(iso) => setValue(field.id, iso, { shouldValidate: true, shouldDirty: true })}
           />
           {error && <p className="text-sm text-red-300">{error}</p>}
         </div>

@@ -9,6 +9,7 @@ import { PathwayLocationStep } from "./PathwayLocationStep";
 import { HabitatTableStep } from "@/components/bng/HabitatTableStep";
 import { BngMetricStep } from "@/components/bng/BngMetricStep";
 import { UnitAllocationStep } from "@/components/bng/UnitAllocationStep";
+import { BngStepGate } from "@/components/bng/BngStepGate";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
 
 export type PathwayStepMode = "submit" | "edit";
@@ -111,7 +112,7 @@ export function PathwayStepScreen({
     isFirstStep,
   };
 
-  const body =
+  const stepBody =
     uiMode === "location_table" ? (
       <PathwayLocationStep {...commonProps} />
     ) : uiMode === "file_form" ? (
@@ -127,6 +128,15 @@ export function PathwayStepScreen({
     ) : (
       <PathwayFormStep {...commonProps} />
     );
+
+  // BNG steps with roles only: who may fill it in (other steps unchanged).
+  const body = step.roles?.length ? (
+    <BngStepGate key={effectiveStepCode} state={state} step={step} mode={mode} onStateUpdated={onStateUpdated}>
+      {stepBody}
+    </BngStepGate>
+  ) : (
+    stepBody
+  );
 
   // Only steps that declare a stage/actor (e.g. the BNG workflows) get tags.
   if (!step.stage && !step.actor) return body;

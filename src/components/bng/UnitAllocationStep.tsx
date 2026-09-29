@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { bngService } from "@/services/bng.service";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
@@ -224,6 +224,22 @@ export function UnitAllocationStep({
       .slice(0, 3);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankOptions, stillNeeded, rows]);
+
+  // Opened from the marketplace's "Reserve units" (?bank=<id>): add that
+  // bank as a row, filled with what it can cover of the remaining need.
+  const prefilledBank = useRef(false);
+  useEffect(() => {
+    if (prefilledBank.current || banks === null || summary === null) return;
+    prefilledBank.current = true;
+    const bankId = new URLSearchParams(window.location.search).get("bank");
+    const option = bankOptions.find((candidate) => String(candidate.id) === bankId);
+    if (!option || usedBankIds.has(String(option.id))) return;
+    const take = { ...ZERO };
+    for (const category of BNG_CATEGORIES) take[category] = Math.min(option.max[category], stillNeeded[category]);
+    applySuggestion(option.id, take);
+    // Once, when the banks and the metric have loaded.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [banks, summary]);
 
   const isLast = !step.next;
 

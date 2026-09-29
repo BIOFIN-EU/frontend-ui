@@ -122,6 +122,20 @@ export default function WorkflowCasePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caseId, user]);
 
+  // ?step=<code> (e.g. from the BNG marketplace) opens that step, but only
+  // the current step or one already saved; anything else is ignored.
+  useEffect(() => {
+    if (!state || !dashboardState) return;
+    const requested = new URLSearchParams(window.location.search).get("step");
+    if (!requested || requested === state.current_step) return;
+    const saved = dashboardState[requested];
+    if (saved != null && dashboardState.workflow_config?.steps?.[requested]) {
+      setViewingStepCode(requested);
+    }
+    // Once, when both have loaded.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [Boolean(state), Boolean(dashboardState)]);
+
   const workflowConfig = dashboardState?.workflow_config ?? null;
 
   const stepConfig: WorkflowStep | null = useMemo(() => {

@@ -54,6 +54,7 @@ const pathways = [
       "Biodiversity Metric (simplified)",
       "Management Plan & Unit Pricing",
       "Biodiversity Gain Site Register",
+      "30-year Monitoring & Verification",
     ],
   },
   {
@@ -70,23 +71,8 @@ const pathways = [
       "On-site or Off-site Decision",
       "Marketplace Unit Reservation",
       "Planning & Gain Plan Approval",
+      "LPA & Ecologist Sign-off",
     ],
-  },
-  {
-    code: "bng_marketplace",
-    group: "bng",
-    title: "BNG Marketplace",
-    subtitle: "Prototype · Browse biodiversity units for sale",
-    description:
-      "See the registered habitat banks with biodiversity units still available, their prices and sites. Reserve units from a BNG Development project's Off-Site Unit Reservation step.",
-    features: [
-      "Available Units per Habitat Bank",
-      "Prices per Unit Type",
-      "Filter by Habitat, Hedgerow or Watercourse",
-      "Sort by Availability or Price",
-    ],
-    // Not a workflow: opens the marketplace page.
-    href: "/bng/marketplace",
   },
 ];
 
@@ -160,8 +146,6 @@ function PathwayIcon({ code }: { code: string }) {
       return <Sprout className={lucideIconClass} strokeWidth={1.7} aria-hidden="true" />;
     case "bng_development_v1":
       return <Building2 className={lucideIconClass} strokeWidth={1.7} aria-hidden="true" />;
-    case "bng_marketplace":
-      return <Store className={lucideIconClass} strokeWidth={1.7} aria-hidden="true" />;
     default:
       return <BlendedFinanceIcon />;
   }
@@ -339,10 +323,22 @@ function PathwaysPageInner() {
       </nav>
 
       {group === "bng" && (
-        <p className="max-w-3xl text-sm leading-6 text-white/65">
-          Prototype pathways for Biodiversity Net Gain: habitat banks register land and sell biodiversity units,
-          developments buy the units they need to reach a 10% net gain.
-        </p>
+        <div className="space-y-4">
+          <p className="max-w-3xl text-sm leading-6 text-white/65">
+            Prototype pathways for Biodiversity Net Gain: habitat banks register land and sell biodiversity units,
+            developments buy the units they need to reach a 10% net gain.
+          </p>
+          <Link
+            href="/bng/marketplace"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.07] px-5 py-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/[0.12]"
+          >
+            <span className="flex items-center gap-3 text-sm text-white/80">
+              <Store className="h-5 w-5 text-emerald-300" aria-hidden="true" />
+              Looking for biodiversity units? Compare registered habitat banks, their prices and what they cover.
+            </span>
+            <span className="text-sm font-semibold !text-emerald-200">Browse the marketplace →</span>
+          </Link>
+        </div>
       )}
 
       <section className="grid items-stretch gap-5 xl:grid-cols-2">
@@ -390,12 +386,6 @@ function PathwaysPageInner() {
               </div>
 
               <div className="mt-auto pt-7">
-                {pathway.href ? (
-                  <Link href={pathway.href} className={`w-full gap-2 !text-white sm:w-auto ${buttonBase} ${buttonPrimary}`}>
-                    Open marketplace
-                    <ArrowIcon />
-                  </Link>
-                ) : (
                 <button onClick={() => handleStartPathway(pathway.code)} disabled={creatingCode === pathway.code} className={`w-full gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto ${buttonBase} ${buttonPrimary}`}>
                   {creatingCode === pathway.code
                     ? "Creating project..."
@@ -403,7 +393,6 @@ function PathwaysPageInner() {
 
                   {creatingCode !== pathway.code && <ArrowIcon />}
                 </button>
-                )}
               </div>
             </div>
           </article>
