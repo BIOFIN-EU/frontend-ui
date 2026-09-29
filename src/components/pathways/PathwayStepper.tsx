@@ -1,5 +1,7 @@
 "use client";
 
+import { Fragment } from "react";
+
 import type { WorkflowConfig, WorkflowStep } from "@/types/workflow";
 
 export type PathwayStepStatus = "done" | "current" | "upcoming";
@@ -8,6 +10,8 @@ export type OrderedStep = {
   code: string;
   title: string;
   status: PathwayStepStatus;
+  stage?: string;
+  actor?: string;
 };
 
 function isStepDataFilled(
@@ -72,7 +76,7 @@ export function buildOrderedSteps(
           ? "done"
           : "upcoming";
 
-    ordered.push({ code, title: step.title, status });
+    ordered.push({ code, title: step.title, status, stage: step.stage, actor: step.actor });
     code = step.next ?? null;
   }
 
@@ -108,10 +112,18 @@ export function PathwayStepper({
         {steps.map((item, index) => {
           const isActive = item.code === activeStepCode;
           const isClickable = item.status === "done" || item.status === "current";
+          // Heading when the stage changes (steps without a stage get none).
+          const stageHeading =
+            item.stage && item.stage !== steps[index - 1]?.stage ? item.stage : null;
 
           return (
+            <Fragment key={item.code}>
+              {stageHeading && (
+                <p className="pt-2 text-[11px] font-semibold uppercase tracking-wider text-emerald-200/80">
+                  {stageHeading}
+                </p>
+              )}
             <button
-              key={item.code}
               type="button"
               disabled={!isClickable}
               onClick={() => isClickable && onSelectStep(item.code)}
@@ -150,6 +162,7 @@ export function PathwayStepper({
                 </span>
               </span>
             </button>
+            </Fragment>
           );
         })}
       </div>

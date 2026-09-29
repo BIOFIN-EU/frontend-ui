@@ -16,7 +16,8 @@ export type FieldSchema = {
     | "checkbox"
     | "textarea"
     | "file"
-    | "content";
+    | "content"
+    | "date";
 
   label: string;
   content?: string;

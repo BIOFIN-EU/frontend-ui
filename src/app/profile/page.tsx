@@ -74,7 +74,7 @@ export default function ProfilePage() {
           </Link>
 
           <Link
-            href="/feedback"
+            href="/support?reason=feedback#contact-form"
             className={`${buttonBase} ${buttonSecondary}`}
           >
             Leave feedback

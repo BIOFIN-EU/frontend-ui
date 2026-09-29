@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api";
+import { bngSubmitExtras } from "@/lib/bngSubmitExtras";
 import type { CaseDocument, DocumentDownloadUrlResponse } from "@/types/case-document";
 import type { DetectCountryRequest, DetectCountryResponse } from "@/types/case-location";
 import type {
@@ -36,7 +37,7 @@ export const workflowService = {
       `${BASE}/cases/${caseId}/submit-json`,
       {
         method: "POST",
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, ...bngSubmitExtras(caseId) }),
       }
     );
 
@@ -74,7 +75,7 @@ export const workflowService = {
       `${BASE}/cases/${caseId}/steps/${stepCode}`,
       {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, ...bngSubmitExtras(caseId) }),
       }
     );
   },

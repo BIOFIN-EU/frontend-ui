@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import RiskMap from "@/components/maps/RiskMap";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { FieldHelp } from "@/components/ui/FieldHelp";
+import { isoToDisplay } from "@/components/ui/DatePicker";
+import { BngCaseSummary } from "@/components/bng/BngCaseSummary";
+import { AllocationsCard, HabitatParcelsCard } from "@/components/bng/BngDashboardCards";
+import type { BngMetricSummary } from "@/types/bng";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import type { CaseLocationEntry } from "@/types/case-location";
 import type { CaseDocument } from "@/types/case-document";
@@ -128,6 +132,16 @@ function isStepComplete(
 
   if (orderedStep.step.ui_mode === "location_table") {
     return Array.isArray(state.location) && state.location.length > 0;
+  }
+
+  // Biodiversity Net Gain steps
+  if (orderedStep.step.ui_mode === "habitat_table") {
+    const value = state[orderedStep.code];
+    return Array.isArray(value) && value.length > 0;
+  }
+
+  if (orderedStep.step.ui_mode === "bng_allocation") {
+    return state[orderedStep.code] != null;
   }
 
   const requiredFields = (orderedStep.step.fields || []).filter(
@@ -333,7 +347,9 @@ function StandardFieldCard({
       </div>
 
       <p className="mt-3 break-words text-sm text-white/70">
-        {formatValue(value)}
+        {field.type === "date" && typeof value === "string" && value
+          ? isoToDisplay(value)
+          : formatValue(value)}
       </p>
     </div>
   );
@@ -434,7 +450,7 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
 
   return (
     <section className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md lg:sticky lg:top-24">
+      <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] lg:sticky lg:top-24">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
             Steps
@@ -490,16 +506,35 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
         </div>
       </aside>
 
-      <div className="min-h-[360px] min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <div className="min-h-[360px] min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
         <h2 className="text-2xl font-semibold tracking-tight text-white">
           {activeStep.step.title}
         </h2>
+
+        {activeStep.step.ui_mode === "bng_metric" && (
+          <div className="mt-6 space-y-4">
+            <BngCaseSummary
+              caseId={state.caseId}
+              summary={state.bng_metric as BngMetricSummary | undefined}
+              steps={state.workflow_config?.steps}
+              signoffs={state.bng_signoffs}
+            />
+          </div>
+        )}
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {activeStep.step.ui_mode === "assignment_table" ? (
             <AssignmentTableCard assignments={assignments} />
           ) : activeStep.step.ui_mode === "location_table" ? (
             <LocationsSection locations={state.location ?? []} />
+          ) : activeStep.step.ui_mode === "habitat_table" ? (
+            <div className="md:col-span-2">
+              <HabitatParcelsCard parcels={state[activeStep.code]} />
+            </div>
+          ) : activeStep.step.ui_mode === "bng_allocation" ? (
+            <div className="md:col-span-2">
+              <AllocationsCard data={state[activeStep.code]} />
+            </div>
           ) : (
             (activeStep.step.fields || [])
             .filter((field) => field.type !== "content")

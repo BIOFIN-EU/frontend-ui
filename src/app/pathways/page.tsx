@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, type ReactNode } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Layers, Leaf, Sprout, Store, Building2 } from "lucide-react";
 import { useAuth } from "@/context/auth.context";
 import { workflowService } from "@/services/workflow.service";
 import { buttonBase, buttonPrimary } from "@/lib/ui";
@@ -9,6 +11,7 @@ import { buttonBase, buttonPrimary } from "@/lib/ui";
 const pathways = [
   {
     code: "private_lending_v1",
+    group: "standard",
     title: "Private Lending",
     subtitle: "Suitable for private lending opportunities",
     description:
@@ -23,6 +26,7 @@ const pathways = [
   },
   {
     code: "use_case_2_v1",
+    group: "standard",
     title: "Public / Private Financing",
     subtitle: "Suitable for public, private and blended finance",
     description:
@@ -34,6 +38,40 @@ const pathways = [
       "Funding Requirements",
       "Investment Rationale",
       "Supporting Documents",
+    ],
+  },
+  {
+    code: "bng_habitat_bank_v1",
+    group: "bng",
+    title: "BNG Habitat Bank",
+    subtitle: "Prototype · For landowners supplying biodiversity units",
+    description:
+      "Register land as a Biodiversity Net Gain habitat bank. Record the baseline and designed habitats, calculate the biodiversity units the site can sell, and secure it for 30 years with a management plan and legal agreement.",
+    features: [
+      "Site Registration & Boundary",
+      "Feasibility & Additionality",
+      "Baseline & Designed Habitats",
+      "Biodiversity Metric (simplified)",
+      "Management Plan & Unit Pricing",
+      "Biodiversity Gain Site Register",
+      "30-year Monitoring & Verification",
+    ],
+  },
+  {
+    code: "bng_development_v1",
+    group: "bng",
+    title: "BNG Development",
+    subtitle: "Prototype · For developments delivering 10% net gain",
+    description:
+      "Show how a development achieves Biodiversity Net Gain. Compare habitats before and after, apply the mitigation hierarchy, and cover any shortfall with units allocated from registered habitat banks, through to planning approval.",
+    features: [
+      "Development Site & Baseline",
+      "Post-development Metric",
+      "Mitigation Hierarchy",
+      "On-site or Off-site Decision",
+      "Marketplace Unit Reservation",
+      "Planning & Gain Plan Approval",
+      "LPA & Ecologist Sign-off",
     ],
   },
 ];
@@ -98,6 +136,28 @@ function BlendedFinanceIcon() {
   );
 }
 
+const lucideIconClass = "h-7 w-7";
+
+function PathwayIcon({ code }: { code: string }) {
+  switch (code) {
+    case "private_lending_v1":
+      return <PrivateLendingIcon />;
+    case "bng_habitat_bank_v1":
+      return <Sprout className={lucideIconClass} strokeWidth={1.7} aria-hidden="true" />;
+    case "bng_development_v1":
+      return <Building2 className={lucideIconClass} strokeWidth={1.7} aria-hidden="true" />;
+    default:
+      return <BlendedFinanceIcon />;
+  }
+}
+
+type PathwayGroup = "standard" | "bng";
+
+const groupTabs: { key: PathwayGroup; label: string; icon: typeof Layers }[] = [
+  { key: "standard", label: "NbS Financing", icon: Layers },
+  { key: "bng", label: "Biodiversity Net Gain", icon: Leaf },
+];
+
 function CheckIcon() {
   return (
     <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -139,8 +199,23 @@ const steps = [
 ];
 
 export default function PathwaysPage() {
+  return (
+    <Suspense fallback={null}>
+      <PathwaysPageInner />
+    </Suspense>
+  );
+}
+
+function PathwaysPageInner() {
   const router = useRouter();
   const { user } = useAuth();
+  // ?tab=bng opens the BNG tab (kept in the URL so it survives a reload).
+  const searchParams = useSearchParams();
+  const group: PathwayGroup = searchParams.get("tab") === "bng" ? "bng" : "standard";
+
+  function selectGroup(next: PathwayGroup) {
+    router.replace(next === "bng" ? "/pathways?tab=bng" : "/pathways", { scroll: false });
+  }
 
   const [creatingCode, setCreatingCode] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -181,13 +256,16 @@ export default function PathwaysPage() {
 
   return (
     <div className="space-y-8 pb-10">
-      <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#07101f] px-6 py-8 shadow-[0_22px_70px_rgba(0,0,0,0.28)] sm:px-8 lg:px-10">
+      <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#07101f] px-6 py-6 shadow-[0_22px_70px_rgba(0,0,0,0.28)] sm:px-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(16,185,129,0.12),transparent_34%),radial-gradient(circle_at_88%_70%,rgba(59,130,246,0.08),transparent_34%)]" />
-        <div className="relative space-y-3">
-          <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+        <div className="relative space-y-2">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
+            Pathways
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight text-white">
             Project Pathways
           </h1>
-          <p className="max-w-3xl text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
+          <p className="max-w-2xl text-sm leading-6 text-white/60">
             Attract funding for Nature-based Solution projects by selecting a pathway.
           </p>
         </div>
@@ -221,15 +299,57 @@ export default function PathwaysPage() {
         </div>
       )}
 
+      <nav aria-label="Pathway groups" role="tablist" className="flex flex-wrap gap-2 border-b border-white/10">
+        {groupTabs.map((tab) => {
+          const Icon = tab.icon;
+          const active = tab.key === group;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => selectGroup(tab.key)}
+              className={[
+                "-mb-px inline-flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition",
+                active ? "border-emerald-400 text-white" : "border-transparent text-white/65 hover:text-white",
+              ].join(" ")}
+            >
+              <Icon className="h-4 w-4 text-emerald-300" aria-hidden="true" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      {group === "bng" && (
+        <div className="space-y-4">
+          <p className="max-w-3xl text-sm leading-6 text-white/65">
+            Prototype pathways for Biodiversity Net Gain: habitat banks register land and sell biodiversity units,
+            developments buy the units they need to reach a 10% net gain.
+          </p>
+          <Link
+            href="/bng/marketplace"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.07] px-5 py-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/[0.12]"
+          >
+            <span className="flex items-center gap-3 text-sm text-white/80">
+              <Store className="h-5 w-5 text-emerald-300" aria-hidden="true" />
+              Looking for biodiversity units? Compare registered habitat banks, their prices and what they cover.
+            </span>
+            <span className="text-sm font-semibold !text-emerald-200">Browse the marketplace →</span>
+          </Link>
+        </div>
+      )}
+
       <section className="grid items-stretch gap-5 xl:grid-cols-2">
-        {pathways.map((pathway, index) => (
+        {pathways.filter((pathway) => pathway.group === group).map((pathway) => (
           <article key={pathway.code} className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] shadow-[0_20px_60px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-0.5 hover:border-emerald-300/25 hover:shadow-[0_24px_70px_rgba(16,185,129,0.07)]">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/[0.045] via-transparent to-blue-500/[0.025] opacity-60" />
 
             <div className="relative flex h-full flex-col p-6 sm:p-7">
               <div className="flex items-start gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-400/10 text-emerald-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]">
-                  {index === 0 ? <PrivateLendingIcon /> : <BlendedFinanceIcon />}
+                  <PathwayIcon code={pathway.code} />
                 </div>
 
                 <div className="min-w-0 pt-0.5">

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/context/auth.context";
 import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";
 import { ProjectAccessManagement } from "@/components/projects/ProjectAccessManagement";
+import { BngRolesPanel } from "@/components/bng/BngRolesPanel";
 
 export default function CaseAccessPage() {
   const params = useParams<{ caseId: string }>();
@@ -45,6 +46,9 @@ export default function CaseAccessPage() {
         users={users}
         onUserAdded={() => window.location.reload()}
       />
+
+      {/* BNG projects only; renders nothing for other projects. */}
+      <BngRolesPanel caseId={numericCaseId} users={users} currentUserId={user?.id} />
     </div>
   );
 }
