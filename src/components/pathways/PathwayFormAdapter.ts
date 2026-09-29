@@ -10,6 +10,7 @@ export function AdaptWorkflowStepToForm(step: WorkflowStep): StepSchema {
     fields: step.fields.map((f) => ({
       id: f.name,
       label: f.display_name,
+      help: f.help_text,
       type: f.type as StepSchema["fields"][number]["type"],
       required: !!f.required,
       options: Array.isArray(f.options) ? f.options : [],

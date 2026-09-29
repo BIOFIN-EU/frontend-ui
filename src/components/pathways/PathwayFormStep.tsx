@@ -106,6 +106,8 @@ export function PathwayFormStep({
       fields: step.fields.map((f) => ({
         id: f.name,
         label: f.display_name,
+        help: f.help_text,
+        describeOptions: f.describe_options,
         type: f.type as any,
         content: f.content,
         required: !!f.required,

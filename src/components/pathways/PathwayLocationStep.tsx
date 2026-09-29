@@ -6,6 +6,7 @@ import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import type { CaseLocationEntry } from "@/types/case-location";
 import RiskMap from "@/components/maps/RiskMap";
 import { RequirementBadge } from "@/components/FormRenderer";
+import { FieldHelp } from "@/components/ui/FieldHelp";
 import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
 import type { PathwayStepMode } from "./PathwayStepScreen";
 
@@ -398,10 +399,19 @@ export function PathwayLocationStep({
     return <p className="text-sm text-white/70">No location step available.</p>;
   }
 
+  const entryHelp =
+    step.fields.find((field) => field.type === "location_table")?.entry_help_text ?? {};
+
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-white">{step.title}</h2>
+        <div className="flex items-center gap-1.5">
+          <h2 className="text-lg font-semibold text-white">{step.title}</h2>
+          <FieldHelp
+            text={step.fields.find((field) => field.type === "location_table")?.help_text}
+            label={step.title}
+          />
+        </div>
         <p className="mt-2 text-sm text-white/60">
           Draw one or more polygons, or drop lat/long points, to mark the
           locations for this project. Click a card to make it active on the
@@ -493,9 +503,15 @@ export function PathwayLocationStep({
                 <div className="space-y-3">
                   <div>
                     <div className="mb-1 flex items-center justify-between gap-2">
-                      <label className="block text-xs font-medium text-white/70">
-                        Name
-                      </label>
+                      <span className="flex items-center gap-1.5">
+                        <label className="block text-xs font-medium text-white/70">
+                          Name
+                        </label>
+                        {/* Inside the clickable card: don't also select it. */}
+                        <span onClick={(e) => e.stopPropagation()}>
+                          <FieldHelp text={entryHelp.friendly_name} label="Name" />
+                        </span>
+                      </span>
                       <RequirementBadge required={false} />
                     </div>
                     <input

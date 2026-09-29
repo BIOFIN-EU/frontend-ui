@@ -44,6 +44,7 @@ export function PathwayFileStep({
       fields: step.fields.map((f) => ({
         id: f.name,
         label: f.display_name,
+        help: f.help_text,
         type: f.type as any,
         required: !!f.required,
         options: Array.isArray(f.options) ? f.options : [],

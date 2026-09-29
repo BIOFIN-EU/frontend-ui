@@ -21,6 +21,39 @@ function dashboardStepToWorkflowStep(step: WorkflowStep): WorkflowStep {
   };
 }
 
+/**
+ * A running workflow keeps the step config it was started with, so help text
+ * added to the config later would never reach older cases. Take each field's
+ * help_text / describe_options (including table row fields) from the current
+ * config instead.
+ */
+function withCurrentHelpText(step: WorkflowStep, current?: WorkflowStep): WorkflowStep {
+  if (!current) return step;
+
+  const currentFields = new Map(current.fields.map((field) => [field.name, field]));
+
+  return {
+    ...step,
+    fields: step.fields.map((field) => {
+      const latest = currentFields.get(field.name);
+      if (!latest) return field;
+
+      return {
+        ...field,
+        help_text: field.help_text ?? latest.help_text,
+        describe_options: field.describe_options ?? latest.describe_options,
+        entry_help_text: field.entry_help_text ?? latest.entry_help_text,
+        row_fields: field.row_fields?.map((row) => ({
+          ...row,
+          help_text:
+            row.help_text ??
+            latest.row_fields?.find((latestRow) => latestRow.name === row.name)?.help_text,
+        })),
+      };
+    }),
+  };
+}
+
 function getCommittedStepData(
   dashboardState: CaseDashboardState | null,
   stepConfig: WorkflowStep | null,
@@ -95,7 +128,9 @@ export default function WorkflowCasePage() {
     if (!state) return null;
 
     if (!viewingStepCode || viewingStepCode === state.current_step) {
-      return state.step;
+      if (!state.step) return null;
+      const current = state.current_step ? workflowConfig?.steps?.[state.current_step] : undefined;
+      return withCurrentHelpText(state.step, current);
     }
 
     const dashStep = workflowConfig?.steps?.[viewingStepCode];

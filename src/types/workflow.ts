@@ -36,6 +36,13 @@ export type WorkflowField = {
   // Name of another field in the same row whose value filters this field's
   // lookup options (e.g. an intermediary's functions).
   filter_by?: string;
+  // Short explanation shown behind the field's info button.
+  help_text?: string;
+  // Also list each lookup option with its description in that popover.
+  describe_options?: boolean;
+  // location_table only: help for the inputs of each location entry,
+  // keyed by the entry property (e.g. friendly_name).
+  entry_help_text?: Record<string, string>;
 };
 
 export type WorkflowUiMode =

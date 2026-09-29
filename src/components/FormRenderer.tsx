@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import type { FieldSchema, StepSchema } from "@/types/forms";
 import { buttonBase, buttonGhost, buttonPrimary } from "@/lib/ui";
 import { Select } from "@/components/ui/Select";
+import { FieldHelp } from "@/components/ui/FieldHelp";
 
 function isVisible(field: FieldSchema, values: Record<string, any>) {
   if (!field.visible_if) return true;
@@ -57,9 +58,12 @@ function Field({
       return (
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <label htmlFor={field.id} className="text-sm font-semibold text-white">
-              {field.label}
-            </label>
+            <span className="flex items-center gap-1.5">
+              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+                {field.label}
+              </label>
+              <FieldHelp text={field.help} label={field.label} />
+            </span>
             <RequirementBadge required={!!field.required} />
           </div>
           <input
@@ -77,9 +81,12 @@ function Field({
       return (
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <label htmlFor={field.id} className="text-sm font-semibold text-white">
-              {field.label}
-            </label>
+            <span className="flex items-center gap-1.5">
+              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+                {field.label}
+              </label>
+              <FieldHelp text={field.help} label={field.label} />
+            </span>
             <RequirementBadge required={!!field.required} />
           </div>
           <input
@@ -96,9 +103,12 @@ function Field({
       return (
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <label htmlFor={field.id} className="text-sm font-semibold text-white">
-              {field.label}
-            </label>
+            <span className="flex items-center gap-1.5">
+              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+                {field.label}
+              </label>
+              <FieldHelp text={field.help} label={field.label} />
+            </span>
             <RequirementBadge required={!!field.required} />
           </div>
           <textarea {...common} rows={4} className={inputClass} />
@@ -123,9 +133,16 @@ function Field({
       return (
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <label htmlFor={field.id} className="text-sm font-semibold text-white">
-              {field.label}
-            </label>
+            <span className="flex items-center gap-1.5">
+              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+                {field.label}
+              </label>
+              <FieldHelp
+                text={field.help}
+                label={field.label}
+                options={field.describeOptions ? field.options : undefined}
+              />
+            </span>
             <RequirementBadge required={!!field.required} />
           </div>
 
@@ -157,7 +174,10 @@ function Field({
       return (
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <div className="text-sm font-semibold text-white">{field.label}</div>
+            <span className="flex items-center gap-1.5">
+              <div className="text-sm font-semibold text-white">{field.label}</div>
+              <FieldHelp text={field.help} label={field.label} />
+            </span>
             <RequirementBadge required={!!field.required} />
           </div>
           {(field.options || []).map((o) => (
@@ -185,6 +205,7 @@ function Field({
               />
               <span className="text-sm font-semibold">{field.label}</span>
             </label>
+            <FieldHelp text={field.help} label={field.label} />
             <RequirementBadge required={!!field.required} />
           </div>
           {error && <p className="text-sm text-red-300">{error}</p>}
@@ -195,9 +216,12 @@ function Field({
       return (
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <label htmlFor={field.id} className="text-sm font-semibold text-white">
-              {field.label}
-            </label>
+            <span className="flex items-center gap-1.5">
+              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+                {field.label}
+              </label>
+              <FieldHelp text={field.help} label={field.label} />
+            </span>
             <RequirementBadge required={!!field.required} />
           </div>
 

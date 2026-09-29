@@ -4,7 +4,7 @@ export type VisibleIfRule = {
   value: any;
 };
 
-export type FieldOption = { label: string; value: string };
+export type FieldOption = { label: string; value: string; description?: string | null };
 
 export type FieldSchema = {
   id: string;
@@ -20,6 +20,9 @@ export type FieldSchema = {
 
   label: string;
   content?: string;
+  help?: string;
+  // List each option with its description in the field's info popover.
+  describeOptions?: boolean;
 
   required?: boolean;
   options?: FieldOption[];

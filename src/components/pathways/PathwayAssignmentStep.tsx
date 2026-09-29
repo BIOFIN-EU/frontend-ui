@@ -6,6 +6,7 @@ import { getLookupOptions } from "@/services/lookups.service";
 import type { LookupOption } from "@/types/lookups";
 import type { WorkflowField, WorkflowState, WorkflowStep } from "@/types/workflow";
 import { RequirementBadge } from "@/components/FormRenderer";
+import { FieldHelp } from "@/components/ui/FieldHelp";
 import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
 import type { PathwayStepMode } from "./PathwayStepScreen";
 
@@ -363,10 +364,15 @@ export function PathwayAssignmentStep({
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-      <div className="mb-6">
+      <div className="mb-6 flex items-start gap-1.5">
         <p className="mt-2 text-sm text-white/60">
           Create one or more assignments and define the role for each.
         </p>
+        {assignmentField && (
+          <span className="mt-2">
+            <FieldHelp text={assignmentField.help_text} label={assignmentField.display_name} />
+          </span>
+        )}
       </div>
 
       {fieldErrors.assignments && (
@@ -384,9 +390,12 @@ export function PathwayAssignmentStep({
             {rowFields.map((field) => (
               <div key={field.name}>
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <label className="block text-sm font-medium text-white/80">
-                    {field.display_name}
-                  </label>
+                  <span className="flex items-center gap-1.5">
+                    <label className="block text-sm font-medium text-white/80">
+                      {field.display_name}
+                    </label>
+                    <FieldHelp text={field.help_text} label={field.display_name} />
+                  </span>
                   <RequirementBadge required={!!field.required} />
                 </div>
 

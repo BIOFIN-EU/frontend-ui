@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import RiskMap from "@/components/maps/RiskMap";
 import { DocumentCard } from "@/components/documents/DocumentCard";
+import { FieldHelp } from "@/components/ui/FieldHelp";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import type { CaseLocationEntry } from "@/types/case-location";
 import type { CaseDocument } from "@/types/case-document";
@@ -286,7 +287,10 @@ function DocumentFieldCard({
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-medium text-white">{field.display_name}</p>
+        <span className="flex items-center gap-1.5">
+          <p className="text-sm font-medium text-white">{field.display_name}</p>
+          <FieldHelp text={field.help_text} label={field.display_name} />
+        </span>
 
         {field.required && (
           <span className="rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-200 ring-1 ring-amber-400/25">
@@ -316,7 +320,10 @@ function StandardFieldCard({
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-medium text-white">{field.display_name}</p>
+        <span className="flex items-center gap-1.5">
+          <p className="text-sm font-medium text-white">{field.display_name}</p>
+          <FieldHelp text={field.help_text} label={field.display_name} />
+        </span>
 
         {field.required && (
           <span className="rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-200 ring-1 ring-amber-400/25">
