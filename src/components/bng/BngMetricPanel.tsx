@@ -31,6 +31,8 @@ function hasData(entry: BngCategoryMetric) {
 export function BngMetricPanel({ summary, loading, title = "Biodiversity metric" }: Props) {
   const rows = (summary?.categories ?? []).filter(hasData);
   const isBank = summary?.role === "habitat_bank";
+  // development: units requested but not yet accepted by the habitat bank
+  const showPending = !isBank && rows.some((entry) => (entry.pending_units ?? 0) > 0);
 
   return (
     <section className="rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.06] p-5">
@@ -63,6 +65,7 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
                   <>
                     <th className="py-2 pr-3 text-right font-semibold">+10% target</th>
                     <th className="py-2 pr-3 text-right font-semibold">Off-site secured</th>
+                    {showPending && <th className="py-2 pr-3 text-right font-semibold">Awaiting bank</th>}
                     <th className="py-2 text-right font-semibold">Still needed</th>
                   </>
                 )}
@@ -92,6 +95,9 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
                     <>
                       <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.target_units)}</td>
                       <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.allocated_units)}</td>
+                      {showPending && (
+                        <td className="py-2.5 pr-3 text-right tabular-nums text-amber-200">{formatUnits(entry.pending_units)}</td>
+                      )}
                       <td
                         className={`py-2.5 text-right font-semibold tabular-nums ${
                           entry.meets_target ? "text-emerald-200" : "text-amber-200"

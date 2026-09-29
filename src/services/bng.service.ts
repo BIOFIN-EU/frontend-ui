@@ -1,6 +1,9 @@
 import { apiFetch } from "@/lib/api";
 import type {
+  BngAllocation,
+  BngFinancials,
   BngHabitatBank,
+  BngTransaction,
   BngHabitatParcel,
   BngMetricSummary,
   BngReferenceData,
@@ -39,7 +42,28 @@ export const bngService = {
     });
   },
 
+  // The marketplace inventory: registered banks with units still available.
   listHabitatBanks(): Promise<BngHabitatBank[]> {
     return apiFetch<BngHabitatBank[]>(`${BASE}/habitat-banks`);
+  },
+
+  getCaseAllocations(caseId: number | string): Promise<BngAllocation[]> {
+    return apiFetch<BngAllocation[]>(`${BASE}/cases/${caseId}/allocations`);
+  },
+
+  getCaseTransactions(caseId: number | string): Promise<BngTransaction[]> {
+    return apiFetch<BngTransaction[]>(`${BASE}/cases/${caseId}/transactions`);
+  },
+
+  getCaseFinancials(caseId: number | string): Promise<BngFinancials> {
+    return apiFetch<BngFinancials>(`${BASE}/cases/${caseId}/financials`);
+  },
+
+  // accept / decline: the habitat bank; release: the development.
+  allocationAction(
+    allocationId: number,
+    action: "accept" | "decline" | "release"
+  ): Promise<{ id: number; status: string }> {
+    return apiFetch(`${BASE}/allocations/${allocationId}/${action}`, { method: "POST" });
   },
 };

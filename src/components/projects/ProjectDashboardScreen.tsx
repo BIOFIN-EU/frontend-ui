@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import RiskMap from "@/components/maps/RiskMap";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { FieldHelp } from "@/components/ui/FieldHelp";
-import { BngMetricPanel } from "@/components/bng/BngMetricPanel";
-import { AllocationsCard, BankAllocationsCard, HabitatParcelsCard } from "@/components/bng/BngDashboardCards";
+import { BngCaseSummary } from "@/components/bng/BngCaseSummary";
+import { AllocationsCard, HabitatParcelsCard } from "@/components/bng/BngDashboardCards";
 import type { BngMetricSummary } from "@/types/bng";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import type { CaseLocationEntry } from "@/types/case-location";
@@ -510,10 +510,7 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
 
         {activeStep.step.ui_mode === "bng_metric" && (
           <div className="mt-6 space-y-4">
-            <BngMetricPanel summary={state.bng_metric as BngMetricSummary | undefined} />
-            {(state.bng_metric as BngMetricSummary | undefined)?.role === "habitat_bank" && (
-              <BankAllocationsCard allocations={state.bng_allocated_to} />
-            )}
+            <BngCaseSummary caseId={state.caseId} summary={state.bng_metric as BngMetricSummary | undefined} />
           </div>
         )}
 
