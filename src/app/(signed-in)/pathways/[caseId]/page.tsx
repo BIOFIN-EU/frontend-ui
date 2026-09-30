@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import { useAuth } from "@/context/auth.context";
-import { workflowService } from "@/services/workflow.service";
-import { caseDashboardService } from "@/services/case-dashboard.service";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCaseDashboard } from "@/queries/projects";
+import { useRefreshCaseData, useStepDraft, useWorkflowState, workflowKeys } from "@/queries/workflow";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import { PathwayStepScreen } from "@/components/pathways/PathwayStepScreen";
@@ -56,7 +56,7 @@ function withCurrentHelpText(step: WorkflowStep, current?: WorkflowStep): Workfl
 }
 
 function getCommittedStepData(
-  dashboardState: CaseDashboardState | null,
+  dashboardState: CaseDashboardState | undefined,
   stepConfig: WorkflowStep | null,
   stepCode: string
 ): unknown {
@@ -75,53 +75,15 @@ function getCommittedStepData(
 export default function WorkflowCasePage() {
   const params = useParams<{ caseId: string }>();
   const caseId = params.caseId;
-  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const refreshCaseData = useRefreshCaseData();
 
-  const [state, setState] = useState<WorkflowState | null>(null);
-  const [dashboardState, setDashboardState] = useState<CaseDashboardState | null>(null);
+  const { data: state, isPending: loading, error } = useWorkflowState(caseId);
+  // The case's saved data; shared with the project dashboard.
+  const { data: dashboardState } = useCaseDashboard(caseId);
+  // Empty means the current step.
   const [viewingStepCode, setViewingStepCode] = useState<string>("");
-  const [draftData, setDraftData] = useState<unknown>(null);
-  const [stepDataLoading, setStepDataLoading] = useState(false);
   const [savedMessage, setSavedMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  async function loadState() {
-    try {
-      setLoading(true);
-      const data = await workflowService.getCaseState(caseId);
-      setState(data);
-      setViewingStepCode((current) => current || (data.current_step ?? ""));
-      setError("");
-    } catch (err) {
-      console.error("load workflow state failed", err);
-
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Failed to load workflow state");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadDashboard() {
-    try {
-      const data = await caseDashboardService.getCaseDashboard(caseId);
-      setDashboardState(data);
-    } catch (err) {
-      console.error("load case dashboard failed", err);
-    }
-  }
-
-  useEffect(() => {
-    if (caseId && user) {
-      loadState();
-      loadDashboard();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [caseId, user]);
 
   // ?step=<code> (e.g. from the BNG marketplace) opens that step, but only
   // the current step or one already saved; anything else is ignored.
@@ -162,40 +124,12 @@ export default function WorkflowCasePage() {
 
   const effectiveStepCode = viewingStepCode || state?.current_step || "";
 
-  // Check for an existing draft for whichever step is being viewed (current
-  // or a past one reached via the stepper), so unsaved progress survives a
-  // refresh and edits prefill from the latest draft when one exists.
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadDraft() {
-      if (!caseId || !effectiveStepCode || !isDraftableStep) {
-        setDraftData(null);
-        return;
-      }
-
-      setStepDataLoading(true);
-
-      try {
-        const draft = await workflowService.getDraft(caseId, effectiveStepCode);
-        if (!cancelled) {
-          setDraftData(draft?.data ?? null);
-        }
-      } catch (err) {
-        console.error("load step draft failed", err);
-        if (!cancelled) setDraftData(null);
-      } finally {
-        if (!cancelled) setStepDataLoading(false);
-      }
-    }
-
-    loadDraft();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [caseId, effectiveStepCode, isDraftableStep]);
-
+  // The draft of whichever step is being viewed (current or a past one
+  // reached via the stepper), so unsaved progress survives a refresh and
+  // edits prefill from the latest draft when one exists.
+  const draft = useStepDraft(caseId, effectiveStepCode, isDraftableStep);
+  const stepDataLoading = draft.isLoading;
+  const draftData = isDraftableStep ? (draft.data?.data ?? null) : null;
   const committedData = useMemo(
     () => getCommittedStepData(dashboardState, stepConfig, effectiveStepCode),
     [dashboardState, stepConfig, effectiveStepCode]
@@ -220,28 +154,17 @@ export default function WorkflowCasePage() {
   }
 
   function handleStateUpdated(updated: WorkflowState) {
-    setState(updated);
+    queryClient.setQueryData(workflowKeys.state(caseId), updated);
     setViewingStepCode(updated.current_step ?? "");
-    loadDashboard();
+    refreshCaseData(caseId);
   }
 
   function handleEditSaved() {
     if (!state) return;
     setViewingStepCode(state.current_step ?? "");
     setSavedMessage("Changes saved");
-    loadDashboard();
+    refreshCaseData(caseId);
     setTimeout(() => setSavedMessage(""), 2500);
-  }
-
-  if (!user) {
-    return (
-      <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-fg">
-          Workflow
-        </h1>
-        <p className="text-sm text-fg/70">Loading workflow access…</p>
-      </section>
-    );
   }
 
   return (
@@ -258,13 +181,13 @@ export default function WorkflowCasePage() {
         </div>
       )}
 
-      {!loading && error && (
+      {error && (
         <Alert tone="danger">
-          {error}
+          {error.message || "Failed to load workflow state"}
         </Alert>
       )}
 
-      {!loading && state && (
+      {state && (
         <section className="grid items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           {workflowConfig && (
             <PathwayStepper
@@ -301,7 +224,6 @@ export default function WorkflowCasePage() {
                   key={`${effectiveStepCode}-${isEditMode ? "edit" : "submit"}`}
                   state={state}
                   onStateUpdated={handleStateUpdated}
-                  onReload={loadState}
                   stepConfig={stepConfig}
                   stepCode={effectiveStepCode}
                   mode={isEditMode ? "edit" : "submit"}

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import { getLookupOptions } from "@/services/lookups.service";
-import type { LookupOption } from "@/types/lookups";
+import { useLookupOptions } from "@/queries/lookups";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import { FormRenderer } from "@/components/FormRenderer";
 import type { PathwayStepMode } from "./PathwayStepScreen";
@@ -59,45 +58,17 @@ export function PathwayFormStep({
   onBack,
   isFirstStep = true,
 }: Props) {
-  const [lookupOptions, setLookupOptions] = useState<Record<string, LookupOption[]>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [draftMessage, setDraftMessage] = useState("");
 
-  useEffect(() => {
-    const selectFields = step.fields.filter(
-      (f) => f.type === "select" && f.options_source
-    );
-
-    if (selectFields.length === 0) {
-      setLookupOptions({});
-      return;
-    }
-
-    let cancelled = false;
-
-    async function loadLookups() {
-      const results = await Promise.all(
-        selectFields.map(async (f) => {
-          try {
-            const options = await getLookupOptions(f.options_source!);
-            return [f.name, options] as const;
-          } catch {
-            return [f.name, []] as const;
-          }
-        })
-      );
-
-      if (!cancelled) {
-        setLookupOptions(Object.fromEntries(results));
-      }
-    }
-
-    loadLookups();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [step]);
+  const lookupRequests = useMemo(
+    () =>
+      step.fields
+        .filter((f) => f.type === "select" && f.options_source)
+        .map((f) => ({ id: f.name, source: f.options_source! })),
+    [step]
+  );
+  const lookupOptions = useLookupOptions(lookupRequests);
 
   const stepSchema = useMemo(
     () => ({

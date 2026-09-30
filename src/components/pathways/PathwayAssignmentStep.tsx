@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import { getLookupOptions } from "@/services/lookups.service";
+import { useQueryClient } from "@tanstack/react-query";
+import { lookupKeys, useLookupOptions, type LookupRequest } from "@/queries/lookups";
 import type { LookupOption } from "@/types/lookups";
 import type { WorkflowField, WorkflowState, WorkflowStep } from "@/types/workflow";
 import { RequirementBadge } from "@/components/FormRenderer";
@@ -141,14 +142,6 @@ export function PathwayAssignmentStep({
     }, {});
   }, [rowFields]);
 
-  const [lookupOptions, setLookupOptions] = useState<
-    Record<string, LookupOption[]>
-  >({});
-  // Options of dependent fields, keyed by filteredKey(field, parent value).
-  const [filteredOptions, setFilteredOptions] = useState<
-    Record<string, LookupOption[]>
-  >({});
-  const pendingFilteredKeys = useRef(new Set<string>());
   const [rows, setRows] = useState<AssignmentRow[]>(() => {
     const normalized = normalizeInitialRows(initialValues, rowFields);
     return normalized && normalized.length > 0 ? normalized : [emptyRow];
@@ -157,61 +150,36 @@ export function PathwayAssignmentStep({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [draftMessage, setDraftMessage] = useState("");
 
-  useEffect(() => {
-    let cancelled = false;
+  const queryClient = useQueryClient();
 
-    async function loadLookups() {
-      const selectFields = rowFields.filter(
-        (field) => field.type === "select" && field.options_source
-      );
+  // Every select's full option list (also used to label a value that is no
+  // longer offered).
+  const lookupRequests = useMemo(
+    () =>
+      rowFields
+        .filter((field) => field.type === "select" && field.options_source)
+        .map((field) => ({ id: field.name, source: field.options_source! })),
+    [rowFields]
+  );
+  const lookupOptions = useLookupOptions(lookupRequests);
 
-      const results = await Promise.all(
-        selectFields.map(async (field) => {
-          const options = await getLookupOptions(field.options_source!);
-          return [field.name, options] as const;
-        })
-      );
-
-      if (!cancelled) {
-        setLookupOptions(Object.fromEntries(results));
-      }
-    }
-
-    loadLookups();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [rowFields]);
-
-  // Load each dependent field's options for the parent values in use.
-  useEffect(() => {
-    const needed: { key: string; field: WorkflowField; filterBy: string; parentValue: string }[] = [];
-
+  // Options of dependent fields for the parent values in use, keyed by
+  // filteredKey(field, parent value).
+  const filteredRequests = useMemo(() => {
+    const byId = new Map<string, LookupRequest>();
     for (const row of rows) {
       for (const field of rowFields) {
         const filterBy = filterFieldOf(field);
         const parentValue = filterBy ? row[filterBy] : "";
         if (!filterBy || !parentValue || !field.options_source) continue;
 
-        const key = filteredKey(field, parentValue);
-        if (key in filteredOptions || pendingFilteredKeys.current.has(key)) continue;
-
-        pendingFilteredKeys.current.add(key);
-        needed.push({ key, field, filterBy, parentValue });
+        const id = filteredKey(field, parentValue);
+        byId.set(id, { id, source: field.options_source, filters: { [filterBy]: parentValue } });
       }
     }
-
-    for (const { key, field, filterBy, parentValue } of needed) {
-      getLookupOptions(field.options_source!, { [filterBy]: parentValue })
-        .then((options) => {
-          setFilteredOptions((current) => ({ ...current, [key]: options }));
-        })
-        .finally(() => {
-          pendingFilteredKeys.current.delete(key);
-        });
-    }
-  }, [rows, rowFields, filteredOptions]);
+    return [...byId.values()];
+  }, [rows, rowFields]);
+  const filteredOptions = useLookupOptions(filteredRequests);
 
   const isLast = !step.next;
 
@@ -227,7 +195,12 @@ export function PathwayAssignmentStep({
         for (const field of rowFields) {
           if (filterFieldOf(field) !== fieldName || !next[field.name]) continue;
 
-          const options = value ? filteredOptions[filteredKey(field, value)] : undefined;
+          // Options already loaded for the new parent, if any.
+          const options = value
+            ? queryClient.getQueryData<LookupOption[]>(
+                lookupKeys.options(field.options_source!, { [fieldName]: value })
+              )
+            : undefined;
           if (!options?.some((option) => option.value === next[field.name])) {
             next[field.name] = "";
           }

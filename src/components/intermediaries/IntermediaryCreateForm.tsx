@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { getLookupOptions } from "@/services/lookups.service";
-import type { LookupOption } from "@/types/lookups";
-import { createIntermediary } from "@/services/intermediaries.service";
+import { lookupQuery } from "@/queries/lookups";
+import { useCreateIntermediary } from "@/queries/intermediaries";
 import { buttonClass } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
 import { Alert } from "@/components/ui/Alert";
@@ -36,40 +36,13 @@ export function IntermediaryCreateForm() {
   const router = useRouter();
 
   const [form, setForm] = useState<FormState>(initialForm);
-  const [functionOptions, setFunctionOptions] = useState<LookupOption[]>([]);
-  const [loadingLookups, setLoadingLookups] = useState(true);
+  const functions = useQuery(lookupQuery(FUNCTION_LOOKUP_KEY));
+  const functionOptions = functions.data ?? [];
+  const loadingLookups = functions.isPending;
+  const createMutation = useCreateIntermediary();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadFunctions() {
-      try {
-        setLoadingLookups(true);
-        const options = await getLookupOptions(FUNCTION_LOOKUP_KEY);
-
-        if (!cancelled) {
-          setFunctionOptions(options);
-        }
-      } catch (err) {
-        console.error("load intermediary functions failed", err);
-        if (!cancelled) {
-          setError("Could not load intermediary functions.");
-        }
-      } finally {
-        if (!cancelled) {
-          setLoadingLookups(false);
-        }
-      }
-    }
-
-    loadFunctions();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const [submitError, setError] = useState("");
+  const error = submitError || (functions.isError ? "Could not load intermediary functions." : "");
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((current) => ({
@@ -104,7 +77,8 @@ export function IntermediaryCreateForm() {
     setIsSubmitting(true);
 
     try {
-      await createIntermediary({
+      // Also refreshes the intermediaries list.
+      await createMutation.mutateAsync({
         name: form.name.trim(),
         address: form.address.trim() || undefined,
         phone: form.phone.trim() || undefined,
@@ -115,7 +89,6 @@ export function IntermediaryCreateForm() {
       });
 
       router.push("/intermediaries");
-      router.refresh();
     } catch (err: any) {
       console.error("create intermediary failed", err);
       setError(
