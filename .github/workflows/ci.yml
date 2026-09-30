@@ -26,10 +26,10 @@ jobs:
         run: npm ci
 
       - name: Type check
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Lint
-        run: npx eslint src
+        run: npm run lint
 
       # Built inside the Dockerfile's Alpine image rather than on the Ubuntu
       # runner: package-lock.json only has sharp's Alpine (musl) binaries,

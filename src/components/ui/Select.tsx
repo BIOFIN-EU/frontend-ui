@@ -1,7 +1,7 @@
 "use client";
 
 import { Listbox } from "@headlessui/react";
-import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { ChevronsUpDown } from "lucide-react";
 import {
   useEffect,
   useLayoutEffect,
@@ -97,7 +97,7 @@ export function Select({ value, onChange, options }: Props) {
               >
                 <span>{selected?.label || "Select..."}</span>
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 opacity-60">
-                  <ChevronUpDownIcon className="h-5 w-5" />
+                  <ChevronsUpDown className="h-5 w-5" strokeWidth={1.75} />
                 </span>
               </Listbox.Button>
             </div>
