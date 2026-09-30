@@ -4,25 +4,6 @@ export type BngCategory = "area" | "hedgerow" | "watercourse";
 
 export const BNG_CATEGORIES: BngCategory[] = ["area", "hedgerow", "watercourse"];
 
-export const BNG_CATEGORY_LABEL: Record<BngCategory, string> = {
-  area: "Area habitats",
-  hedgerow: "Hedgerows",
-  watercourse: "Watercourses",
-};
-
-// Area habitats are measured in hectares, hedgerows and watercourses in km.
-export const BNG_SIZE_UNIT: Record<BngCategory, string> = {
-  area: "ha",
-  hedgerow: "km",
-  watercourse: "km",
-};
-
-export const BNG_UNIT_NAME: Record<BngCategory, string> = {
-  area: "habitat units",
-  hedgerow: "hedgerow units",
-  watercourse: "watercourse units",
-};
-
 export type BngHabitatType = {
   id: number;
   name: string;
@@ -42,6 +23,7 @@ export type BngReferenceData = {
   habitat_types: BngHabitatType[];
   conditions: BngMultiplierOption[];
   strategic_significance: BngMultiplierOption[];
+  vocabulary: BngVocabulary;
 };
 
 export type BngHabitatParcel = {
@@ -109,21 +91,11 @@ export type BngAllocationStatus =
   | "declined"
   | "released";
 
-export const BNG_ACTIVE_STATUSES: BngAllocationStatus[] = ["requested", "reserved", "allocated", "retired"];
-export const BNG_LOCKED_STATUSES: BngAllocationStatus[] = ["allocated", "retired"];
-
-export const BNG_STATUS_LABEL: Record<BngAllocationStatus, string> = {
-  requested: "Requested",
-  reserved: "Reserved",
-  allocated: "Allocated",
-  retired: "Retired",
-  declined: "Declined",
-  released: "Released",
-};
-
 export type BngAllocation = {
   id?: number;
   status?: BngAllocationStatus;
+  // Allocated or retired: can no longer be changed or released.
+  locked?: boolean;
   development_case_id?: number;
   development_name?: string | null;
   habitat_bank_case_id: number;
@@ -158,12 +130,6 @@ export type BngTransaction = {
 };
 
 export type BngRevenueParty = "landowner" | "investor" | "manager";
-
-export const BNG_REVENUE_PARTY_LABEL: Record<BngRevenueParty, string> = {
-  landowner: "Landowner",
-  investor: "Investor",
-  manager: "Habitat manager",
-};
 
 export type BngFinancials = {
   prices: Record<BngCategory, number | null>;
@@ -208,26 +174,25 @@ export function formatUnits(value: number | null | undefined): string {
 
 export type BngRole = "landowner" | "investor" | "developer" | "ecologist" | "lpa";
 
-export const BNG_ROLES: BngRole[] = ["landowner", "investor", "developer", "ecologist", "lpa"];
-
-export const BNG_ROLE_LABEL: Record<BngRole, string> = {
-  landowner: "Landowner / Habitat Bank",
-  investor: "Investor",
-  developer: "Developer",
-  ecologist: "Ecologist",
-  lpa: "Local Planning Authority",
+// How the user may act for something owned by `roles` (from the API):
+// as their own role, on behalf of it (a project manager, who confirms each
+// time), or not at all.
+export type BngCapacity = {
+  kind: "own" | "on_behalf" | "none";
+  role: BngRole | null;
+  roles: BngRole[];
 };
-
-export function roleNames(roles: string[] | undefined): string {
-  const labels = (roles ?? []).map((role) => BNG_ROLE_LABEL[role as BngRole] ?? role);
-  if (labels.length <= 1) return labels.join("");
-  return `${labels.slice(0, -1).join(", ")} or ${labels[labels.length - 1]}`;
-}
 
 export type BngMyAccess = {
   roles: BngRole[];
   can_update: boolean;
   can_record_on_behalf: boolean;
+  capacities?: {
+    steps: Record<string, BngCapacity>;
+    allocations: BngCapacity;
+    monitoring_submit: BngCapacity | null;
+    monitoring_verify: BngCapacity | null;
+  };
 };
 
 export type BngSignoff = {
@@ -250,14 +215,6 @@ export type BngWaiting = {
 };
 
 export type BngMonitoringStatus = "due" | "submitted" | "passed" | "failed" | "remediated";
-
-export const BNG_MONITORING_STATUS_LABEL: Record<BngMonitoringStatus, string> = {
-  due: "Due",
-  submitted: "Awaiting verification",
-  passed: "Passed",
-  failed: "Failed",
-  remediated: "Remediated",
-};
 
 export type BngRemedialAction = {
   id: number;
@@ -302,6 +259,7 @@ export type BngMonitoring = {
 export type BngReport = {
   case_id: number;
   case_type: string;
+  role: "habitat_bank" | "development";
   name: string | null;
   metric: BngMetricSummary;
   allocations: BngAllocation[];
@@ -321,3 +279,48 @@ export function formatDay(value: string | null | undefined): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
 }
+
+// How BNG codes are shown (reference data's "vocabulary").
+export type BngVocabulary = {
+  roles: { code: BngRole; label: string }[];
+  categories: { code: BngCategory; label: string; size_unit: string; unit_name: string }[];
+  allocation_statuses: Record<BngAllocationStatus, string>;
+  monitoring_statuses: Record<BngMonitoringStatus, string>;
+  revenue_parties: Record<BngRevenueParty, string>;
+  signoff_decisions: Record<BngSignoff["decision"], string>;
+};
+
+// How well a habitat bank covers a need, at its prices (cost null when a
+// needed price isn't set).
+export type BngMatch = { take: Record<BngCategory, number>; coverage: number; cost: number | null };
+
+export type BngMarketplaceDevelopment = {
+  case_id: number;
+  name: string | null;
+  // Still needed off-site, less what is already requested.
+  need: Record<BngCategory, number>;
+  reservation_status: "open" | "not_reached" | "not_needed" | "completed";
+  // The step that reserves units (opened with ?bank=<id>).
+  reservation_step: string;
+  requested_bank_ids: number[];
+};
+
+export type BngMarketplace = {
+  banks: (BngHabitatBank & { match: BngMatch | null })[];
+  developments: { case_id: number; name: string | null }[];
+  development: BngMarketplaceDevelopment | null;
+};
+
+// The reservation step's banks, with the most this development can take.
+export type BngAllocationOption = {
+  case_id: number;
+  name: string | null;
+  countries: string[];
+  site_names: string[];
+  max: Record<BngCategory, number>;
+  prices: Record<BngCategory, number | null>;
+};
+
+export type BngAllocationOptions = { needed: Record<BngCategory, number>; banks: BngAllocationOption[] };
+
+export type BngSuggestion = BngMatch & { bank_id: number };

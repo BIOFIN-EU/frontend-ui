@@ -1,13 +1,7 @@
 "use client";
 
 import { formatDay, type BngSignoff } from "@/types/bng";
-
-const DECISION_LABEL: Record<BngSignoff["decision"], string> = {
-  submitted: "Completed",
-  approved: "Approved",
-  rejected: "Rejected",
-  edited: "Edited",
-};
+import { useBngLabels } from "@/queries/bng";
 
 const DECISION_STYLE: Record<BngSignoff["decision"], string> = {
   submitted: "text-fg/80",
@@ -19,6 +13,7 @@ const DECISION_STYLE: Record<BngSignoff["decision"], string> = {
 /** Who completed, approved or rejected each BNG step, and in which role. */
 export function BngSignoffsCard({ titles, signoffs }: { titles?: Record<string, string | undefined>; signoffs?: unknown }) {
   const rows = Array.isArray(signoffs) ? (signoffs as BngSignoff[]) : [];
+  const labels = useBngLabels();
 
   return (
     <section className="rounded-2xl surface-card p-5">
@@ -33,7 +28,7 @@ export function BngSignoffsCard({ titles, signoffs }: { titles?: Record<string, 
             <li key={row.id} className="flex flex-wrap items-baseline justify-between gap-2 py-2.5">
               <div className="min-w-0">
                 <p className="text-fg">
-                  <span className={`font-semibold ${DECISION_STYLE[row.decision]}`}>{DECISION_LABEL[row.decision]}</span>
+                  <span className={`font-semibold ${DECISION_STYLE[row.decision]}`}>{labels.signoffDecision(row.decision)}</span>
                   {" · "}
                   {titles?.[row.step_code] ?? row.step_code}
                 </p>

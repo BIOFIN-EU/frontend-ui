@@ -129,7 +129,14 @@ export function PathwayStepScreen({
 
   // BNG steps with roles only: who may fill it in (other steps unchanged).
   const body = step.roles?.length ? (
-    <BngStepGate key={effectiveStepCode} state={state} step={step} mode={mode} onStateUpdated={onStateUpdated}>
+    <BngStepGate
+      key={effectiveStepCode}
+      state={state}
+      step={step}
+      stepCode={effectiveStepCode}
+      mode={mode}
+      onStateUpdated={onStateUpdated}
+    >
       {stepBody}
     </BngStepGate>
   ) : (

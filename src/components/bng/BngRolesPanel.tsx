@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { bngService } from "@/services/bng.service";
-import { bngKeys, useCaseRoles } from "@/queries/bng";
+import { bngKeys, useBngLabels, useCaseRoles } from "@/queries/bng";
 import { useRefreshCaseData } from "@/queries/workflow";
-import { BNG_ROLE_LABEL, BNG_ROLES, type BngRole } from "@/types/bng";
+import type { BngRole } from "@/types/bng";
 import type { CaseUserAccess } from "@/types/case-access";
 import { buttonClass } from "@/components/ui/Button";
 
@@ -22,6 +22,7 @@ type Props = {
 export function BngRolesPanel({ caseId, users, currentUserId }: Props) {
   const queryClient = useQueryClient();
   const refreshCaseData = useRefreshCaseData();
+  const labels = useBngLabels();
   // Null while loading, and for a project that isn't BNG (the request fails).
   const roles = useCaseRoles(caseId).data ?? null;
   // Unsaved ticks, per user; kept when the saved roles reload.
@@ -76,7 +77,7 @@ export function BngRolesPanel({ caseId, users, currentUserId }: Props) {
               {member.user_id === currentUserId && <span className="ml-2 text-xs text-fg/50">(you)</span>}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              {BNG_ROLES.map((role) => {
+              {labels.roles.map(({ code: role, label }) => {
                 const on = (draft[member.user_id] ?? []).includes(role);
                 return (
                   <button
@@ -91,7 +92,7 @@ export function BngRolesPanel({ caseId, users, currentUserId }: Props) {
                         : "bg-fg/5 text-fg/60 ring-fg/10 hover:text-fg",
                     ].join(" ")}
                   >
-                    {BNG_ROLE_LABEL[role]}
+                    {label}
                   </button>
                 );
               })}

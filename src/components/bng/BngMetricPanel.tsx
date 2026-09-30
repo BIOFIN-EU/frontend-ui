@@ -1,12 +1,11 @@
 "use client";
 
 import {
-  BNG_CATEGORY_LABEL,
-  BNG_UNIT_NAME,
   formatUnits,
   type BngCategoryMetric,
   type BngMetricSummary,
 } from "@/types/bng";
+import { useBngLabels } from "@/queries/bng";
 
 type Props = {
   summary: BngMetricSummary | null | undefined;
@@ -29,6 +28,7 @@ function hasData(entry: BngCategoryMetric) {
  * plus what a habitat bank can sell or what a development still needs.
  */
 export function BngMetricPanel({ summary, loading, title = "Biodiversity metric" }: Props) {
+  const labels = useBngLabels();
   const rows = (summary?.categories ?? []).filter(hasData);
   const isBank = summary?.role === "habitat_bank";
   // development: units requested but not yet accepted by the habitat bank
@@ -75,8 +75,8 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
               {rows.map((entry) => (
                 <tr key={entry.category}>
                   <td className="py-2.5 pr-3">
-                    <p className="font-semibold text-fg">{BNG_CATEGORY_LABEL[entry.category]}</p>
-                    <p className="text-xs text-fg/50">{BNG_UNIT_NAME[entry.category]}</p>
+                    <p className="font-semibold text-fg">{labels.category(entry.category)}</p>
+                    <p className="text-xs text-fg/50">{labels.unitName(entry.category)}</p>
                   </td>
                   <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.baseline_units)}</td>
                   <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.proposed_units)}</td>

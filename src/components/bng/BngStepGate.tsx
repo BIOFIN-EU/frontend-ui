@@ -4,17 +4,17 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ShieldCheck, UserCheck, Clock } from "lucide-react";
 import { workflowService } from "@/services/workflow.service";
 import { setBngSubmitExtras } from "@/lib/bngSubmitExtras";
-import { BNG_ROLE_LABEL, roleNames, type BngRole } from "@/types/bng";
+import type { BngCapacity, BngRole } from "@/types/bng";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import { buttonClass } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
-import { useBngMyAccess } from "@/queries/bng";
-import { capacityFor } from "./capacity";
+import { useBngLabels, useBngMyAccess } from "@/queries/bng";
 import { Alert } from "@/components/ui/Alert";
 
 type Props = {
   state: WorkflowState;
   step: WorkflowStep;
+  stepCode: string;
   mode: "submit" | "edit";
   onStateUpdated: (state: WorkflowState) => void;
   children: ReactNode;
@@ -25,11 +25,17 @@ type Props = {
  * project manager must first confirm they record it on the role's behalf;
  * anyone else sees whose turn it is. Approval steps also get Reject.
  */
-export function BngStepGate({ state, step, mode, onStateUpdated, children }: Props) {
+export function BngStepGate({ state, step, stepCode, mode, onStateUpdated, children }: Props) {
   const access = useBngMyAccess(state.case_id);
+  const labels = useBngLabels();
   const [onBehalf, setOnBehalf] = useState(false);
-  const capacity = capacityFor(access, step.roles, step.allow_on_behalf);
-  const owners = roleNames(step.roles);
+  // From the API (the same rule that checks the submission).
+  const capacity: BngCapacity = access?.capacities?.steps[stepCode] ?? {
+    kind: "none",
+    role: (step.roles?.[0] as BngRole | undefined) ?? null,
+    roles: (step.roles ?? []) as BngRole[],
+  };
+  const owners = labels.roleNames(step.roles);
 
   useEffect(() => {
     setBngSubmitExtras(state.case_id, onBehalf && capacity.kind === "on_behalf" ? { _bng_on_behalf: true } : null);
@@ -55,7 +61,7 @@ export function BngStepGate({ state, step, mode, onStateUpdated, children }: Pro
     );
   }
 
-  const roleLabel = BNG_ROLE_LABEL[capacity.role as BngRole] ?? capacity.role;
+  const roleLabel = labels.role(capacity.role);
   const canAct = capacity.kind === "own" || onBehalf;
 
   return (
