@@ -162,8 +162,8 @@ docker network create biofin_network
 To build a standalone image:
 
 ```bash
-bash build-image.sh          # tags as frontend-ui:1.0.0
-VERSION=2.0.0 bash build-image.sh
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000 bash build-image.sh         # tags as frontend-ui:1.0.0
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000 bash build-image.sh 2.0.0   # tags as frontend-ui:2.0.0
 ```
 
 ---
