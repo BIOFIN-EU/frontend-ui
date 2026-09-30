@@ -105,6 +105,9 @@
 
 /* Shadows and background effects (dark). */
 :root {
+  /* Native controls (a select's option list, scrollbars, date pickers)
+     drawn dark to match; light mode sets its own below. */
+  color-scheme: dark;
   --shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.35);
   --shadow-panel-soft: 0 20px 60px rgba(0, 0, 0, 0.25);
   --shadow-overlay: 0 24px 80px rgba(0, 0, 0, 0.5);

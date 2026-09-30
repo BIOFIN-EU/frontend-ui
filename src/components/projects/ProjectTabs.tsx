@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Leaf, Users } from "lucide-react";
+import { Download, LayoutDashboard, Leaf, Users } from "lucide-react";
 
 type Props = {
   caseId: string;
@@ -20,6 +20,12 @@ export function ProjectTabs({ caseId, canManageUsers }: Props) {
       label: "Vulnerability Index",
       icon: Leaf,
       active: pathname.startsWith(`${base}/vulnerability`),
+    },
+    {
+      href: `${base}/export`,
+      label: "Export",
+      icon: Download,
+      active: pathname.startsWith(`${base}/export`),
     },
     ...(canManageUsers
       ? [

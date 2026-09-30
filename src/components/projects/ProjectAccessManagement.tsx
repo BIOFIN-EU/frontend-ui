@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { CaseUserAccess } from "@/types/case-access";
 import { useAddCaseUser } from "@/queries/projects";
 import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import { Badge } from "@/components/ui/Badge";
 
 type CaseAccessManagementProps = {
@@ -67,7 +68,7 @@ export function ProjectAccessManagement({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="User email"
-            className="w-full rounded-lg bg-fg/10 px-3 py-2 text-sm text-fg outline-none"
+            className={fieldClass()}
           />
 
           <select
@@ -75,7 +76,7 @@ export function ProjectAccessManagement({
             onChange={(e) =>
               setRole(e.target.value as "borrower" | "funder" | "intermediary")
             }
-            className="w-full rounded-lg bg-fg/10 px-3 py-2 text-sm text-fg outline-none"
+            className={fieldClass()}
           >
             <option value="borrower">Borrower</option>
             <option value="funder">Funder</option>
