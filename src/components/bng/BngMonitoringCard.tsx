@@ -3,23 +3,20 @@
 import { useState } from "react";
 import { bngService } from "@/services/bng.service";
 import {
-  BNG_MONITORING_STATUS_LABEL,
   formatDay,
-  roleNames,
+  type BngCapacity,
   type BngMonitoringReport,
   type BngMonitoringStatus,
   type BngRole,
 } from "@/types/bng";
 import { buttonClass } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
-import { useBngMyAccess, useMonitoring } from "@/queries/bng";
+import { useBngLabels, useBngMyAccess, useMonitoring } from "@/queries/bng";
 import { useRefreshCaseData } from "@/queries/workflow";
-import { capacityFor } from "./capacity";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
 
-const BANK_ROLES: BngRole[] = ["landowner"];
-const VERIFIER_ROLES: BngRole[] = ["ecologist", "lpa"];
+const CANNOT_ACT: BngCapacity = { kind: "none", role: null, roles: [] };
 
 const STATUS_TONE: Record<BngMonitoringStatus, BadgeTone> = {
   due: "neutral",
@@ -38,6 +35,7 @@ const inputClass = fieldClass();
  */
 export function BngMonitoringCard({ caseId }: { caseId: number }) {
   const access = useBngMyAccess(caseId);
+  const labels = useBngLabels();
   const monitoring = useMonitoring(caseId).data ?? null;
   const refreshCaseData = useRefreshCaseData();
   const [openId, setOpenId] = useState<number | null>(null);
@@ -84,7 +82,7 @@ export function BngMonitoringCard({ caseId }: { caseId: number }) {
                     Year {report.year} <span className="text-fg/50">· due {formatDay(report.due_date)}</span>
                     {report.overdue && <span className="ml-2 text-xs font-semibold text-danger-200">Overdue</span>}
                   </span>
-                  <Badge tone={STATUS_TONE[report.status]}>{BNG_MONITORING_STATUS_LABEL[report.status]}</Badge>
+                  <Badge tone={STATUS_TONE[report.status]}>{labels.monitoringStatus(report.status)}</Badge>
                 </button>
                 {openId === report.id && (
                   <ReportDetail report={report} access={access} onChanged={load} />
@@ -101,17 +99,19 @@ export function BngMonitoringCard({ caseId }: { caseId: number }) {
 type Access = ReturnType<typeof useBngMyAccess>;
 
 function OnBehalfBox({ roles, checked, onChange }: { roles: BngRole[]; checked: boolean; onChange: (v: boolean) => void }) {
+  const labels = useBngLabels();
   return (
     <label className="flex cursor-pointer items-start gap-2 text-xs text-warning-100">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5 accent-warning-400" />
-      <span>This is for the {roleNames(roles)}. I am recording it on their behalf.</span>
+      <span>This is for the {labels.roleNames(roles)}. I am recording it on their behalf.</span>
     </label>
   );
 }
 
 function ReportDetail({ report, access, onChanged }: { report: BngMonitoringReport; access: Access; onChanged: () => Promise<void> }) {
-  const bank = capacityFor(access, BANK_ROLES);
-  const verifier = capacityFor(access, VERIFIER_ROLES);
+  // From the API: who submits reports (the bank) and who verifies them.
+  const bank = access?.capacities?.monitoring_submit ?? CANNOT_ACT;
+  const verifier = access?.capacities?.monitoring_verify ?? CANNOT_ACT;
 
   return (
     <div className="mt-3 space-y-4 rounded-xl border border-fg/10 bg-fg/[0.03] p-4 text-sm">
@@ -149,11 +149,11 @@ function ReportDetail({ report, access, onChanged }: { report: BngMonitoringRepo
       )}
 
       {(report.status === "due" || report.status === "submitted") && bank.kind !== "none" && (
-        <SubmitForm report={report} onBehalf={bank.kind === "on_behalf"} onChanged={onChanged} />
+        <SubmitForm report={report} onBehalf={bank.kind === "on_behalf"} roles={bank.roles} onChanged={onChanged} />
       )}
 
       {report.status === "submitted" && verifier.kind !== "none" && (
-        <VerifyForm report={report} onBehalf={verifier.kind === "on_behalf"} onChanged={onChanged} />
+        <VerifyForm report={report} onBehalf={verifier.kind === "on_behalf"} roles={verifier.roles} onChanged={onChanged} />
       )}
 
       {report.status === "due" && bank.kind === "none" && (
@@ -185,7 +185,9 @@ function useAction(onChanged: () => Promise<void>) {
   return { busy, error, run };
 }
 
-function SubmitForm({ report, onBehalf, onChanged }: { report: BngMonitoringReport; onBehalf: boolean; onChanged: () => Promise<void> }) {
+type FormProps = { report: BngMonitoringReport; onBehalf: boolean; roles: BngRole[]; onChanged: () => Promise<void> };
+
+function SubmitForm({ report, onBehalf, roles, onChanged }: FormProps) {
   const [onTrack, setOnTrack] = useState(report.habitats_on_track ?? true);
   const [condition, setCondition] = useState(report.condition_summary ?? "");
   const [management, setManagement] = useState(report.management_carried_out ?? "");
@@ -210,7 +212,7 @@ function SubmitForm({ report, onBehalf, onChanged }: { report: BngMonitoringRepo
         <span className="text-xs text-fg/70">Management carried out (optional)</span>
         <textarea value={management} onChange={(e) => setManagement(e.target.value)} rows={2} className={inputClass} />
       </label>
-      {onBehalf && <OnBehalfBox roles={BANK_ROLES} checked={confirmed} onChange={setConfirmed} />}
+      {onBehalf && <OnBehalfBox roles={roles} checked={confirmed} onChange={setConfirmed} />}
       {error && <p className="text-danger-200">{error}</p>}
       <button
         type="button"
@@ -233,7 +235,7 @@ function SubmitForm({ report, onBehalf, onChanged }: { report: BngMonitoringRepo
   );
 }
 
-function VerifyForm({ report, onBehalf, onChanged }: { report: BngMonitoringReport; onBehalf: boolean; onChanged: () => Promise<void> }) {
+function VerifyForm({ report, onBehalf, roles, onChanged }: FormProps) {
   const [outcome, setOutcome] = useState<"passed" | "failed">("passed");
   const [notes, setNotes] = useState("");
   const [actions, setActions] = useState([{ description: "", due_date: "" }]);
@@ -278,7 +280,7 @@ function VerifyForm({ report, onBehalf, onChanged }: { report: BngMonitoringRepo
           </button>
         </div>
       )}
-      {onBehalf && <OnBehalfBox roles={VERIFIER_ROLES} checked={confirmed} onChange={setConfirmed} />}
+      {onBehalf && <OnBehalfBox roles={roles} checked={confirmed} onChange={setConfirmed} />}
       {error && <p className="text-danger-200">{error}</p>}
       <button
         type="button"
@@ -310,7 +312,7 @@ function RemedialActions({
   onChanged,
 }: {
   report: BngMonitoringReport;
-  capacity: ReturnType<typeof capacityFor>;
+  capacity: BngCapacity;
   onChanged: () => Promise<void>;
 }) {
   const [notes, setNotes] = useState<Record<number, string>>({});
@@ -363,7 +365,7 @@ function RemedialActions({
           </li>
         ))}
       </ul>
-      {hasOpen && onBehalf && <OnBehalfBox roles={BANK_ROLES} checked={confirmed} onChange={setConfirmed} />}
+      {hasOpen && onBehalf && <OnBehalfBox roles={capacity.roles} checked={confirmed} onChange={setConfirmed} />}
       {error && <p className="text-danger-200">{error}</p>}
     </div>
   );

@@ -1,8 +1,10 @@
 import { apiFetch } from "@/lib/api";
 import type {
   BngAllocation,
+  BngAllocationOptions,
+  BngMarketplace,
+  BngSuggestion,
   BngFinancials,
-  BngHabitatBank,
   BngTransaction,
   BngHabitatParcel,
   BngMetricSummary,
@@ -40,9 +42,28 @@ export const bngService = {
     });
   },
 
-  // The marketplace inventory: registered banks with units still available.
-  listHabitatBanks(): Promise<BngHabitatBank[]> {
-    return apiFetch<BngHabitatBank[]>(`${BASE}/habitat-banks`);
+  // The inventory, the user's developments and, for one, how each bank matches its need.
+  getMarketplace(developmentId?: number | string): Promise<BngMarketplace> {
+    const query = developmentId ? `?development_id=${developmentId}` : "";
+    return apiFetch<BngMarketplace>(`${BASE}/marketplace${query}`);
+  },
+
+  // The reservation step's needed units and banks.
+  getAllocationOptions(caseId: number | string): Promise<BngAllocationOptions> {
+    return apiFetch<BngAllocationOptions>(`${BASE}/cases/${caseId}/allocation-options`);
+  },
+
+  // Banks ranked by how much of `need` they cover (silent: suggestions are optional).
+  getAllocationSuggestions(
+    caseId: number | string,
+    need: Record<string, number>,
+    excludeBankIds: number[]
+  ): Promise<BngSuggestion[]> {
+    return apiFetch<BngSuggestion[]>(`${BASE}/cases/${caseId}/allocation-suggestions`, {
+      method: "POST",
+      body: JSON.stringify({ need, exclude_bank_ids: excludeBankIds }),
+      silent: true,
+    });
   },
 
   getCaseAllocations(caseId: number | string): Promise<BngAllocation[]> {

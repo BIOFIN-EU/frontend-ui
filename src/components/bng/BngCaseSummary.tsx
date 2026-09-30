@@ -5,15 +5,13 @@ import { useState } from "react";
 import { bngService } from "@/services/bng.service";
 import { FileText } from "lucide-react";
 import {
-  BNG_REVENUE_PARTY_LABEL,
   formatDay,
   formatMoney,
-  roleNames,
   type BngAllocation,
+  type BngCapacity,
   type BngFinancials,
   type BngMetricSummary,
   type BngRevenueParty,
-  type BngRole,
   type BngTransaction,
 } from "@/types/bng";
 import type { WorkflowStep } from "@/types/workflow";
@@ -22,9 +20,14 @@ import { AllocationStatusBadge } from "./AllocationStatusBadge";
 import { unitsLine } from "./BngDashboardCards";
 import { BngMonitoringCard } from "./BngMonitoringCard";
 import { BngSignoffsCard } from "./BngSignoffsCard";
-import { useBngMyAccess, useCaseAllocations, useCaseFinancials, useCaseTransactions } from "@/queries/bng";
+import {
+  useBngLabels,
+  useBngMyAccess,
+  useCaseAllocations,
+  useCaseFinancials,
+  useCaseTransactions,
+} from "@/queries/bng";
 import { useRefreshCaseData } from "@/queries/workflow";
-import { capacityFor } from "./capacity";
 import { buttonClass } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 
@@ -36,11 +39,7 @@ type Props = {
   signoffs?: unknown;
 };
 
-// Who decides on reservation requests, per side (see bng_marketplace.py).
-const DECIDING_ROLES: Record<"habitat_bank" | "development", BngRole[]> = {
-  habitat_bank: ["landowner", "investor"],
-  development: ["developer"],
-};
+const CANNOT_DECIDE: BngCapacity = { kind: "none", role: null, roles: [] };
 
 const card = "rounded-2xl surface-card p-5";
 
@@ -51,8 +50,10 @@ const card = "rounded-2xl surface-card p-5";
 export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
   const isBank = summary?.role === "habitat_bank";
   const access = useBngMyAccess(caseId);
-  const deciding = DECIDING_ROLES[isBank ? "habitat_bank" : "development"];
-  const capacity = capacityFor(access, deciding);
+  const labels = useBngLabels();
+  // Whether the user decides on requests (the bank) or releases them (the
+  // development): from the API, the same rule that checks the action.
+  const capacity = access?.capacities?.allocations ?? CANNOT_DECIDE;
   const [onBehalf, setOnBehalf] = useState(false);
   const canDecide = capacity.kind === "own" || (capacity.kind === "on_behalf" && onBehalf);
   const refreshCaseData = useRefreshCaseData();
@@ -120,7 +121,7 @@ export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
           <Alert tone="warning" as="label" className="mt-3 flex cursor-pointer items-start gap-3">
             <input type="checkbox" checked={onBehalf} onChange={(e) => setOnBehalf(e.target.checked)} className="mt-0.5 h-4 w-4 accent-warning-400" />
             <span>
-              These decisions are for the {roleNames(deciding)}. I am recording them on their behalf.
+              These decisions are for the {labels.roleNames(capacity.roles)}. I am recording them on their behalf.
             </span>
           </Alert>
         )}
@@ -221,6 +222,7 @@ function FinancialsCard({ financials }: { financials: BngFinancials }) {
 }
 
 function RevenueSplit({ financials }: { financials: BngFinancials }) {
+  const labels = useBngLabels();
   const shares = financials.revenue_shares;
   const distribution = financials.revenue_distribution;
   if (!shares && !distribution?.retired_revenue) {
@@ -230,7 +232,7 @@ function RevenueSplit({ financials }: { financials: BngFinancials }) {
       </p>
     );
   }
-  const parties = Object.keys(BNG_REVENUE_PARTY_LABEL) as BngRevenueParty[];
+
   return (
     <div className="mt-4 overflow-x-auto">
       <p className="mb-2 text-eyebrow tracking-wider">Revenue split</p>
@@ -243,11 +245,15 @@ function RevenueSplit({ financials }: { financials: BngFinancials }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-fg/10 text-fg/85">
-          {parties.map((party) => (
-            <tr key={party}>
-              <td className="py-2 pr-3">{BNG_REVENUE_PARTY_LABEL[party]}</td>
-              <td className="py-2 pr-3 text-right tabular-nums">{shares ? `${shares[party]}%` : "—"}</td>
-              <td className="py-2 text-right tabular-nums">{formatMoney(distribution?.distributed[party] ?? null)}</td>
+          {labels.revenueParties.map(({ code, label }) => (
+            <tr key={code}>
+              <td className="py-2 pr-3">{label}</td>
+              <td className="py-2 pr-3 text-right tabular-nums">
+                {shares ? `${shares[code as BngRevenueParty]}%` : "—"}
+              </td>
+              <td className="py-2 text-right tabular-nums">
+                {formatMoney(distribution?.distributed[code as BngRevenueParty] ?? null)}
+              </td>
             </tr>
           ))}
         </tbody>

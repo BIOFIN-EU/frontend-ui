@@ -3,18 +3,18 @@
 import {
   BNG_ALLOCATION_UNIT_FIELD,
   BNG_CATEGORIES,
-  BNG_CATEGORY_LABEL,
-  BNG_SIZE_UNIT,
   formatMoney,
   formatUnits,
   type BngAllocation,
   type BngAllocationStepData,
   type BngHabitatParcel,
 } from "@/types/bng";
+import { useBngLabels } from "@/queries/bng";
 import { AllocationStatusBadge } from "./AllocationStatusBadge";
 
 /** Read-only habitat parcels of one phase (project dashboard). */
 export function HabitatParcelsCard({ parcels }: { parcels: unknown }) {
+  const labels = useBngLabels();
   const rows = Array.isArray(parcels) ? (parcels as BngHabitatParcel[]) : [];
 
   if (rows.length === 0) {
@@ -42,10 +42,10 @@ export function HabitatParcelsCard({ parcels }: { parcels: unknown }) {
                 <td className="px-4 py-3">{parcel.parcel_name || `Parcel ${index + 1}`}</td>
                 <td className="px-4 py-3">
                   <p className="text-fg">{parcel.habitat_type_name}</p>
-                  <p className="text-xs text-fg/50">{BNG_CATEGORY_LABEL[category]}</p>
+                  <p className="text-xs text-fg/50">{labels.category(category)}</p>
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums">
-                  {parcel.size} {BNG_SIZE_UNIT[category]}
+                  {parcel.size} {labels.sizeUnit(category)}
                 </td>
                 <td className="px-4 py-3">{parcel.condition_name}</td>
                 <td className="px-4 py-3">{parcel.strategic_significance_name}</td>
@@ -65,6 +65,7 @@ export function unitsLine(allocation: Pick<BngAllocation, "habitat_units" | "hed
 
 /** A development's off-site units, per habitat bank, with their status. */
 export function AllocationsCard({ data }: { data: unknown }) {
+  const labels = useBngLabels();
   const step = data as (BngAllocationStepData & { _skipped?: boolean }) | null;
   const allocations = step?.allocations ?? [];
 
@@ -88,7 +89,7 @@ export function AllocationsCard({ data }: { data: unknown }) {
           <div className="mt-2 grid gap-2 text-sm sm:grid-cols-3">
             {BNG_CATEGORIES.map((category) => (
               <p key={category} className="text-fg/75">
-                {BNG_CATEGORY_LABEL[category]}:{" "}
+                {labels.category(category)}:{" "}
                 <span className="font-semibold tabular-nums text-fg">
                   {formatUnits(allocation[BNG_ALLOCATION_UNIT_FIELD[category]])}
                 </span>

@@ -3,20 +3,17 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import { useCaseMetric, useHabitatBanks } from "@/queries/bng";
+import { useAllocationOptions, useAllocationSuggestions, useBngLabels } from "@/queries/bng";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import {
   BNG_ALLOCATION_UNIT_FIELD,
   BNG_CATEGORIES,
-  BNG_CATEGORY_LABEL,
-  BNG_LOCKED_STATUSES,
-  BNG_STATUS_LABEL,
   formatMoney,
   formatUnits,
   type BngAllocation,
+  type BngAllocationOption,
   type BngAllocationStatus,
   type BngCategory,
-  type BngHabitatBank,
 } from "@/types/bng";
 import { FieldHelp } from "@/components/ui/FieldHelp";
 import { AllocationStatusBadge } from "./AllocationStatusBadge";
@@ -42,6 +39,8 @@ type AllocationRow = {
   bank_id: string;
   // status of the saved allocation this row edits (none for a new row)
   status?: BngAllocationStatus;
+  // allocated or retired: can no longer be changed or released
+  locked?: boolean;
 } & Record<BngCategory, string>;
 
 const ZERO: Units = { area: 0, hedgerow: 0, watercourse: 0 };
@@ -51,14 +50,6 @@ let rowCounter = 0;
 function emptyRow(): AllocationRow {
   rowCounter += 1;
   return { key: `allocation-${rowCounter}`, bank_id: "", area: "", hedgerow: "", watercourse: "" };
-}
-
-function allocationUnits(allocation: BngAllocation): Units {
-  return {
-    area: Number(allocation.habitat_units ?? 0),
-    hedgerow: Number(allocation.hedgerow_units ?? 0),
-    watercourse: Number(allocation.watercourse_units ?? 0),
-  };
 }
 
 function savedAllocations(initial: unknown): BngAllocation[] {
@@ -79,6 +70,7 @@ function rowFrom(record: Record<string, unknown>): AllocationRow {
     ...emptyRow(),
     bank_id: String(record.habitat_bank_case_id ?? record.bank_id ?? ""),
     status: (record.status as BngAllocationStatus | undefined) ?? undefined,
+    locked: record.locked === true,
     area: value("area"),
     hedgerow: value("hedgerow"),
     watercourse: value("watercourse"),
@@ -100,11 +92,8 @@ function cost(units: Units, prices?: Record<BngCategory, number | null>): number
   return total;
 }
 
-// One shared empty list, so memos on `banks` don't rerun every render.
-const NO_BANKS: BngHabitatBank[] = [];
-
 // Where a bank is, so two banks with the same name can be told apart.
-function bankPlace(bank: BngHabitatBank): string {
+function bankPlace(bank: BngAllocationOption): string {
   return [bank.site_names?.join(", "), bank.countries?.join(", ")].filter(Boolean).join(", ");
 }
 
@@ -124,10 +113,10 @@ export function UnitAllocationStep({
   // Declined / released requests are history, not editable rows.
   const history = saved.filter((a) => a.status === "declined" || a.status === "released");
 
-  // Null while loading (banks: empty if they fail to load).
-  const banksQuery = useHabitatBanks();
-  const banks = banksQuery.data ?? (banksQuery.isError ? NO_BANKS : null);
-  const summary = useCaseMetric(state.case_id).data ?? null;
+  const labels = useBngLabels();
+  // The units needed and the banks, with the most this development can take
+  // from each (its own requests included): from the API. Null while loading.
+  const options = useAllocationOptions(state.case_id).data ?? null;
   const [rows, setRows] = useState<AllocationRow[]>(() => {
     const initial = savedAllocations(initialValues)
       .filter((a) => a.status !== "declined" && a.status !== "released")
@@ -145,48 +134,19 @@ export function UnitAllocationStep({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [draftMessage, setDraftMessage] = useState("");
 
-  // Listed availability already excludes this development's own active
-  // allocations; add them back so a saved request can be kept or changed.
-  const bankOptions = useMemo(() => {
-    const byId = new Map<
-      number,
-      { id: number; name: string; place: string; max: Units; prices?: Record<BngCategory, number | null> }
-    >();
-    for (const bank of banks ?? []) {
-      byId.set(bank.case_id, {
+  const bankOptions = useMemo(
+    () =>
+      (options?.banks ?? []).map((bank) => ({
         id: bank.case_id,
         name: bank.name ?? "Habitat bank",
         place: bankPlace(bank),
-        max: { ...ZERO, ...bank.available_units },
+        max: bank.max,
         prices: bank.prices,
-      });
-    }
-    for (const allocation of saved) {
-      if (allocation.status === "declined" || allocation.status === "released") continue;
-      const id = allocation.habitat_bank_case_id;
-      const entry = byId.get(id) ?? {
-        id,
-        name: allocation.habitat_bank_name ?? "Habitat bank",
-        place: "",
-        max: { ...ZERO },
-        prices: {
-          area: allocation.price_per_habitat_unit ?? null,
-          hedgerow: allocation.price_per_hedgerow_unit ?? null,
-          watercourse: allocation.price_per_watercourse_unit ?? null,
-        },
-      };
-      const units = allocationUnits(allocation);
-      for (const category of BNG_CATEGORIES) entry.max[category] += units[category];
-      byId.set(id, entry);
-    }
-    return Array.from(byId.values());
-  }, [banks, saved]);
+      })),
+    [options]
+  );
 
-  const needed = useMemo(() => {
-    const result = { ...ZERO };
-    for (const entry of summary?.categories ?? []) result[entry.category] = entry.onsite_shortfall_units ?? 0;
-    return result;
-  }, [summary]);
+  const needed = options?.needed ?? ZERO;
 
   const totals = useMemo(() => {
     const result = { ...ZERO };
@@ -206,40 +166,41 @@ export function UnitAllocationStep({
   const nothingNeeded = BNG_CATEGORIES.every((category) => needed[category] <= 0);
   const usedBankIds = new Set(rows.map((row) => row.bank_id).filter(Boolean));
 
-  // Matching (diagram step 10): banks ranked by how much of the remaining
-  // need they can cover, with the cost of doing so at their prices.
-  const suggestions = useMemo(() => {
-    const totalNeed = BNG_CATEGORIES.reduce((sum, category) => sum + stillNeeded[category], 0);
-    if (totalNeed <= 0) return [];
-    return bankOptions
-      .filter((option) => !usedBankIds.has(String(option.id)))
-      .map((option) => {
-        const take = { ...ZERO };
-        for (const category of BNG_CATEGORIES) take[category] = Math.min(option.max[category], stillNeeded[category]);
-        const covered = BNG_CATEGORIES.reduce((sum, category) => sum + take[category], 0);
-        return { option, take, coverage: covered / totalNeed, cost: cost(take, option.prices) };
-      })
-      .filter((suggestion) => suggestion.coverage > 0)
-      .sort((a, b) => b.coverage - a.coverage || (a.cost ?? Infinity) - (b.cost ?? Infinity))
-      .slice(0, 3);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bankOptions, stillNeeded, rows]);
+  // Matching (diagram step 10), from the API: banks ranked by how much of
+  // the remaining need they cover, with the cost at their prices.
+  const totalStillNeeded = BNG_CATEGORIES.reduce((sum, category) => sum + stillNeeded[category], 0);
+  const usedIds = useMemo(() => [...usedBankIds].map(Number), [rows]); // eslint-disable-line react-hooks/exhaustive-deps
+  const suggestionsQuery = useAllocationSuggestions(state.case_id, stillNeeded, usedIds, options !== null && totalStillNeeded > 0);
+  const suggestions = useMemo(
+    () =>
+      totalStillNeeded <= 0
+        ? []
+        : (suggestionsQuery.data ?? [])
+            .map((s) => ({ ...s, option: bankOptions.find((option) => option.id === s.bank_id) }))
+            .filter((s): s is typeof s & { option: (typeof bankOptions)[number] } => Boolean(s.option))
+            .slice(0, 3),
+    [suggestionsQuery.data, bankOptions, totalStillNeeded]
+  );
 
   // Opened from the marketplace's "Reserve units" (?bank=<id>): add that
   // bank as a row, filled with what it can cover of the remaining need.
   const prefilledBank = useRef(false);
   useEffect(() => {
-    if (prefilledBank.current || banks === null || summary === null) return;
-    prefilledBank.current = true;
+    if (prefilledBank.current || options === null) return;
     const bankId = new URLSearchParams(window.location.search).get("bank");
     const option = bankOptions.find((candidate) => String(candidate.id) === bankId);
-    if (!option || usedBankIds.has(String(option.id))) return;
-    const take = { ...ZERO };
-    for (const category of BNG_CATEGORIES) take[category] = Math.min(option.max[category], stillNeeded[category]);
-    applySuggestion(option.id, take);
-    // Once, when the banks and the metric have loaded.
+    if (!option || usedBankIds.has(String(option.id))) {
+      prefilledBank.current = true;
+      return;
+    }
+    // Wait for the first suggestions, which say what it can cover.
+    if (totalStillNeeded > 0 && suggestionsQuery.isPending) return;
+    prefilledBank.current = true;
+    const match = suggestionsQuery.data?.find((s) => s.bank_id === option.id);
+    applySuggestion(option.id, match?.take ?? ZERO);
+    // Once, when the options (and suggestions) have loaded.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [banks, summary]);
+  }, [options, suggestionsQuery.data]);
 
   const isLast = !step.next;
 
@@ -326,7 +287,7 @@ export function UnitAllocationStep({
             const covered = totals[category] >= needed[category];
             return (
               <div key={category} className="rounded-xl surface-card p-3">
-                <p className="text-eyebrow tracking-wider">{BNG_CATEGORY_LABEL[category]}</p>
+                <p className="text-eyebrow tracking-wider">{labels.category(category)}</p>
                 <p className="mt-1 text-sm text-fg">
                   Needed off-site: <span className="font-semibold tabular-nums">{formatUnits(needed[category])}</span>
                 </p>
@@ -338,7 +299,7 @@ export function UnitAllocationStep({
           })}
         </div>
 
-        {nothingNeeded && summary && (
+        {nothingNeeded && options && (
           <Alert tone="success" as="p" className="mb-4">
             The 10% target is met on-site, so no off-site units are needed. You can continue without requesting any.
           </Alert>
@@ -369,7 +330,7 @@ export function UnitAllocationStep({
           <Alert tone="danger" className="mb-4">{error}</Alert>
         )}
 
-        {banks !== null && bankOptions.length === 0 ? (
+        {options !== null && bankOptions.length === 0 ? (
           <p className="text-sm text-fg/60">
             No registered habitat banks have units available yet. A habitat bank becomes available once all of its
             steps are completed.
@@ -378,7 +339,7 @@ export function UnitAllocationStep({
           <div className="space-y-3">
             {rows.map((row) => {
               const bank = bankOptions.find((option) => String(option.id) === row.bank_id);
-              const locked = row.status ? BNG_LOCKED_STATUSES.includes(row.status) : false;
+              const locked = Boolean(row.locked);
               const rowCost = bank ? cost(rowUnits(row), bank.prices) : null;
               return (
                 <div key={row.key} className="rounded-xl surface-card p-4">
@@ -393,7 +354,7 @@ export function UnitAllocationStep({
                         disabled={locked || Boolean(row.status)}
                         className={`${inputClass} disabled:opacity-70`}
                       >
-                        <option value="">{banks === null ? "Loading…" : "Select habitat bank"}</option>
+                        <option value="">{options === null ? "Loading…" : "Select habitat bank"}</option>
                         {bankOptions.map((option) => (
                           <option key={option.id} value={option.id}>
                             {option.name}
@@ -405,7 +366,7 @@ export function UnitAllocationStep({
 
                     {BNG_CATEGORIES.map((category) => (
                       <label key={category} className="space-y-1">
-                        <span className="block text-label">{BNG_CATEGORY_LABEL[category]}</span>
+                        <span className="block text-label">{labels.category(category)}</span>
                         <input
                           type="number"
                           min="0"
@@ -461,7 +422,7 @@ export function UnitAllocationStep({
               {history.map((allocation) => (
                 <li key={allocation.id ?? allocation.habitat_bank_case_id}>
                   {allocation.habitat_bank_name ?? "Habitat bank"} ·{" "}
-                  {BNG_STATUS_LABEL[allocation.status as BngAllocationStatus]}
+                  {labels.allocationStatus(allocation.status ?? "")}
                 </li>
               ))}
             </ul>

@@ -4,23 +4,13 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useParams } from "next/navigation";
 import { Printer } from "lucide-react";
-import { useBngReport } from "@/queries/bng";
-import {
-  BNG_MONITORING_STATUS_LABEL,
-  BNG_REVENUE_PARTY_LABEL,
-  BNG_ROLE_LABEL,
-  BNG_STATUS_LABEL,
-  formatDay,
-  formatMoney,
-  type BngRevenueParty,
-} from "@/types/bng";
+import { useBngLabels, useBngReport } from "@/queries/bng";
+import { formatDay, formatMoney, type BngRevenueParty } from "@/types/bng";
 import { BngMetricPanel } from "@/components/bng/BngMetricPanel";
 import { BngSignoffsCard } from "@/components/bng/BngSignoffsCard";
 import { unitsLine } from "@/components/bng/BngDashboardCards";
 import { buttonClass } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
-
-const PARTIES = Object.keys(BNG_REVENUE_PARTY_LABEL) as BngRevenueParty[];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -35,13 +25,17 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 export default function BngReportPage() {
   const { caseId } = useParams<{ caseId: string }>();
   const { data: report, error } = useBngReport(caseId);
+  const labels = useBngLabels();
+  // Revenue parties in the API's order.
+  const parties = labels.revenueParties.map((p) => p.code as BngRevenueParty);
+  const partyLabel = (code: BngRevenueParty) => labels.revenueParties.find((p) => p.code === code)?.label ?? code;
 
   if (error) {
     return <Alert tone="danger">{error.message || "Could not load the report."}</Alert>;
   }
   if (!report) return <p className="text-sm text-fg/60">Loading report…</p>;
 
-  const isBank = report.case_type === "bng_habitat_bank_v1";
+  const isBank = report.role === "habitat_bank";
   const roleRows = Object.entries(report.roles);
 
   return (
@@ -77,7 +71,7 @@ export default function BngReportPage() {
           <ul className="space-y-1">
             {roleRows.map(([userId, roles]) => (
               <li key={userId}>
-                <span className="break-all text-fg/60">{userId}</span>: {roles.map((r) => BNG_ROLE_LABEL[r] ?? r).join(", ")}
+                <span className="break-all text-fg/60">{userId}</span>: {roles.map((r) => labels.role(r)).join(", ")}
               </li>
             ))}
           </ul>
@@ -94,7 +88,7 @@ export default function BngReportPage() {
                 <span>
                   <span className="font-semibold text-fg">{(isBank ? a.development_name : a.habitat_bank_name) ?? "—"}</span>
                   {" · "}
-                  {a.status ? BNG_STATUS_LABEL[a.status] : ""}
+                  {a.status ? labels.allocationStatus(a.status) : ""}
                 </span>
                 <span className="tabular-nums text-fg/70">
                   {unitsLine(a)} · {formatMoney(a.total_price)}
@@ -117,8 +111,8 @@ export default function BngReportPage() {
                   <th className="py-1.5 pr-3 font-semibold">{isBank ? "Development" : "Habitat bank"}</th>
                   <th className="py-1.5 pr-3 font-semibold">Date</th>
                   <th className="py-1.5 pr-3 text-right font-semibold">Price</th>
-                  {isBank && PARTIES.map((p) => (
-                    <th key={p} className="py-1.5 pr-3 text-right font-semibold">{BNG_REVENUE_PARTY_LABEL[p]}</th>
+                  {isBank && parties.map((p) => (
+                    <th key={p} className="py-1.5 pr-3 text-right font-semibold">{partyLabel(p)}</th>
                   ))}
                 </tr>
               </thead>
@@ -129,7 +123,7 @@ export default function BngReportPage() {
                     <td className="py-2 pr-3">{(isBank ? t.development_name : t.habitat_bank_name) ?? "—"}</td>
                     <td className="py-2 pr-3">{formatDay(t.created_at)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums">{formatMoney(t.total_price)}</td>
-                    {isBank && PARTIES.map((p) => (
+                    {isBank && parties.map((p) => (
                       <td key={p} className="py-2 pr-3 text-right tabular-nums">{formatMoney(t.split?.[p] ?? null)}</td>
                     ))}
                   </tr>
@@ -152,7 +146,7 @@ export default function BngReportPage() {
               Revenue split:{" "}
               <b className="text-fg">
                 {report.financials.revenue_shares
-                  ? PARTIES.map((p) => `${BNG_REVENUE_PARTY_LABEL[p]} ${report.financials?.revenue_shares?.[p]}%`).join(", ")
+                  ? parties.map((p) => `${partyLabel(p)} ${report.financials?.revenue_shares?.[p]}%`).join(", ")
                   : "not set"}
               </b>
             </p>
@@ -179,7 +173,7 @@ export default function BngReportPage() {
                   <tr key={r.id}>
                     <td className="py-2 pr-3">{r.year}</td>
                     <td className="py-2 pr-3">{formatDay(r.due_date)}{r.overdue ? " (overdue)" : ""}</td>
-                    <td className="py-2 pr-3">{BNG_MONITORING_STATUS_LABEL[r.status]}</td>
+                    <td className="py-2 pr-3">{labels.monitoringStatus(r.status)}</td>
                     <td className="py-2">
                       {r.remedial_actions.length === 0
                         ? "—"

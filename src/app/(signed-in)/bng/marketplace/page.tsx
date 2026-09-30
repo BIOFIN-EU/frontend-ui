@@ -3,137 +3,54 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useHabitatBanks } from "@/queries/bng";
-import { useCaseDashboard, useCases } from "@/queries/projects";
-import { useWorkflowState } from "@/queries/workflow";
-import type { CaseDashboardState } from "@/types/case-dashboard";
-import type { WorkflowState } from "@/types/workflow";
+import { useBngLabels, useMarketplace } from "@/queries/bng";
 import {
-  BNG_ACTIVE_STATUSES,
   BNG_CATEGORIES,
-  BNG_CATEGORY_LABEL,
   formatMoney,
   formatUnits,
-  type BngAllocationStepData,
   type BngCategory,
   type BngHabitatBank,
-  type BngMetricSummary,
+  type BngMarketplaceDevelopment,
+  type BngMatch,
 } from "@/types/bng";
-import type { CaseListItem } from "@/types/case-list";
 import { buttonClass } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
 import { Alert } from "@/components/ui/Alert";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 type SortKey = "match" | "available" | "price";
-type Units = Record<BngCategory, number>;
-
-const ZERO: Units = { area: 0, hedgerow: 0, watercourse: 0 };
-const ALLOCATION_STEP = "offsite_allocation";
 
 const inputClass = fieldClass("compact", { inline: true });
-
-// The development the marketplace is showing matches for.
-type Development = {
-  id: number;
-  name: string;
-  need: Units;
-  // Whether units can be reserved from its Off-Site Unit Reservation step.
-  reservable: "open" | "not_reached" | "not_needed" | "completed";
-  requestedBankIds: Set<number>;
-};
 
 function readParam(name: string): string | null {
   if (typeof window === "undefined") return null;
   return new URLSearchParams(window.location.search).get(name);
 }
 
-function toDevelopment(item: CaseListItem, dashboard: CaseDashboardState, state: WorkflowState): Development {
-  const metric = dashboard.bng_metric as BngMetricSummary | undefined;
-  const need = { ...ZERO };
-  for (const entry of metric?.categories ?? []) {
-    // Still needed, less what is already requested and awaiting the bank.
-    need[entry.category] = Math.max((entry.remaining_shortfall_units ?? 0) - (entry.pending_units ?? 0), 0);
-  }
-
-  const allocation = dashboard[ALLOCATION_STEP] as (BngAllocationStepData & { _skipped?: boolean }) | undefined;
-  const reservable: Development["reservable"] =
-    state.status === "completed"
-      ? "completed"
-      : allocation?._skipped
-        ? "not_needed"
-        : allocation || state.current_step === ALLOCATION_STEP
-          ? "open"
-          : "not_reached";
-
-  return {
-    id: item.caseId,
-    name: item.name || `Development #${item.caseId}`,
-    need,
-    reservable,
-    requestedBankIds: new Set(
-      (allocation?.allocations ?? [])
-        .filter((a) => a.status && BNG_ACTIVE_STATUSES.includes(a.status))
-        .map((a) => a.habitat_bank_case_id)
-    ),
-  };
-}
-
-function match(bank: BngHabitatBank, need: Units) {
-  const take = { ...ZERO };
-  let total = 0;
-  for (const category of BNG_CATEGORIES) {
-    take[category] = Math.min(bank.available_units?.[category] ?? 0, need[category]);
-    total += need[category];
-  }
-  const covered = BNG_CATEGORIES.reduce((sum, category) => sum + take[category], 0);
-  let cost: number | null = 0;
-  for (const category of BNG_CATEGORIES) {
-    if (take[category] <= 0) continue;
-    const price = bank.prices?.[category];
-    cost = price == null || cost == null ? null : cost + take[category] * price;
-  }
-  return { take, coverage: total > 0 ? covered / total : 0, cost };
-}
-
 // Marketplace (diagram steps 9-10): registered habitat banks with units for
 // sale; for a chosen development, how well each covers what it still needs.
+// The matching, the need and whether units can be reserved come from the API.
 export default function BngMarketplacePage() {
   const router = useRouter();
-  const banksQuery = useHabitatBanks();
-  const banks = banksQuery.data ?? null;
-  const error = banksQuery.error ? banksQuery.error.message || "Could not load the marketplace." : "";
+  const labels = useBngLabels();
   const [category, setCategory] = useState<BngCategory>("area");
 
-  // The user's developments (from the shared project list).
-  const { data: cases } = useCases();
-  const developments = useMemo(
-    () => (cases ?? []).filter((item) => item.caseType === "bng_development_v1"),
-    [cases]
-  );
-
-  // ?development=<id> from the URL until the user picks one ("" = none).
+  // ?development=<id> from the URL until the user picks one ("" = none);
+  // the API ignores one that isn't the user's.
   const [picked, setPicked] = useState<string | null>(null);
-  const requested = readParam("development");
-  const developmentId =
-    picked ?? (requested && developments.some((item) => String(item.caseId) === requested) ? requested : "");
-  const selected = developments.find((item) => String(item.caseId) === developmentId);
+  const developmentId = picked ?? readParam("development") ?? "";
 
-  // Its data and workflow state, shared with its project and pathway pages.
-  const dashboardQuery = useCaseDashboard(selected?.caseId ?? "");
-  const stateQuery = useWorkflowState(selected?.caseId ?? "");
-  const development = useMemo(
-    () =>
-      selected && dashboardQuery.data && stateQuery.data
-        ? toDevelopment(selected, dashboardQuery.data, stateQuery.data)
-        : null,
-    [selected, dashboardQuery.data, stateQuery.data]
-  );
-  const loadingDevelopment = Boolean(selected) && (dashboardQuery.isPending || stateQuery.isPending);
+  const query = useMarketplace(developmentId);
+  const banks = query.data?.banks ?? null;
+  const developments = query.data?.developments ?? [];
+  const development = query.data?.development ?? null;
+  // Switching development: the last one stays shown until the new one loads.
+  const loadingDevelopment = query.isPlaceholderData;
+  const error = query.error ? query.error.message || "Could not load the marketplace." : "";
 
   // Best match first when a development is chosen, until the user sorts.
   const [sortChoice, setSort] = useState<SortKey | null>(null);
-  const sort: SortKey = sortChoice ?? (developmentId ? "match" : "available");
+  const sort: SortKey = sortChoice ?? (development ? "match" : "available");
 
   function chooseDevelopment(id: string) {
     setPicked(id);
@@ -144,14 +61,13 @@ export default function BngMarketplacePage() {
   const totalNeed = development ? BNG_CATEGORIES.reduce((sum, c) => sum + development.need[c], 0) : 0;
 
   const listed = useMemo(() => {
-    const rows = (banks ?? []).map((bank) => ({ bank, fit: development ? match(bank, development.need) : null }));
+    const rows = (banks ?? []).map((bank) => ({ bank, fit: bank.match }));
     const visible = development
       ? rows.filter((row) => BNG_CATEGORIES.some((c) => (row.bank.available_units?.[c] ?? 0) > 0))
       : rows.filter((row) => (row.bank.available_units?.[category] ?? 0) > 0);
-    return visible.sort((a, b) => {
-      if (sort === "match" && a.fit && b.fit) {
-        return b.fit.coverage - a.fit.coverage || (a.fit.cost ?? Infinity) - (b.fit.cost ?? Infinity);
-      }
+    // "Best match" keeps the API's ranking; the other sorts are only display.
+    if (sort === "match") return visible;
+    return [...visible].sort((a, b) => {
       if (sort === "price") return (a.bank.prices?.[category] ?? Infinity) - (b.bank.prices?.[category] ?? Infinity);
       return (b.bank.available_units[category] ?? 0) - (a.bank.available_units[category] ?? 0);
     });
@@ -179,11 +95,15 @@ export default function BngMarketplacePage() {
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex flex-wrap items-center gap-2 text-sm text-fg/80">
               Showing matches for
-              <select value={developmentId} onChange={(e) => chooseDevelopment(e.target.value)} className={inputClass}>
+              <select
+                value={development ? String(development.case_id) : ""}
+                onChange={(e) => chooseDevelopment(e.target.value)}
+                className={inputClass}
+              >
                 <option value="">No development (browse only)</option>
                 {developments.map((item) => (
-                  <option key={item.caseId} value={item.caseId}>
-                    {item.name || `Development #${item.caseId}`}
+                  <option key={item.case_id} value={item.case_id}>
+                    {item.name || `Development #${item.case_id}`}
                   </option>
                 ))}
               </select>
@@ -194,14 +114,14 @@ export default function BngMarketplacePage() {
 
         {development && !loadingDevelopment && (
           <p className="mt-3 text-sm text-fg/75">
-            {development.reservable === "not_needed"
+            {development.reservation_status === "not_needed"
               ? "This development meets its 10% target on-site, so it doesn't need off-site units."
               : totalNeed <= 0
                 ? "This development's target is already covered by its requests and reservations."
                 : `Still needed off-site: ${BNG_CATEGORIES.filter((c) => development.need[c] > 0)
-                    .map((c) => `${formatUnits(development.need[c])} ${BNG_CATEGORY_LABEL[c].toLowerCase()}`)
+                    .map((c) => `${formatUnits(development.need[c])} ${labels.category(c).toLowerCase()}`)
                     .join(", ")} units.`}
-            {development.reservable === "not_reached" &&
+            {development.reservation_status === "not_reached" &&
               " Units can be reserved once it reaches its Off-Site Unit Reservation step."}
           </p>
         )}
@@ -214,7 +134,7 @@ export default function BngMarketplacePage() {
             <select value={category} onChange={(e) => setCategory(e.target.value as BngCategory)} className={inputClass}>
               {BNG_CATEGORIES.map((option) => (
                 <option key={option} value={option}>
-                  {BNG_CATEGORY_LABEL[option]}
+                  {labels.category(option)}
                 </option>
               ))}
             </select>
@@ -242,7 +162,7 @@ export default function BngMarketplacePage() {
         <p className="text-sm text-fg/60">
           {development
             ? "No registered habitat banks have units available yet."
-            : `No registered habitat banks have ${BNG_CATEGORY_LABEL[category].toLowerCase()} units available yet.`}
+            : `No registered habitat banks have ${labels.category(category).toLowerCase()} units available yet.`}
         </p>
       ) : (
         <section className="grid gap-4 lg:grid-cols-2">
@@ -269,7 +189,7 @@ export default function BngMarketplacePage() {
                 <tbody className="divide-y divide-fg/10 text-fg/85">
                   {BNG_CATEGORIES.filter((c) => (bank.uplift_units?.[c] ?? bank.available_units[c] ?? 0) > 0).map((c) => (
                     <tr key={c} className={!development && c === category ? "text-fg" : undefined}>
-                      <td className="py-2 pr-3">{BNG_CATEGORY_LABEL[c]}</td>
+                      <td className="py-2 pr-3">{labels.category(c)}</td>
                       <td className="py-2 pr-3 text-right font-semibold tabular-nums text-accent-200">
                         {formatUnits(bank.available_units[c])}
                       </td>
@@ -298,12 +218,12 @@ function MatchFooter({
   totalNeed,
 }: {
   bank: BngHabitatBank;
-  development: Development;
-  fit: ReturnType<typeof match>;
+  development: BngMarketplaceDevelopment;
+  fit: BngMatch;
   totalNeed: number;
 }) {
-  const alreadyRequested = development.requestedBankIds.has(bank.case_id);
-  const href = `/pathways/${development.id}?step=${ALLOCATION_STEP}&bank=${bank.case_id}`;
+  const alreadyRequested = development.requested_bank_ids.includes(bank.case_id);
+  const href = `/pathways/${development.case_id}?step=${development.reservation_step}&bank=${bank.case_id}`;
 
   return (
     <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-fg/10 pt-4 text-sm">
@@ -313,7 +233,7 @@ function MatchFooter({
         ) : fit.coverage > 0 ? (
           <>
             Covers <span className="font-semibold text-fg">{Math.round(fit.coverage * 100)}%</span> of what{" "}
-            {development.name} still needs
+            {development.name || `Development #${development.case_id}`} still needs
             {fit.cost != null && (
               <>
                 {" "}· about <span className="font-semibold text-fg">{formatMoney(fit.cost)}</span>
@@ -326,13 +246,13 @@ function MatchFooter({
         {alreadyRequested && <span className="block text-xs text-fg/50">Already requested by this development.</span>}
       </p>
 
-      {development.reservable === "open" && (fit.coverage > 0 || alreadyRequested) ? (
+      {development.reservation_status === "open" && (fit.coverage > 0 || alreadyRequested) ? (
         <Link href={href} className={buttonClass("primary", "sm")}>
           {alreadyRequested ? "Change reservation →" : "Reserve units →"}
         </Link>
-      ) : development.reservable === "not_reached" && fit.coverage > 0 ? (
+      ) : development.reservation_status === "not_reached" && fit.coverage > 0 ? (
         <span className="text-xs text-fg/50">Reserve once the development reaches Off-Site Unit Reservation</span>
-      ) : development.reservable === "completed" ? (
+      ) : development.reservation_status === "completed" ? (
         <span className="text-xs text-fg/50">This development is complete</span>
       ) : null}
     </div>

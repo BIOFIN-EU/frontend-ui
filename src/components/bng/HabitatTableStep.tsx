@@ -3,12 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { bngService } from "@/services/bng.service";
-import { useBngReferenceData } from "@/queries/bng";
+import { useBngLabels, useBngReferenceData } from "@/queries/bng";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import {
   BNG_CATEGORIES,
-  BNG_CATEGORY_LABEL,
-  BNG_SIZE_UNIT,
   type BngCategory,
   type BngMetricSummary,
 } from "@/types/bng";
@@ -110,6 +108,7 @@ export function HabitatTableStep({
   const phase = tableField?.phase ?? "baseline";
 
   const reference = useBngReferenceData().data ?? null;
+  const labels = useBngLabels();
   const [rows, setRows] = useState<ParcelRow[]>(() => {
     const initial = rowsFromInitial(initialValues);
     return initial.length > 0 ? initial : [emptyRow()];
@@ -253,7 +252,7 @@ export function HabitatTableStep({
                     >
                       {BNG_CATEGORIES.map((category) => (
                         <option key={category} value={category}>
-                          {BNG_CATEGORY_LABEL[category]}
+                          {labels.category(category)}
                         </option>
                       ))}
                     </select>
@@ -283,7 +282,7 @@ export function HabitatTableStep({
 
                   <label className="space-y-1">
                     <span className="block text-label">
-                      Size ({BNG_SIZE_UNIT[row.category]})
+                      Size ({labels.sizeUnit(row.category)})
                     </span>
                     <input
                       type="number"

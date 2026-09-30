@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BellRing, ChevronDown } from "lucide-react";
-import { useBngWaiting } from "@/queries/bng";
-import { roleNames } from "@/types/bng";
+import { useBngLabels, useBngWaiting } from "@/queries/bng";
 import type { CaseListItem } from "@/types/case-list";
 
 /**
@@ -12,6 +11,7 @@ import type { CaseListItem } from "@/types/case-list";
  * nothing when there are none (so for every user without BNG roles).
  */
 export function BngWaitingBanner({ cases }: { cases: CaseListItem[] }) {
+  const labels = useBngLabels();
   // Silent on failure: then nothing is waiting.
   const { data: waiting = [] } = useBngWaiting();
   // Collapsed by default: just the count, the list on click.
@@ -45,7 +45,7 @@ export function BngWaitingBanner({ cases }: { cases: CaseListItem[] }) {
                 <span className="font-semibold text-fg">{names.get(item.case_id) || "BNG project"}</span>
                 {" · "}
                 {item.step_title ?? item.step_code}
-                <span className="text-fg/55"> (as {roleNames(item.roles)})</span>
+                <span className="text-fg/55"> (as {labels.roleNames(item.roles)})</span>
               </span>
               <Link href={`/pathways/${item.case_id}`} className="font-semibold !text-warning-100 hover:!text-fg">
                 Continue →
