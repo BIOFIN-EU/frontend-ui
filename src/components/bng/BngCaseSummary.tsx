@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { bngService } from "@/services/bng.service";
 import { FileText } from "lucide-react";
 import {
@@ -22,7 +22,9 @@ import { AllocationStatusBadge } from "./AllocationStatusBadge";
 import { unitsLine } from "./BngDashboardCards";
 import { BngMonitoringCard } from "./BngMonitoringCard";
 import { BngSignoffsCard } from "./BngSignoffsCard";
-import { capacityFor, useBngMyAccess } from "./useBngMyAccess";
+import { useBngMyAccess, useCaseAllocations, useCaseFinancials, useCaseTransactions } from "@/queries/bng";
+import { useRefreshCaseData } from "@/queries/workflow";
+import { capacityFor } from "./capacity";
 import { buttonClass } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 
@@ -53,30 +55,17 @@ export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
   const capacity = capacityFor(access, deciding);
   const [onBehalf, setOnBehalf] = useState(false);
   const canDecide = capacity.kind === "own" || (capacity.kind === "on_behalf" && onBehalf);
-  const [allocations, setAllocations] = useState<BngAllocation[] | null>(null);
-  const [transactions, setTransactions] = useState<BngTransaction[] | null>(null);
-  const [financials, setFinancials] = useState<BngFinancials | null>(null);
-  const [metric, setMetric] = useState<BngMetricSummary | undefined>(summary);
+  const refreshCaseData = useRefreshCaseData();
+  // Null while loading; a list that fails to load shows as empty.
+  const allocationsQuery = useCaseAllocations(caseId);
+  const allocations = allocationsQuery.data ?? (allocationsQuery.isError ? [] : null);
+  const transactionsQuery = useCaseTransactions(caseId);
+  const transactions = transactionsQuery.data ?? (transactionsQuery.isError ? [] : null);
+  const financials = useCaseFinancials(caseId, isBank).data ?? null;
+  // From the project's data, which reloads after each action.
+  const metric = summary;
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState("");
-
-  const load = useCallback(async () => {
-    const [nextAllocations, nextTransactions] = await Promise.all([
-      bngService.getCaseAllocations(caseId).catch(() => []),
-      bngService.getCaseTransactions(caseId).catch(() => []),
-    ]);
-    setAllocations(nextAllocations);
-    setTransactions(nextTransactions);
-    if (isBank) setFinancials(await bngService.getCaseFinancials(caseId).catch(() => null));
-  }, [caseId, isBank]);
-
-  useEffect(() => {
-    setMetric(summary);
-  }, [summary]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
 
   async function act(allocation: BngAllocation, action: "accept" | "decline" | "release") {
     if (allocation.id == null) return;
@@ -84,8 +73,9 @@ export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
     setBusyId(allocation.id);
     try {
       await bngService.allocationAction(allocation.id, action, capacity.kind === "on_behalf");
-      await load();
-      setMetric(await bngService.getCaseMetric(caseId).catch(() => metric));
+      // Also reloads the metric and the dashboard's allocations card, and
+      // the habitat bank's side of the request.
+      await refreshCaseData(caseId);
     } catch (err: any) {
       setError(err?.message || "Could not update the request.");
     } finally {

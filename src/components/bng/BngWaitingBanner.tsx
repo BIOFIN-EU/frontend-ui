@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BellRing, ChevronDown } from "lucide-react";
-import { bngService } from "@/services/bng.service";
-import { roleNames, type BngWaiting } from "@/types/bng";
+import { useBngWaiting } from "@/queries/bng";
+import { roleNames } from "@/types/bng";
 import type { CaseListItem } from "@/types/case-list";
 
 /**
@@ -12,13 +12,10 @@ import type { CaseListItem } from "@/types/case-list";
  * nothing when there are none (so for every user without BNG roles).
  */
 export function BngWaitingBanner({ cases }: { cases: CaseListItem[] }) {
-  const [waiting, setWaiting] = useState<BngWaiting[]>([]);
+  // Silent on failure: then nothing is waiting.
+  const { data: waiting = [] } = useBngWaiting();
   // Collapsed by default: just the count, the list on click.
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    bngService.getWaiting().then(setWaiting).catch(() => setWaiting([]));
-  }, []);
 
   if (waiting.length === 0) return null;
 

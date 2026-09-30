@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useParams } from "next/navigation";
 import { Printer } from "lucide-react";
-import { useAuth } from "@/context/auth.context";
-import { bngService } from "@/services/bng.service";
+import { useBngReport } from "@/queries/bng";
 import {
   BNG_MONITORING_STATUS_LABEL,
   BNG_REVENUE_PARTY_LABEL,
@@ -13,7 +12,6 @@ import {
   BNG_STATUS_LABEL,
   formatDay,
   formatMoney,
-  type BngReport,
   type BngRevenueParty,
 } from "@/types/bng";
 import { BngMetricPanel } from "@/components/bng/BngMetricPanel";
@@ -36,20 +34,10 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 // Diagram step 32: one printable summary of a BNG project.
 export default function BngReportPage() {
   const { caseId } = useParams<{ caseId: string }>();
-  const { user } = useAuth();
-  const [report, setReport] = useState<BngReport | null>(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!user) return;
-    bngService
-      .getReport(caseId)
-      .then(setReport)
-      .catch((err) => setError(err?.message || "Could not load the report."));
-  }, [caseId, user]);
+  const { data: report, error } = useBngReport(caseId);
 
   if (error) {
-    return <Alert tone="danger">{error}</Alert>;
+    return <Alert tone="danger">{error.message || "Could not load the report."}</Alert>;
   }
   if (!report) return <p className="text-sm text-fg/60">Loading report…</p>;
 

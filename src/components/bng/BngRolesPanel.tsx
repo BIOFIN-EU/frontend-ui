@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { bngService } from "@/services/bng.service";
+import { bngKeys, useCaseRoles } from "@/queries/bng";
+import { useRefreshCaseData } from "@/queries/workflow";
 import { BNG_ROLE_LABEL, BNG_ROLES, type BngRole } from "@/types/bng";
 import type { CaseUserAccess } from "@/types/case-access";
 import { buttonClass } from "@/components/ui/Button";
@@ -17,28 +20,21 @@ type Props = {
  * which decide the steps they can complete. A user can hold several.
  */
 export function BngRolesPanel({ caseId, users, currentUserId }: Props) {
-  const [roles, setRoles] = useState<Record<string, BngRole[]> | null>(null);
-  const [draft, setDraft] = useState<Record<string, BngRole[]>>({});
+  const queryClient = useQueryClient();
+  const refreshCaseData = useRefreshCaseData();
+  // Null while loading, and for a project that isn't BNG (the request fails).
+  const roles = useCaseRoles(caseId).data ?? null;
+  // Unsaved ticks, per user; kept when the saved roles reload.
+  const [edits, setEdits] = useState<Record<string, BngRole[]>>({});
+  const draft = { ...(roles ?? {}), ...edits };
   const [savingId, setSavingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ userId: string; text: string; error?: boolean } | null>(null);
-
-  useEffect(() => {
-    bngService
-      .getCaseRoles(caseId)
-      .then((value) => {
-        setRoles(value);
-        setDraft(value);
-      })
-      .catch(() => setRoles(null)); // not a BNG project
-  }, [caseId]);
 
   if (roles === null) return null;
 
   function toggle(userId: string, role: BngRole) {
-    setDraft((current) => {
-      const mine = current[userId] ?? [];
-      return { ...current, [userId]: mine.includes(role) ? mine.filter((r) => r !== role) : [...mine, role] };
-    });
+    const mine = draft[userId] ?? [];
+    setEdits((current) => ({ ...current, [userId]: mine.includes(role) ? mine.filter((r) => r !== role) : [...mine, role] }));
   }
 
   async function save(userId: string) {
@@ -46,7 +42,12 @@ export function BngRolesPanel({ caseId, users, currentUserId }: Props) {
     setMessage(null);
     try {
       const saved = await bngService.setUserRoles(caseId, userId, draft[userId] ?? []);
-      setRoles((current) => ({ ...(current ?? {}), [userId]: saved.roles }));
+      queryClient.setQueryData<Record<string, BngRole[]>>(bngKeys.roles(caseId), (current) => ({
+        ...(current ?? {}),
+        [userId]: saved.roles,
+      }));
+      // Roles decide who can act on steps (e.g. "Waiting for you").
+      void refreshCaseData(caseId);
       setMessage({ userId, text: "Roles saved" });
     } catch (err: any) {
       setMessage({ userId, text: err?.message || "Could not save the roles.", error: true });

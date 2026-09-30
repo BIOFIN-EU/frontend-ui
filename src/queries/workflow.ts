@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { workflowService } from "@/services/workflow.service";
 import { projectKeys } from "@/queries/projects";
 import { riskKeys } from "@/queries/risk";
+import { bngKeys } from "@/queries/bng";
 
 type CaseId = number | string;
 
@@ -45,17 +46,21 @@ export function useStepDraft(caseId: CaseId, stepCode: string, enabled: boolean)
 }
 
 /**
- * Call after a step of a case is saved: its data, its risk results (which
- * depend on its locations) and the project list (which shows each
- * project's progress) are then loaded again.
+ * Call after anything about a case is saved (a step, a BNG action). All
+ * project and BNG data is marked out of date, since some changes reach
+ * other projects too (e.g. an allocation links a development and a habitat
+ * bank). Only what is on screen reloads now; the rest when next shown. The
+ * case's risk results (slow; they depend on its locations) reload too.
  */
 export function useRefreshCaseData() {
   const queryClient = useQueryClient();
-  return (caseId: CaseId) => {
-    queryClient.invalidateQueries({ queryKey: projectKeys.dashboard(caseId) });
-    queryClient.invalidateQueries({ queryKey: projectKeys.list() });
-    queryClient.invalidateQueries({ queryKey: riskKeys.case(caseId) });
-  };
+  // Resolves once what is on screen has reloaded.
+  return (caseId: CaseId) =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+      queryClient.invalidateQueries({ queryKey: bngKeys.all }),
+      queryClient.invalidateQueries({ queryKey: riskKeys.case(caseId) }),
+    ]);
 }
 
 /** Starts a new pathway, which creates a new project. */
