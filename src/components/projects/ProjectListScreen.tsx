@@ -6,32 +6,31 @@ import { formatDate } from "@/lib/format";
 import type { CaseListItem } from "@/types/case-list";
 import { Select } from "@/components/ui/Select";
 import { DeleteProjectDialog } from "@/components/projects/DeleteProjectDialog";
-import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { Badge, type BadgeTone } from "@/components/ui/Badge";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 type Props = {
   cases: CaseListItem[];
   onDeleted?: (caseId: number) => void;
 };
 
-const deleteButtonClasses =
-  "border border-red-400/30 bg-red-500/10 !text-red-200 hover:bg-red-500/20";
-
 function safeLower(value: unknown) {
   return typeof value === "string" ? value.toLowerCase() : "";
 }
 
-function getStatusClasses(status: string) {
+function statusTone(status: string): BadgeTone {
   switch (safeLower(status)) {
     case "draft":
-      return "border-amber-400/25 bg-amber-500/10 text-amber-200";
+      return "warning";
     case "completed":
-      return "border-emerald-400/25 bg-emerald-500/10 text-emerald-200";
+      return "success";
     case "submitted":
-      return "border-sky-400/25 bg-sky-500/10 text-sky-200";
+      return "info";
     case "in_progress":
-      return "border-violet-400/25 bg-violet-500/10 text-violet-200";
+      return "violet";
     default:
-      return "border-white/10 bg-white/10 text-white/70";
+      return "neutral";
   }
 }
 
@@ -102,77 +101,65 @@ export function ProjectListScreen({ cases, onDeleted }: Props) {
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.03] p-6 shadow-[0_20px_70px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
-              Projects
-            </p>
-
-            <h1 className="text-3xl font-semibold tracking-tight text-white">
-              Project dashboard
-            </h1>
-
-            <p className="max-w-2xl text-sm leading-6 text-white/60">
-              Browse, filter, and open your projects from one place.
-            </p>
-          </div>
-
-          <Link
-            href="/pathways"
-            className={`${buttonBase} ${buttonPrimary}`}
-          >
-            Create New Project
-          </Link>
-        </div>
+      <section className="overflow-hidden rounded-3xl border border-fg/10 bg-gradient-to-br from-fg/[0.08] to-fg/[0.03] p-6 shadow-panel backdrop-blur-xl">
+        <PageHeader
+          eyebrow="Projects"
+          title="Project dashboard"
+          subtitle="Browse, filter, and open your projects from one place."
+          actions={
+            <Link href="/pathways" className={buttonClass("primary")}>
+              Create New Project
+            </Link>
+          }
+        />
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
+          <div className="rounded-2xl border border-fg/8 bg-shade/20 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fg/45">
               Total projects
             </p>
 
-            <p className="mt-3 text-3xl font-semibold text-white">
+            <p className="mt-3 text-3xl font-semibold text-fg">
               {cases.length}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
+          <div className="rounded-2xl border border-fg/8 bg-shade/20 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fg/45">
               Project types
             </p>
 
-            <p className="mt-3 text-3xl font-semibold text-white">
+            <p className="mt-3 text-3xl font-semibold text-fg">
               {caseTypeOptions.length}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
+          <div className="rounded-2xl border border-fg/8 bg-shade/20 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fg/45">
               Statuses
             </p>
 
-            <p className="mt-3 text-3xl font-semibold text-white">
+            <p className="mt-3 text-3xl font-semibold text-fg">
               {statuses.length}
             </p>
           </div>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+      <section className="rounded-3xl surface-panel p-6 shadow-panel-soft backdrop-blur-xl">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <p className="text-sm text-white/50">
+          <p className="text-sm text-fg/50">
             Filter projects
           </p>
 
-          <div className="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200">
+          <div className="inline-flex items-center rounded-full border border-accent-400/20 bg-accent-500/10 px-3 py-1.5 text-xs font-semibold text-accent-200">
             {filteredCases.length} visible
           </div>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[1.5fr_0.85fr_0.85fr]">
           <div>
-            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-fg/45">
               Search
             </label>
 
@@ -180,12 +167,12 @@ export function ProjectListScreen({ cases, onDeleted }: Props) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by case id, name, type, status..."
-              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-emerald-400/30 focus:bg-black/30"
+              className="w-full rounded-2xl surface-card px-4 py-3 text-sm text-fg outline-none transition placeholder:text-fg/30 focus:border-accent-400/30 focus:bg-shade/30"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-fg/45">
               Project type
             </label>
 
@@ -206,7 +193,7 @@ export function ProjectListScreen({ cases, onDeleted }: Props) {
           </div>
 
           <div>
-            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-fg/45">
               Status
             </label>
 
@@ -228,57 +215,53 @@ export function ProjectListScreen({ cases, onDeleted }: Props) {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+      <section className="overflow-hidden rounded-3xl surface-panel shadow-panel-soft backdrop-blur-xl">
         {filteredCases.length === 0 ? (
-          <div className="p-8 text-sm text-white/60">No projects found.</div>
+          <div className="p-8 text-sm text-fg/60">No projects found.</div>
         ) : (
-          <div className="divide-y divide-white/8">
+          <div className="divide-y divide-fg/8">
             {filteredCases.map((item) => (
               <div
                 key={item.caseId}
-                className="group flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 transition hover:bg-white/[0.04]"
+                className="group flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 transition hover:bg-fg/[0.04]"
               >
                 {/* Fixed width + tabular digits keep every column aligned whatever the ID length. */}
-                <span className="inline-flex w-16 shrink-0 justify-center rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-white/60">
+                <span className="inline-flex w-16 shrink-0 justify-center rounded-full border border-fg/10 bg-fg/8 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-fg/60">
                   #{item.caseId}
                 </span>
 
-                <span
-                  className={`inline-flex w-28 shrink-0 items-center justify-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${getStatusClasses(
-                    item.status ?? ""
-                  )}`}
-                >
+                <Badge tone={statusTone(item.status ?? "")} size="md" className="w-28 shrink-0 justify-center">
                   {formatStatusLabel(item.status ?? "unknown")}
-                </span>
+                </Badge>
 
                 <Link
                   href={`/projects/${item.caseId}`}
                   className="min-w-0 flex-1 basis-64"
                 >
-                  <p className="truncate text-sm font-semibold text-white transition group-hover:text-emerald-200">
+                  <p className="truncate text-sm font-semibold text-fg transition group-hover:text-accent-200">
                     {item.name || "Untitled project"}
                   </p>
-                  <p className="truncate text-xs text-white/45">
+                  <p className="truncate text-xs text-fg/45">
                     {item.caseTypeName || item.caseType || "Unknown type"}
                     {item.description ? ` · ${item.description}` : ""}
                   </p>
                 </Link>
 
-                <span className="hidden w-48 shrink-0 whitespace-nowrap text-right text-xs tabular-nums text-white/40 sm:block">
+                <span className="hidden w-48 shrink-0 whitespace-nowrap text-right text-xs tabular-nums text-fg/40 sm:block">
                   Updated {formatDate(item.updatedAt)}
                 </span>
 
                 <div className="flex shrink-0 items-center gap-2">
                   <Link
                     href={`/projects/${item.caseId}`}
-                    className={`${buttonBaseSm} ${buttonPrimary}`}
+                    className={buttonClass("primary", "sm")}
                   >
                     Open
                   </Link>
 
                   <Link
                     href={`/pathways/${item.caseId}`}
-                    className={`${buttonBaseSm} ${buttonGhost}`}
+                    className={buttonClass("ghost", "sm")}
                   >
                     Edit
                   </Link>
@@ -289,12 +272,12 @@ export function ProjectListScreen({ cases, onDeleted }: Props) {
                     <button
                       type="button"
                       onClick={() => setPendingDelete(item)}
-                      className={`${buttonBaseSm} ${deleteButtonClasses}`}
+                      className={buttonClass("danger-soft", "sm")}
                     >
                       Delete
                     </button>
                   ) : (
-                    <span aria-hidden="true" className={`${buttonBaseSm} ${deleteButtonClasses} invisible`}>
+                    <span aria-hidden="true" className={`${buttonClass("danger-soft", "sm")} invisible`}>
                       Delete
                     </span>
                   )}

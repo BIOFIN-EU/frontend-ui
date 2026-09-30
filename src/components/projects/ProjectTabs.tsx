@@ -36,7 +36,7 @@ export function ProjectTabs({ caseId, canManageUsers }: Props) {
   return (
     <nav
       aria-label="Project sections"
-      className="flex flex-wrap gap-2 border-b border-white/10"
+      className="flex flex-wrap gap-2 border-b border-fg/10"
     >
       {tabs.map((tab) => {
         const Icon = tab.icon;
@@ -48,13 +48,13 @@ export function ProjectTabs({ caseId, canManageUsers }: Props) {
             aria-current={tab.active ? "page" : undefined}
             className={[
               "-mb-px inline-flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition",
-              // `!` beats globals.css's `a { color: inherit }`, as in lib/ui.ts.
+              // `!` beats globals.css's `a { color: inherit }`, as in components/ui/Button.tsx.
               tab.active
-                ? "border-emerald-400 !text-white"
-                : "border-transparent !text-white/65 hover:!text-white",
+                ? "border-accent-400 !text-fg"
+                : "border-transparent !text-fg/65 hover:!text-fg",
             ].join(" ")}
           >
-            <Icon className="h-4 w-4 text-emerald-300" aria-hidden="true" />
+            <Icon className="h-4 w-4 text-accent-300" aria-hidden="true" />
             {tab.label}
           </Link>
         );

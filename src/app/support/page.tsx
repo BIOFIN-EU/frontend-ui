@@ -4,10 +4,12 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/context/auth.context";
 import { Select } from "@/components/ui/Select";
 import { apiFetch } from "@/lib/api";
-import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import { PageBackdrop } from "@/components/PageBackdrop";
 import { photoCredits } from "@/lib/photo-credits";
 import ballycastle from "../../../public/images/ballycastle-county-mayo.jpg";
+import { Alert } from "@/components/ui/Alert";
 
 type ContactReason =
   | "I am an Nature-based Solutions Funder"
@@ -21,7 +23,7 @@ const FEEDBACK_REASON: ContactReason = "I want to leave feedback";
 
 function IconFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-300/20 bg-emerald-400/10 text-emerald-200">
+    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-accent-300/20 bg-accent-400/10 text-accent-200">
       {children}
     </div>
   );
@@ -514,13 +516,13 @@ export default function SupportPage() {
         scrim="light"
       />
 
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#07101f]/55 shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop-blur-sm">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(16,185,129,0.12),transparent_35%),radial-gradient(circle_at_90%_60%,rgba(59,130,246,0.10),transparent_38%)]" />
+      <section className="relative overflow-hidden rounded-3xl border border-fg/10 bg-deep/55 shadow-panel backdrop-blur-sm">
+        <div className="absolute inset-0 bg-hero-glow" />
         <div className="relative grid min-h-[280px] items-center gap-8 px-7 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-10">
           <header className="max-w-2xl space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Support</h1>
-            <p className="max-w-xl text-base leading-7 text-white/70">Need help or want to get in touch? We&apos;re here to support you.</p>
-            <a href="#contact-form" className={`mt-4 gap-2 ${buttonBase} ${buttonPrimary}`}>
+            <h1 className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl">Support</h1>
+            <p className="max-w-xl text-base leading-7 text-fg/70">Need help or want to get in touch? We&apos;re here to support you.</p>
+            <a href="#contact-form" className={`mt-4 gap-2 ${buttonClass("primary")}`}>
               Get in touch <span aria-hidden="true">→</span>
             </a>
           </header>
@@ -528,29 +530,29 @@ export default function SupportPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Help &amp; guidance</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">How can we help you?</h2>
+      <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">Help &amp; guidance</p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-fg">How can we help you?</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {supportCards.map((card) => (
-            <button key={card.title} type="button" onClick={() => { setReason(card.reason); document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="group rounded-2xl border border-white/10 bg-black/20 p-5 text-left ring-1 ring-white/5 transition hover:-translate-y-1 hover:border-emerald-300/25 hover:bg-white/[0.06]">
+            <button key={card.title} type="button" onClick={() => { setReason(card.reason); document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="group rounded-2xl surface-card p-5 text-left ring-1 ring-fg/5 transition hover:-translate-y-1 hover:border-accent-300/25 hover:bg-fg/[0.06]">
               <div className="flex items-start justify-between gap-4">
                 <IconFrame>{card.icon}</IconFrame>
-                <span className="text-lg text-white/25 transition group-hover:translate-x-1 group-hover:text-emerald-200">→</span>
+                <span className="text-lg text-fg/25 transition group-hover:translate-x-1 group-hover:text-accent-200">→</span>
               </div>
-              <p className="mt-5 text-sm font-semibold text-white">{card.title}</p>
-              <p className="mt-2 text-sm leading-6 text-white/70">{card.description}</p>
+              <p className="mt-5 text-sm font-semibold text-fg">{card.title}</p>
+              <p className="mt-2 text-sm leading-6 text-fg/70">{card.description}</p>
             </button>
           ))}
         </div>
       </section>
 
-      <section id="contact-form" className="scroll-mt-24 rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-8">
+      <section id="contact-form" className="scroll-mt-24 rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md sm:p-8">
         <div className="flex items-center gap-4">
           <IconFrame><MailIcon /></IconFrame>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Contact form</p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
+            <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">Contact form</p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-fg">
               {isFeedback ? "Leave feedback" : "Get in touch"}
             </h2>
           </div>
@@ -559,17 +561,17 @@ export default function SupportPage() {
         <form onSubmit={onSubmit} className="mt-7 grid max-w-4xl gap-5">
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
-              <label htmlFor="support-name" className="text-xs font-medium text-white/70">Name</label>
-              <input id="support-name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20" placeholder="Your name" />
+              <label htmlFor="support-name" className="text-label">Name</label>
+              <input id="support-name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" className={fieldClass("roomy")} placeholder="Your name" />
             </div>
             <div className="space-y-2">
-              <label htmlFor="support-email" className="text-xs font-medium text-white/70">Email</label>
-              <input id="support-email" value={email} onChange={(e) => setEmail(e.target.value)} type="email" required autoComplete="email" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20" placeholder="you@example.com" />
+              <label htmlFor="support-email" className="text-label">Email</label>
+              <input id="support-email" value={email} onChange={(e) => setEmail(e.target.value)} type="email" required autoComplete="email" className={fieldClass("roomy")} placeholder="you@example.com" />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-white/70">What is your message about?</label>
+            <label className="text-label">What is your message about?</label>
             <Select value={String(reason ?? "")} onChange={(nextValue) => setReason(nextValue as ContactReason)} options={[
               { label: "Select an option", value: "" },
               { label: "I'm a Nature-based Solutions funder", value: "I am an Nature-based Solutions Funder" },
@@ -581,14 +583,14 @@ export default function SupportPage() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="support-comment" className="text-xs font-medium text-white/70">Comment</label>
-            <textarea id="support-comment" value={comment} onChange={(e) => setComment(e.target.value)} required rows={5} className="w-full resize-y rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20" placeholder={reason === FEEDBACK_REASON ? "What works well, and what could be better?" : "Tell us more..."} />
+            <label htmlFor="support-comment" className="text-label">Comment</label>
+            <textarea id="support-comment" value={comment} onChange={(e) => setComment(e.target.value)} required rows={5} className={`${fieldClass("roomy")} resize-y`} placeholder={reason === FEEDBACK_REASON ? "What works well, and what could be better?" : "Tell us more..."} />
           </div>
 
-          {error && <div role="alert" className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">{error}</div>}
-          {success && <div role="status" className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">{success}</div>}
+          {error && <Alert tone="danger" role="alert">{error}</Alert>}
+          {success && <Alert tone="success" role="status">{success}</Alert>}
 
-          <button type="submit" disabled={loading} className={`gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit ${buttonBase} ${buttonPrimary}`}>
+          <button type="submit" disabled={loading} className={`gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit ${buttonClass("primary")}`}>
             <MailIcon />
             {loading ? "Sending…" : "Send message"}
           </button>

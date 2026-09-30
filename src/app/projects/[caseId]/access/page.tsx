@@ -6,6 +6,7 @@ import { useAuth } from "@/context/auth.context";
 import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";
 import { ProjectAccessManagement } from "@/components/projects/ProjectAccessManagement";
 import { BngRolesPanel } from "@/components/bng/BngRolesPanel";
+import { Alert } from "@/components/ui/Alert";
 
 export default function CaseAccessPage() {
   const params = useParams<{ caseId: string }>();
@@ -20,7 +21,7 @@ export default function CaseAccessPage() {
 
   if (!user || loading) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
+      <div className="rounded-2xl surface-panel p-6 text-fg/70">
         Loading project access…
       </div>
     );
@@ -29,15 +30,15 @@ export default function CaseAccessPage() {
   // The Access tab is hidden for these users; this covers a direct link.
   if (!canManageUsers) {
     return (
-      <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+      <Alert tone="danger">
         You do not have permission to manage users for this case.
-      </div>
+      </Alert>
     );
   }
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold tracking-tight text-white">
+      <h2 className="text-2xl font-semibold tracking-tight text-fg">
         Project access management
       </h2>
 

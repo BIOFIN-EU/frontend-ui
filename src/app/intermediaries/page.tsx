@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
 import { PageBackdrop } from "@/components/PageBackdrop";
 import { photoCredits } from "@/lib/photo-credits";
 import forest from "../../../public/images/forest-dieny-portinanni.jpg";
 
 import { listIntermediaries } from "@/services/intermediaries.service";
 import type { Intermediary } from "@/types/intermediaries";
+import { Alert } from "@/components/ui/Alert";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function IntermediariesPage() {
   const [intermediaries, setIntermediaries] = useState<Intermediary[]>([]);
@@ -56,50 +58,42 @@ export default function IntermediariesPage() {
         objectPositionClassName="object-[50%_35%]"
       />
 
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-            Intermediaries
-          </h1>
-
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
-            View registered intermediaries and the functions assigned to them.
-          </p>
-        </div>
-
-        <Link
-          href="/intermediaries/new"
-          className={`${buttonBase} ${buttonPrimary}`}
-        >
-          Register intermediary
-        </Link>
-      </header>
+      <PageHeader
+        className="pt-3"
+        title="Intermediaries"
+        subtitle="View registered intermediaries and the functions assigned to them."
+        actions={
+          <Link href="/intermediaries/new" className={buttonClass("primary")}>
+            Register intermediary
+          </Link>
+        }
+      />
 
       {loading && (
-        <div className="rounded-2xl border border-white/10 bg-[#07141b]/80 backdrop-blur-md p-6 text-white/75">
+        <div className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-6 text-fg/75">
           Loading intermediaries...
         </div>
       )}
 
       {!loading && error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+        <Alert tone="danger">
           {error}
-        </div>
+        </Alert>
       )}
 
       {!loading && !error && intermediaries.length === 0 && (
-        <div className="rounded-2xl border border-white/10 bg-[#07141b]/80 backdrop-blur-md p-8 text-center">
-          <h2 className="text-xl font-semibold text-white">
+        <div className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-8 text-center">
+          <h2 className="text-xl font-semibold text-fg">
             No intermediaries yet
           </h2>
 
-          <p className="mt-2 text-sm text-white/75">
+          <p className="mt-2 text-sm text-fg/75">
             Register as an Intermediary and specify your credentials and support services.
           </p>
 
           <Link
             href="/intermediaries/new"
-            className={`mt-5 ${buttonBase} ${buttonPrimary}`}
+            className={`mt-5 ${buttonClass("primary")}`}
           >
             Register intermediary
           </Link>
@@ -126,59 +120,59 @@ export default function IntermediariesPage() {
             return (
               <article
                 key={intermediary.id}
-                className="rounded-2xl border border-white/10 bg-[#07141b]/80 backdrop-blur-md p-6"
+                className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-6"
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-white">
+                    <h2 className="text-xl font-semibold text-fg">
                       {intermediary.name}
                     </h2>
 
-                    <div className="mt-3 grid gap-2 text-sm text-white/75 sm:grid-cols-2">
+                    <div className="mt-3 grid gap-2 text-sm text-fg/75 sm:grid-cols-2">
                       {intermediary.email && (
                         <p>
-                          <span className="text-white/60">Email:</span>{" "}
+                          <span className="text-fg/60">Email:</span>{" "}
                           {intermediary.email}
                         </p>
                       )}
 
                       {intermediary.phone && (
                         <p>
-                          <span className="text-white/60">Phone:</span>{" "}
+                          <span className="text-fg/60">Phone:</span>{" "}
                           {intermediary.phone}
                         </p>
                       )}
 
                       {intermediary.address && (
                         <p className="sm:col-span-2">
-                          <span className="text-white/60">Address:</span>{" "}
+                          <span className="text-fg/60">Address:</span>{" "}
                           {intermediary.address}
                         </p>
                       )}
                     </div>
 
                     {intermediary.contact_details && (
-                      <p className="mt-4 text-sm leading-6 text-white/75">
-                        <span className="text-white/60">Contact:</span>{" "}
+                      <p className="mt-4 text-sm leading-6 text-fg/75">
+                        <span className="text-fg/60">Contact:</span>{" "}
                         {intermediary.contact_details}
                       </p>
                     )}
 
                     {intermediary.notes && (
-                      <p className="mt-3 text-sm leading-6 text-white/75">
-                        <span className="text-white/60">Notes:</span>{" "}
+                      <p className="mt-3 text-sm leading-6 text-fg/75">
+                        <span className="text-fg/60">Notes:</span>{" "}
                         {intermediary.notes}
                       </p>
                     )}
                   </div>
 
                   <div className="min-w-0 lg:max-w-md">
-                    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-white/60">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg/60">
                       Functions
                     </p>
 
                     {intermediary.functions.length === 0 ? (
-                      <p className="text-sm text-white/65">
+                      <p className="text-sm text-fg/65">
                         No functions assigned.
                       </p>
                     ) : (
@@ -186,7 +180,7 @@ export default function IntermediariesPage() {
                         {Object.entries(groupedFunctions).map(
                           ([category, functions]) => (
                             <div key={category}>
-                              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-200">
+                              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-accent-200">
                                 {category}
                               </p>
 
@@ -194,7 +188,7 @@ export default function IntermediariesPage() {
                                 {functions.map((fn) => (
                                   <span
                                     key={fn.id}
-                                    className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-100"
+                                    className="rounded-full border border-accent-400/25 bg-accent-400/10 px-3 py-1 text-xs font-medium text-accent-100"
                                   >
                                     {fn.intermediary_function_name ||
                                       `Function #${fn.intermediary_function_id}`}

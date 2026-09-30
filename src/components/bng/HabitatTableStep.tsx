@@ -14,8 +14,10 @@ import {
 } from "@/types/bng";
 import { FieldHelp } from "@/components/ui/FieldHelp";
 import { BngMetricPanel } from "./BngMetricPanel";
-import { buttonBase, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import type { PathwayStepMode } from "@/components/pathways/PathwayStepScreen";
+import { Alert } from "@/components/ui/Alert";
 
 type Props = {
   state: WorkflowState;
@@ -93,8 +95,7 @@ function toPayload(row: ParcelRow) {
   };
 }
 
-const selectClass =
-  "w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400";
+const selectClass = fieldClass();
 
 export function HabitatTableStep({
   state,
@@ -209,9 +210,9 @@ export function HabitatTableStep({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+      <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6">
         <div className="mb-5 flex items-start gap-1.5">
-          <p className="text-sm text-white/60">
+          <p className="text-sm text-fg/60">
             {phase === "baseline"
               ? "Record the habitats on the site before any works, one row per habitat parcel."
               : "Record the habitats the site will have after the works, one row per habitat parcel."}
@@ -220,9 +221,9 @@ export function HabitatTableStep({
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <Alert tone="danger" className="mb-4">
             {error}
-          </div>
+          </Alert>
         )}
 
         <div className="space-y-3">
@@ -231,16 +232,16 @@ export function HabitatTableStep({
             const selectedHabitat = habitats.find((habitat) => String(habitat.id) === row.habitat_type_id);
 
             return (
-              <div key={row.key} className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div key={row.key} className="rounded-xl surface-card p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
+                  <p className="text-eyebrow tracking-wider">
                     Parcel {index + 1}
                   </p>
                   <button
                     type="button"
                     onClick={() => removeRow(row.key)}
                     disabled={rows.length === 1}
-                    className="text-xs font-semibold text-white/60 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                    className="text-xs font-semibold text-fg/60 hover:text-fg disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Remove
                   </button>
@@ -248,7 +249,7 @@ export function HabitatTableStep({
 
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   <label className="space-y-1">
-                    <span className="block text-xs font-medium text-white/70">Type</span>
+                    <span className="block text-label">Type</span>
                     <select
                       value={row.category}
                       onChange={(e) => updateRow(row.key, { category: e.target.value as BngCategory })}
@@ -263,7 +264,7 @@ export function HabitatTableStep({
                   </label>
 
                   <label className="space-y-1 xl:col-span-2">
-                    <span className="block text-xs font-medium text-white/70">Habitat</span>
+                    <span className="block text-label">Habitat</span>
                     <select
                       value={row.habitat_type_id}
                       onChange={(e) => updateRow(row.key, { habitat_type_id: e.target.value })}
@@ -277,7 +278,7 @@ export function HabitatTableStep({
                       ))}
                     </select>
                     {selectedHabitat && (
-                      <span className="block text-xs text-white/50">
+                      <span className="block text-xs text-fg/50">
                         Distinctiveness: {selectedHabitat.distinctiveness.replace("_", " ")}
                         {selectedHabitat.description ? ` · ${selectedHabitat.description}` : ""}
                       </span>
@@ -285,7 +286,7 @@ export function HabitatTableStep({
                   </label>
 
                   <label className="space-y-1">
-                    <span className="block text-xs font-medium text-white/70">
+                    <span className="block text-label">
                       Size ({BNG_SIZE_UNIT[row.category]})
                     </span>
                     <input
@@ -301,7 +302,7 @@ export function HabitatTableStep({
                   </label>
 
                   <label className="space-y-1">
-                    <span className="block text-xs font-medium text-white/70">Condition</span>
+                    <span className="block text-label">Condition</span>
                     <select
                       value={row.condition_id}
                       onChange={(e) => updateRow(row.key, { condition_id: e.target.value })}
@@ -317,7 +318,7 @@ export function HabitatTableStep({
                   </label>
 
                   <label className="space-y-1">
-                    <span className="block text-xs font-medium text-white/70">Strategic significance</span>
+                    <span className="block text-label">Strategic significance</span>
                     <select
                       value={row.strategic_significance_id}
                       onChange={(e) => updateRow(row.key, { strategic_significance_id: e.target.value })}
@@ -333,7 +334,7 @@ export function HabitatTableStep({
                   </label>
 
                   <label className="space-y-1 md:col-span-2 xl:col-span-3">
-                    <span className="block text-xs font-medium text-white/70">Parcel name (optional)</span>
+                    <span className="block text-label">Parcel name (optional)</span>
                     <input
                       value={row.parcel_name}
                       onChange={(e) => updateRow(row.key, { parcel_name: e.target.value })}
@@ -348,20 +349,20 @@ export function HabitatTableStep({
         </div>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <button type="button" onClick={() => setRows((current) => [...current, emptyRow()])} className={`${buttonBase} ${buttonSecondary}`}>
+          <button type="button" onClick={() => setRows((current) => [...current, emptyRow()])} className={buttonClass("secondary")}>
             Add parcel
           </button>
 
           <div className="flex items-center gap-3">
-            {draftMessage && <span className="text-xs font-medium text-emerald-300">{draftMessage}</span>}
-            <button type="button" onClick={handleSaveDraft} className={`${buttonBase} ${buttonGhost}`}>
+            {draftMessage && <span className="text-xs font-medium text-accent-300">{draftMessage}</span>}
+            <button type="button" onClick={handleSaveDraft} className={buttonClass("ghost")}>
               Save draft
             </button>
             <button
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
+              className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass("primary")}`}
             >
               {isSubmitting ? "Submitting..." : mode === "edit" ? "Save changes" : isLast ? "Finish" : "Next"}
             </button>

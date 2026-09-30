@@ -93,7 +93,7 @@ export function Select({ value, onChange, options }: Props) {
             <div className="relative">
               <Listbox.Button
                 ref={buttonRef}
-                className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-left text-sm text-white outline-none"
+                className="w-full rounded-xl surface-card px-4 py-3 text-left text-sm text-fg outline-none"
               >
                 <span>{selected?.label || "Select..."}</span>
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 opacity-60">
@@ -109,14 +109,14 @@ export function Select({ value, onChange, options }: Props) {
                     as="div"
                     ref={optionsRef}
                     style={panelStyle}
-                    className="max-h-60 overflow-auto rounded-xl border border-white/10 bg-[#0b1220] p-1 shadow-2xl ring-1 ring-black/40 focus:outline-none"
+                    className="max-h-60 overflow-auto rounded-xl border border-fg/10 bg-popover p-1 shadow-2xl ring-1 ring-shade/40 focus:outline-none"
                   >
                     {options.map((opt) => (
                       <Listbox.Option key={opt.value} value={opt.value} as={Fragment}>
                         {({ focus, selected }) => (
                           <div
                             className={`cursor-pointer rounded-lg px-4 py-3 text-sm ${
-                              focus ? "bg-white/10 text-white" : "text-white/80"
+                              focus ? "bg-fg/10 text-fg" : "text-fg/80"
                             } ${selected ? "font-semibold" : ""}`}
                           >
                             {opt.label}

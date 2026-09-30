@@ -93,8 +93,8 @@ export function PathwayFileStep({
   // dashboard.
   if (mode === "edit") {
     return (
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
+      <div className="rounded-2xl surface-card p-6">
+        <p className="text-xs font-semibold uppercase tracking-wider text-fg/40">
           Uploaded file
         </p>
 
@@ -102,13 +102,13 @@ export function PathwayFileStep({
           {matchingDoc ? (
             <DocumentCard caseId={state.case_id} document={matchingDoc} />
           ) : (
-            <p className="text-sm text-white">
+            <p className="text-sm text-fg">
               No file has been uploaded for this step yet.
             </p>
           )}
         </div>
 
-        <p className="mt-4 text-xs text-white/50">
+        <p className="mt-4 text-xs text-fg/50">
           File uploads can&apos;t be changed from here once submitted.
         </p>
       </div>
@@ -119,11 +119,11 @@ export function PathwayFileStep({
     <div className="space-y-4">
       {matchingDoc && (
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/40">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-fg/40">
             Already uploaded
           </p>
           <DocumentCard caseId={state.case_id} document={matchingDoc} />
-          <p className="mt-2 text-xs text-white/50">
+          <p className="mt-2 text-xs text-fg/50">
             Uploading a new file below will replace this one.
           </p>
         </div>
@@ -141,7 +141,7 @@ export function PathwayFileStep({
       />
 
       {error && (
-        <p className="mt-3 text-sm text-red-300">{error}</p>
+        <p className="mt-3 text-sm text-danger-300">{error}</p>
       )}
     </div>
   );

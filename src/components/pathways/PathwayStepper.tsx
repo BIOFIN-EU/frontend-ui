@@ -103,8 +103,8 @@ export function PathwayStepper({
   if (steps.length === 0) return null;
 
   return (
-    <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] lg:sticky lg:top-24">
-      <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
+    <aside className="h-fit rounded-2xl surface-panel p-5 shadow-panel lg:sticky lg:top-24">
+      <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">
         Steps
       </p>
 
@@ -119,7 +119,7 @@ export function PathwayStepper({
           return (
             <Fragment key={item.code}>
               {stageHeading && (
-                <p className="pt-2 text-[11px] font-semibold uppercase tracking-wider text-emerald-200/80">
+                <p className="pt-2 text-[11px] font-semibold uppercase tracking-wider text-accent-200/80">
                   {stageHeading}
                 </p>
               )}
@@ -130,30 +130,30 @@ export function PathwayStepper({
               className={[
                 "flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition",
                 isActive
-                  ? "border-emerald-400/40 bg-emerald-500/10"
+                  ? "border-accent-400/40 bg-accent-500/10"
                   : isClickable
-                    ? "border-white/10 bg-black/20 hover:bg-white/[0.06]"
-                    : "cursor-not-allowed border-white/5 bg-black/10 opacity-50",
+                    ? "border-fg/10 bg-shade/20 hover:bg-fg/[0.06]"
+                    : "cursor-not-allowed border-fg/5 bg-shade/10 opacity-50",
               ].join(" ")}
             >
               <span
                 className={[
                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
                   item.status === "done"
-                    ? "bg-emerald-400 text-emerald-950"
+                    ? "bg-accent-400 text-accent-950"
                     : item.status === "current"
-                      ? "bg-emerald-500/20 text-emerald-200 ring-1 ring-emerald-400/40"
-                      : "bg-white/10 text-white/40",
+                      ? "bg-accent-500/20 text-accent-200 ring-1 ring-accent-400/40"
+                      : "bg-fg/10 text-fg/40",
                 ].join(" ")}
               >
                 {item.status === "done" ? "✓" : index + 1}
               </span>
 
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-white">
+                <span className="block truncate text-sm font-medium text-fg">
                   {item.title}
                 </span>
-                <span className="block text-[10px] uppercase tracking-wider text-white/40">
+                <span className="block text-[10px] uppercase tracking-wider text-fg/40">
                   {item.status === "current"
                     ? "In progress"
                     : item.status === "done"

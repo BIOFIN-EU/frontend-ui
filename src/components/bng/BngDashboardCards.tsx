@@ -18,13 +18,13 @@ export function HabitatParcelsCard({ parcels }: { parcels: unknown }) {
   const rows = Array.isArray(parcels) ? (parcels as BngHabitatParcel[]) : [];
 
   if (rows.length === 0) {
-    return <p className="text-sm text-white/60">No habitats recorded.</p>;
+    return <p className="text-sm text-fg/60">No habitats recorded.</p>;
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/20">
+    <div className="overflow-x-auto rounded-xl surface-card">
       <table className="w-full min-w-[640px] text-left text-sm">
-        <thead className="text-xs uppercase tracking-wider text-white/50">
+        <thead className="text-xs uppercase tracking-wider text-fg/50">
           <tr>
             <th className="px-4 py-3 font-semibold">Parcel</th>
             <th className="px-4 py-3 font-semibold">Habitat</th>
@@ -34,15 +34,15 @@ export function HabitatParcelsCard({ parcels }: { parcels: unknown }) {
             <th className="px-4 py-3 text-right font-semibold">Units</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/10 text-white/85">
+        <tbody className="divide-y divide-fg/10 text-fg/85">
           {rows.map((parcel, index) => {
             const category = parcel.category ?? "area";
             return (
               <tr key={parcel.id ?? index}>
                 <td className="px-4 py-3">{parcel.parcel_name || `Parcel ${index + 1}`}</td>
                 <td className="px-4 py-3">
-                  <p className="text-white">{parcel.habitat_type_name}</p>
-                  <p className="text-xs text-white/50">{BNG_CATEGORY_LABEL[category]}</p>
+                  <p className="text-fg">{parcel.habitat_type_name}</p>
+                  <p className="text-xs text-fg/50">{BNG_CATEGORY_LABEL[category]}</p>
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums">
                   {parcel.size} {BNG_SIZE_UNIT[category]}
@@ -69,35 +69,35 @@ export function AllocationsCard({ data }: { data: unknown }) {
   const allocations = step?.allocations ?? [];
 
   if (step?._skipped) {
-    return <p className="text-sm text-white/60">Not needed: the 10% target is met on-site.</p>;
+    return <p className="text-sm text-fg/60">Not needed: the 10% target is met on-site.</p>;
   }
   if (allocations.length === 0) {
-    return <p className="text-sm text-white/60">No off-site units requested.</p>;
+    return <p className="text-sm text-fg/60">No off-site units requested.</p>;
   }
 
   return (
     <div className="space-y-3">
       {allocations.map((allocation) => (
-        <div key={allocation.id ?? allocation.habitat_bank_case_id} className="rounded-xl border border-white/10 bg-black/20 p-4">
+        <div key={allocation.id ?? allocation.habitat_bank_case_id} className="rounded-xl surface-card p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-fg">
               {allocation.habitat_bank_name ?? "Habitat bank"}
             </p>
             {allocation.status && <AllocationStatusBadge status={allocation.status} />}
           </div>
           <div className="mt-2 grid gap-2 text-sm sm:grid-cols-3">
             {BNG_CATEGORIES.map((category) => (
-              <p key={category} className="text-white/75">
+              <p key={category} className="text-fg/75">
                 {BNG_CATEGORY_LABEL[category]}:{" "}
-                <span className="font-semibold tabular-nums text-white">
+                <span className="font-semibold tabular-nums text-fg">
                   {formatUnits(allocation[BNG_ALLOCATION_UNIT_FIELD[category]])}
                 </span>
               </p>
             ))}
           </div>
           {allocation.total_price != null && (
-            <p className="mt-2 text-sm text-white/70">
-              Price: <span className="font-semibold text-white">{formatMoney(allocation.total_price)}</span>
+            <p className="mt-2 text-sm text-fg/70">
+              Price: <span className="font-semibold text-fg">{formatMoney(allocation.total_price)}</span>
             </p>
           )}
         </div>

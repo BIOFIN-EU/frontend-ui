@@ -19,15 +19,16 @@ import {
 import { BngMetricPanel } from "@/components/bng/BngMetricPanel";
 import { BngSignoffsCard } from "@/components/bng/BngSignoffsCard";
 import { unitsLine } from "@/components/bng/BngDashboardCards";
-import { buttonBase, buttonSecondary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { Alert } from "@/components/ui/Alert";
 
 const PARTIES = Object.keys(BNG_REVENUE_PARTY_LABEL) as BngRevenueParty[];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="break-inside-avoid rounded-2xl border border-white/10 bg-black/20 p-5">
-      <h2 className="text-base font-semibold text-white">{title}</h2>
-      <div className="mt-3 text-sm text-white/80">{children}</div>
+    <section className="break-inside-avoid rounded-2xl surface-card p-5">
+      <h2 className="text-base font-semibold text-fg">{title}</h2>
+      <div className="mt-3 text-sm text-fg/80">{children}</div>
     </section>
   );
 }
@@ -48,9 +49,9 @@ export default function BngReportPage() {
   }, [caseId, user]);
 
   if (error) {
-    return <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">{error}</div>;
+    return <Alert tone="danger">{error}</Alert>;
   }
-  if (!report) return <p className="text-sm text-white/60">Loading report…</p>;
+  if (!report) return <p className="text-sm text-fg/60">Loading report…</p>;
 
   const isBank = report.case_type === "bng_habitat_bank_v1";
   const roleRows = Object.entries(report.roles);
@@ -59,20 +60,20 @@ export default function BngReportPage() {
     <div className="space-y-5 pb-10">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-200/70">
             {isBank ? "Habitat bank report" : "Development report"}
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">{report.name ?? "BNG project"}</h1>
-          <p className="text-sm text-white/55">
+          <h1 className="text-3xl font-semibold tracking-tight text-fg">{report.name ?? "BNG project"}</h1>
+          <p className="text-sm text-fg/55">
             Generated {formatDay(new Date().toISOString())} · Prototype, simplified metric (not the Statutory
             Biodiversity Metric)
           </p>
         </div>
         <div className="flex gap-3 print:hidden">
-          <Link href={`/projects/${report.case_id}`} className={`${buttonBase} ${buttonSecondary}`}>
+          <Link href={`/projects/${report.case_id}`} className={buttonClass("secondary")}>
             Back to project
           </Link>
-          <button type="button" onClick={() => window.print()} className={`${buttonBase} ${buttonSecondary} gap-2`}>
+          <button type="button" onClick={() => window.print()} className={`${buttonClass("secondary")} gap-2`}>
             <Printer className="h-4 w-4" aria-hidden="true" />
             Print or save as PDF
           </button>
@@ -83,12 +84,12 @@ export default function BngReportPage() {
 
       <Section title="People and roles">
         {roleRows.length === 0 ? (
-          <p className="text-white/60">No roles given yet.</p>
+          <p className="text-fg/60">No roles given yet.</p>
         ) : (
           <ul className="space-y-1">
             {roleRows.map(([userId, roles]) => (
               <li key={userId}>
-                <span className="break-all text-white/60">{userId}</span>: {roles.map((r) => BNG_ROLE_LABEL[r] ?? r).join(", ")}
+                <span className="break-all text-fg/60">{userId}</span>: {roles.map((r) => BNG_ROLE_LABEL[r] ?? r).join(", ")}
               </li>
             ))}
           </ul>
@@ -97,17 +98,17 @@ export default function BngReportPage() {
 
       <Section title={isBank ? "Reservations and allocations" : "Off-site units"}>
         {report.allocations.length === 0 ? (
-          <p className="text-white/60">None.</p>
+          <p className="text-fg/60">None.</p>
         ) : (
-          <ul className="divide-y divide-white/10">
+          <ul className="divide-y divide-fg/10">
             {report.allocations.map((a) => (
               <li key={a.id} className="flex flex-wrap justify-between gap-2 py-2">
                 <span>
-                  <span className="font-semibold text-white">{(isBank ? a.development_name : a.habitat_bank_name) ?? "—"}</span>
+                  <span className="font-semibold text-fg">{(isBank ? a.development_name : a.habitat_bank_name) ?? "—"}</span>
                   {" · "}
                   {a.status ? BNG_STATUS_LABEL[a.status] : ""}
                 </span>
-                <span className="tabular-nums text-white/70">
+                <span className="tabular-nums text-fg/70">
                   {unitsLine(a)} · {formatMoney(a.total_price)}
                 </span>
               </li>
@@ -118,11 +119,11 @@ export default function BngReportPage() {
 
       <Section title="Transactions">
         {report.transactions.length === 0 ? (
-          <p className="text-white/60">None yet.</p>
+          <p className="text-fg/60">None yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left">
-              <thead className="text-xs uppercase tracking-wider text-white/50">
+              <thead className="text-xs uppercase tracking-wider text-fg/50">
                 <tr>
                   <th className="py-1.5 pr-3 font-semibold">Reference</th>
                   <th className="py-1.5 pr-3 font-semibold">{isBank ? "Development" : "Habitat bank"}</th>
@@ -133,10 +134,10 @@ export default function BngReportPage() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody className="divide-y divide-fg/10">
                 {report.transactions.map((t) => (
                   <tr key={t.reference}>
-                    <td className="py-2 pr-3 font-mono text-white">{t.reference}</td>
+                    <td className="py-2 pr-3 font-mono text-fg">{t.reference}</td>
                     <td className="py-2 pr-3">{(isBank ? t.development_name : t.habitat_bank_name) ?? "—"}</td>
                     <td className="py-2 pr-3">{formatDay(t.created_at)}</td>
                     <td className="py-2 pr-3 text-right tabular-nums">{formatMoney(t.total_price)}</td>
@@ -154,14 +155,14 @@ export default function BngReportPage() {
       {report.financials && (
         <Section title="Finances">
           <div className="grid gap-2 sm:grid-cols-2">
-            <p>Potential revenue: <b className="text-white">{formatMoney(report.financials.potential_revenue)}</b></p>
-            <p>Committed revenue: <b className="text-white">{formatMoney(report.financials.committed_revenue)}</b></p>
-            <p>Pipeline: <b className="text-white">{formatMoney(report.financials.pipeline_revenue)}</b></p>
-            <p>Delivery cost: <b className="text-white">{formatMoney(report.financials.delivery_cost)}</b></p>
-            <p>Potential margin: <b className="text-white">{formatMoney(report.financials.potential_margin)}</b></p>
+            <p>Potential revenue: <b className="text-fg">{formatMoney(report.financials.potential_revenue)}</b></p>
+            <p>Committed revenue: <b className="text-fg">{formatMoney(report.financials.committed_revenue)}</b></p>
+            <p>Pipeline: <b className="text-fg">{formatMoney(report.financials.pipeline_revenue)}</b></p>
+            <p>Delivery cost: <b className="text-fg">{formatMoney(report.financials.delivery_cost)}</b></p>
+            <p>Potential margin: <b className="text-fg">{formatMoney(report.financials.potential_margin)}</b></p>
             <p>
               Revenue split:{" "}
-              <b className="text-white">
+              <b className="text-fg">
                 {report.financials.revenue_shares
                   ? PARTIES.map((p) => `${BNG_REVENUE_PARTY_LABEL[p]} ${report.financials?.revenue_shares?.[p]}%`).join(", ")
                   : "not set"}
@@ -174,10 +175,10 @@ export default function BngReportPage() {
       {report.monitoring && (
         <Section title="Monitoring">
           {!report.monitoring.summary.scheduled ? (
-            <p className="text-white/60">Starts once the habitat bank is registered.</p>
+            <p className="text-fg/60">Starts once the habitat bank is registered.</p>
           ) : (
             <table className="w-full text-left">
-              <thead className="text-xs uppercase tracking-wider text-white/50">
+              <thead className="text-xs uppercase tracking-wider text-fg/50">
                 <tr>
                   <th className="py-1.5 pr-3 font-semibold">Year</th>
                   <th className="py-1.5 pr-3 font-semibold">Due</th>
@@ -185,7 +186,7 @@ export default function BngReportPage() {
                   <th className="py-1.5 font-semibold">Remedial actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody className="divide-y divide-fg/10">
                 {report.monitoring.reports.map((r) => (
                   <tr key={r.id}>
                     <td className="py-2 pr-3">{r.year}</td>

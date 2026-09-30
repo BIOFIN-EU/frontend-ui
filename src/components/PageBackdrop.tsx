@@ -49,24 +49,24 @@ export function PageBackdrop({
 
         {scrim === "left" ? (
           <>
-            <div className="absolute inset-0 bg-[#07141b]/70 lg:hidden" />
-            <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,rgba(7,20,27,0.92)_0%,rgba(7,20,27,0.78)_35%,rgba(7,20,27,0.4)_65%,rgba(7,20,27,0.25)_100%)] lg:block" />
+            <div className="absolute inset-0 bg-photo-scrim lg:hidden" />
+            <div className="absolute inset-0 hidden bg-photo-scrim-left lg:block" />
           </>
         ) : (
           <div
-            className={`absolute inset-0 ${scrim === "light" ? "bg-[#07141b]/45" : "bg-[#07141b]/70"}`}
+            className={`absolute inset-0 ${scrim === "light" ? "bg-photo-scrim-light" : "bg-photo-scrim"}`}
           />
         )}
 
         {/* Soft top edge under the header, and a fade into the page background */}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,20,27,0.45)_0%,transparent_22%,transparent_50%,rgba(8,24,33,0.75)_78%,#081821_100%)]" />
+        <div className="absolute inset-0 bg-photo-fade" />
       </div>
 
       <a
         href={credit.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute -top-5 right-0 z-10 text-[11px] !text-white/55 hover:!text-white/80"
+        className="absolute -top-5 right-0 z-10 text-[11px] !text-fg/55 hover:!text-fg/80"
       >
         {credit.label}
       </a>

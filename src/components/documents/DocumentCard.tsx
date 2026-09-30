@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { formatDate } from "@/lib/format";
-import { buttonBaseSm, buttonGhost } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
 import type { CaseDocument } from "@/types/case-document";
 
 export type DocumentCardDoc = Pick<CaseDocument, "case_document_id" | "original_filename"> &
@@ -53,20 +53,20 @@ export function DocumentCard({
     .join(" · ");
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+    <div className="flex items-center justify-between gap-3 rounded-xl surface-card px-4 py-3">
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-white">
+        <p className="truncate text-sm font-medium text-fg">
           {document.original_filename}
         </p>
-        {meta && <p className="mt-0.5 text-xs text-white/45">{meta}</p>}
-        {error && <p className="mt-1 text-xs text-red-300">{error}</p>}
+        {meta && <p className="mt-0.5 text-xs text-fg/45">{meta}</p>}
+        {error && <p className="mt-1 text-xs text-danger-300">{error}</p>}
       </div>
 
       <button
         type="button"
         onClick={handleDownload}
         disabled={downloading}
-        className={`shrink-0 disabled:cursor-not-allowed disabled:opacity-60 ${buttonBaseSm} ${buttonGhost}`}
+        className={`shrink-0 disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass("ghost", "sm")}`}
       >
         {downloading ? "Loading..." : "Download"}
       </button>

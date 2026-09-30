@@ -21,8 +21,10 @@ import {
 } from "@/types/bng";
 import { FieldHelp } from "@/components/ui/FieldHelp";
 import { AllocationStatusBadge } from "./AllocationStatusBadge";
-import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import type { PathwayStepMode } from "@/components/pathways/PathwayStepScreen";
+import { Alert } from "@/components/ui/Alert";
 
 type Props = {
   state: WorkflowState;
@@ -104,8 +106,7 @@ function bankPlace(bank: BngHabitatBank): string {
   return [bank.site_names?.join(", "), bank.countries?.join(", ")].filter(Boolean).join(", ");
 }
 
-const inputClass =
-  "w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400";
+const inputClass = fieldClass();
 
 export function UnitAllocationStep({
   state,
@@ -307,16 +308,16 @@ export function UnitAllocationStep({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+      <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-start gap-1.5">
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-fg/60">
               Request units from registered habitat banks to cover the shortfall that can&apos;t be met on-site.
               Each habitat bank accepts or declines your request.
             </p>
             {field && <FieldHelp text={field.help_text} label={field.display_name} />}
           </div>
-          <Link href="/bng/marketplace" className="text-sm font-semibold !text-emerald-200 hover:!text-emerald-100">
+          <Link href="/bng/marketplace" className="text-sm font-semibold !text-accent-200 hover:!text-accent-100">
             Browse the marketplace →
           </Link>
         </div>
@@ -325,12 +326,12 @@ export function UnitAllocationStep({
           {BNG_CATEGORIES.map((category) => {
             const covered = totals[category] >= needed[category];
             return (
-              <div key={category} className="rounded-xl border border-white/10 bg-black/20 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-white/45">{BNG_CATEGORY_LABEL[category]}</p>
-                <p className="mt-1 text-sm text-white">
+              <div key={category} className="rounded-xl surface-card p-3">
+                <p className="text-eyebrow tracking-wider">{BNG_CATEGORY_LABEL[category]}</p>
+                <p className="mt-1 text-sm text-fg">
                   Needed off-site: <span className="font-semibold tabular-nums">{formatUnits(needed[category])}</span>
                 </p>
-                <p className={`text-sm ${covered ? "text-emerald-200" : "text-amber-200"}`}>
+                <p className={`text-sm ${covered ? "text-accent-200" : "text-warning-200"}`}>
                   Requested: <span className="font-semibold tabular-nums">{formatUnits(totals[category])}</span>
                 </p>
               </div>
@@ -339,24 +340,24 @@ export function UnitAllocationStep({
         </div>
 
         {nothingNeeded && summary && (
-          <p className="mb-4 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+          <Alert tone="success" as="p" className="mb-4">
             The 10% target is met on-site, so no off-site units are needed. You can continue without requesting any.
-          </p>
+          </Alert>
         )}
 
         {suggestions.length > 0 && (
-          <div className="mb-5 rounded-xl border border-emerald-400/20 bg-emerald-500/[0.06] p-4">
-            <p className="text-sm font-semibold text-white">Suggested habitat banks</p>
+          <div className="mb-5 rounded-xl border border-accent-400/20 bg-accent-500/[0.06] p-4">
+            <p className="text-sm font-semibold text-fg">Suggested habitat banks</p>
             <ul className="mt-2 space-y-2">
               {suggestions.map(({ option, take, coverage, cost: estimate }) => (
                 <li key={option.id} className="flex flex-wrap items-center justify-between gap-3 text-sm">
-                  <span className="text-white/85">
-                    <span className="font-semibold text-white">{option.name}</span>
-                    {option.place && <span className="text-white/55"> ({option.place})</span>}
+                  <span className="text-fg/85">
+                    <span className="font-semibold text-fg">{option.name}</span>
+                    {option.place && <span className="text-fg/55"> ({option.place})</span>}
                     {" · "}covers {Math.round(coverage * 100)}% of what you still need
                     {estimate != null && ` · about ${formatMoney(estimate)}`}
                   </span>
-                  <button type="button" onClick={() => applySuggestion(option.id, take)} className={`${buttonBaseSm} ${buttonPrimary}`}>
+                  <button type="button" onClick={() => applySuggestion(option.id, take)} className={buttonClass("primary", "sm")}>
                     Use
                   </button>
                 </li>
@@ -366,11 +367,11 @@ export function UnitAllocationStep({
         )}
 
         {error && (
-          <div className="mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>
+          <Alert tone="danger" className="mb-4">{error}</Alert>
         )}
 
         {banks !== null && bankOptions.length === 0 ? (
-          <p className="text-sm text-white/60">
+          <p className="text-sm text-fg/60">
             No registered habitat banks have units available yet. A habitat bank becomes available once all of its
             steps are completed.
           </p>
@@ -381,10 +382,10 @@ export function UnitAllocationStep({
               const locked = row.status ? BNG_LOCKED_STATUSES.includes(row.status) : false;
               const rowCost = bank ? cost(rowUnits(row), bank.prices) : null;
               return (
-                <div key={row.key} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <div key={row.key} className="rounded-xl surface-card p-4">
                   <div className="grid gap-3 md:grid-cols-[2fr_1fr_1fr_1fr_auto]">
                     <label className="space-y-1">
-                      <span className="flex items-center gap-2 text-xs font-medium text-white/70">
+                      <span className="flex items-center gap-2 text-label">
                         Habitat bank {row.status && <AllocationStatusBadge status={row.status} />}
                       </span>
                       <select
@@ -405,7 +406,7 @@ export function UnitAllocationStep({
 
                     {BNG_CATEGORIES.map((category) => (
                       <label key={category} className="space-y-1">
-                        <span className="block text-xs font-medium text-white/70">{BNG_CATEGORY_LABEL[category]}</span>
+                        <span className="block text-label">{BNG_CATEGORY_LABEL[category]}</span>
                         <input
                           type="number"
                           min="0"
@@ -418,7 +419,7 @@ export function UnitAllocationStep({
                           className={`${inputClass} disabled:opacity-50`}
                         />
                         {bank && !locked && (
-                          <span className="block text-xs text-white/50">
+                          <span className="block text-xs text-fg/50">
                             Up to {formatUnits(bank.max[category])}
                             {bank.prices?.[category] != null && ` · ${formatMoney(bank.prices[category])}/unit`}
                           </span>
@@ -431,14 +432,14 @@ export function UnitAllocationStep({
                         <button
                           type="button"
                           onClick={() => setRows((current) => (current.length === 1 ? [emptyRow()] : current.filter((r) => r.key !== row.key)))}
-                          className={`${buttonBaseSm} ${buttonGhost}`}
+                          className={buttonClass("ghost", "sm")}
                         >
                           Remove
                         </button>
                       )}
                     </div>
                   </div>
-                  <p className="mt-2 text-xs text-white/55">
+                  <p className="mt-2 text-xs text-fg/55">
                     {locked
                       ? `These units are ${row.status} and can no longer be changed.`
                       : row.status === "reserved"
@@ -455,9 +456,9 @@ export function UnitAllocationStep({
         )}
 
         {history.length > 0 && (
-          <div className="mt-5 rounded-xl border border-white/10 bg-black/10 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/45">Earlier requests</p>
-            <ul className="mt-2 space-y-1 text-sm text-white/65">
+          <div className="mt-5 rounded-xl border border-fg/10 bg-shade/10 p-4">
+            <p className="text-eyebrow tracking-wider">Earlier requests</p>
+            <ul className="mt-2 space-y-1 text-sm text-fg/65">
               {history.map((allocation) => (
                 <li key={allocation.id ?? allocation.habitat_bank_case_id}>
                   {allocation.habitat_bank_name ?? "Habitat bank"} ·{" "}
@@ -469,20 +470,20 @@ export function UnitAllocationStep({
         )}
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <button type="button" onClick={() => setRows((current) => [...current, emptyRow()])} className={`${buttonBase} ${buttonSecondary}`}>
+          <button type="button" onClick={() => setRows((current) => [...current, emptyRow()])} className={buttonClass("secondary")}>
             Add habitat bank
           </button>
 
           <div className="flex items-center gap-3">
-            {draftMessage && <span className="text-xs font-medium text-emerald-300">{draftMessage}</span>}
-            <button type="button" onClick={handleSaveDraft} className={`${buttonBase} ${buttonGhost}`}>
+            {draftMessage && <span className="text-xs font-medium text-accent-300">{draftMessage}</span>}
+            <button type="button" onClick={handleSaveDraft} className={buttonClass("ghost")}>
               Save draft
             </button>
             <button
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
+              className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass("primary")}`}
             >
               {isSubmitting ? "Submitting..." : mode === "edit" ? "Save changes" : isLast ? "Finish" : "Next"}
             </button>

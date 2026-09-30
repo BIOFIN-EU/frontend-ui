@@ -9,6 +9,7 @@ import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import { PathwayStepScreen } from "@/components/pathways/PathwayStepScreen";
 import { PathwayStepper, buildOrderedSteps } from "@/components/pathways/PathwayStepper";
+import { Alert } from "@/components/ui/Alert";
 
 function dashboardStepToWorkflowStep(step: WorkflowStep): WorkflowStep {
   return {
@@ -235,10 +236,10 @@ export default function WorkflowCasePage() {
   if (!user) {
     return (
       <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">
+        <h1 className="text-3xl font-semibold tracking-tight text-fg">
           Workflow
         </h1>
-        <p className="text-sm text-white/70">Loading workflow access…</p>
+        <p className="text-sm text-fg/70">Loading workflow access…</p>
       </section>
     );
   }
@@ -246,21 +247,21 @@ export default function WorkflowCasePage() {
   return (
     <div className="space-y-8">
       <header className="space-y-4">
-        <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
+        <div className="inline-flex w-fit items-center rounded-full bg-accent-500/15 px-3 py-1 text-xs font-semibold text-accent-200 ring-1 ring-accent-400/25">
           Project #{caseId}
         </div>
       </header>
 
       {loading && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
+        <div className="rounded-2xl surface-panel p-6 text-fg/70">
           Loading workflow...
         </div>
       )}
 
       {!loading && error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+        <Alert tone="danger">
           {error}
-        </div>
+        </Alert>
       )}
 
       {!loading && state && (
@@ -275,24 +276,24 @@ export default function WorkflowCasePage() {
             />
           )}
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+          <div className="rounded-2xl surface-panel p-6 shadow-panel">
             {savedMessage && (
-              <div className="mb-4 rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-200">
+              <Alert tone="success" className="mb-4">
                 {savedMessage}
-              </div>
+              </Alert>
             )}
 
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
+            <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">
               {isEditMode ? "Editing step" : "Current step"}
             </p>
 
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-fg">
               {stepConfig?.title ?? "Completed"}
             </h2>
 
             <div className="mt-6">
               {stepDataLoading ? (
-                <div className="rounded-xl border border-white/10 bg-black/20 p-6 text-sm text-white/60">
+                <div className="rounded-xl surface-card p-6 text-sm text-fg/60">
                   Loading step…
                 </div>
               ) : (

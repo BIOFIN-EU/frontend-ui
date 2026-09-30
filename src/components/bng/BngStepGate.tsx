@@ -6,8 +6,10 @@ import { workflowService } from "@/services/workflow.service";
 import { setBngSubmitExtras } from "@/lib/bngSubmitExtras";
 import { BNG_ROLE_LABEL, roleNames, type BngRole } from "@/types/bng";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
-import { buttonBase, buttonBaseSm, buttonDanger, buttonGhost } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import { capacityFor, useBngMyAccess } from "./useBngMyAccess";
+import { Alert } from "@/components/ui/Alert";
 
 type Props = {
   state: WorkflowState;
@@ -34,15 +36,15 @@ export function BngStepGate({ state, step, mode, onStateUpdated, children }: Pro
   }, [state.case_id, onBehalf, capacity.kind]);
 
   if (access === null) {
-    return <p className="text-sm text-white/60">Checking your role on this project…</p>;
+    return <p className="text-sm text-fg/60">Checking your role on this project…</p>;
   }
 
   if (capacity.kind === "none") {
     return (
-      <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-sm text-white/75">
-        <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" aria-hidden="true" />
+      <div className="flex items-start gap-3 rounded-2xl border border-fg/10 bg-fg/[0.04] p-5 text-sm text-fg/75">
+        <Clock className="mt-0.5 h-5 w-5 shrink-0 text-warning-300" aria-hidden="true" />
         <div>
-          <p className="font-semibold text-white">Waiting for the {owners}</p>
+          <p className="font-semibold text-fg">Waiting for the {owners}</p>
           <p className="mt-1">
             Only the {owners} can {mode === "edit" ? "change" : "complete"} this step. Ask the project owner to give you
             that role on the Access tab if it should be you.
@@ -58,23 +60,23 @@ export function BngStepGate({ state, step, mode, onStateUpdated, children }: Pro
   return (
     <div className="space-y-4">
       {capacity.kind === "own" ? (
-        <p className="flex items-center gap-2 text-sm text-emerald-200">
+        <p className="flex items-center gap-2 text-sm text-accent-200">
           <UserCheck className="h-4 w-4" aria-hidden="true" />
           You are completing this step as {roleLabel}.
         </p>
       ) : (
-        <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-amber-400/25 bg-amber-500/10 p-4 text-sm text-amber-50">
+        <Alert tone="warning" as="label" className="flex cursor-pointer items-start gap-3">
           <input
             type="checkbox"
             checked={onBehalf}
             onChange={(e) => setOnBehalf(e.target.checked)}
-            className="mt-0.5 h-4 w-4 accent-amber-400"
+            className="mt-0.5 h-4 w-4 accent-warning-400"
           />
           <span>
             <span className="font-semibold">This step is for the {owners}.</span> I am recording their decision on
             their behalf. It will be shown as recorded on behalf of the {roleLabel}.
           </span>
-        </label>
+        </Alert>
       )}
 
       {canAct && children}
@@ -120,14 +122,14 @@ function RejectPanel({
   }
 
   return (
-    <div className="rounded-2xl border border-red-400/20 bg-red-500/[0.06] p-5">
+    <div className="rounded-2xl border border-danger-400/20 bg-danger-500/[0.06] p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-sm text-white/80">
-          <ShieldCheck className="h-4 w-4 text-red-300" aria-hidden="true" />
+        <p className="flex items-center gap-2 text-sm text-fg/80">
+          <ShieldCheck className="h-4 w-4 text-danger-300" aria-hidden="true" />
           Not approved? Reject it and the project goes back to {target}.
         </p>
         {!open && (
-          <button type="button" onClick={() => setOpen(true)} className={`${buttonBaseSm} ${buttonGhost}`}>
+          <button type="button" onClick={() => setOpen(true)} className={buttonClass("ghost", "sm")}>
             Reject…
           </button>
         )}
@@ -135,21 +137,21 @@ function RejectPanel({
       {open && (
         <div className="mt-4 space-y-3">
           <label className="block space-y-1">
-            <span className="text-xs font-medium text-white/70">Reason for rejecting</span>
+            <span className="text-label">Reason for rejecting</span>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={3}
               maxLength={2000}
-              className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-red-400"
+              className={`${fieldClass()} focus:!border-danger-400`}
             />
           </label>
-          {error && <p className="text-sm text-red-200">{error}</p>}
+          {error && <p className="text-sm text-danger-200">{error}</p>}
           <div className="flex justify-end gap-3">
-            <button type="button" onClick={() => setOpen(false)} disabled={busy} className={`${buttonBase} ${buttonGhost}`}>
+            <button type="button" onClick={() => setOpen(false)} disabled={busy} className={buttonClass("ghost")}>
               Cancel
             </button>
-            <button type="button" onClick={reject} disabled={busy} className={`${buttonBase} ${buttonDanger} disabled:opacity-60`}>
+            <button type="button" onClick={reject} disabled={busy} className={`${buttonClass("danger")} disabled:opacity-60`}>
               {busy ? "Rejecting…" : `Reject and return to ${target}`}
             </button>
           </div>

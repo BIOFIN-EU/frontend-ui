@@ -322,16 +322,16 @@ export default function RiskMap({
 
   return (
     <div
-      className={`relative w-full overflow-hidden rounded-2xl border border-white/10 ${heightClassName}`}
+      className={`relative w-full overflow-hidden rounded-2xl border border-fg/10 ${heightClassName}`}
     >
       <div ref={mapRef} className="h-full w-full" />
 
       {!readOnly && (
-        <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-md">
-          <p className="text-sm font-semibold text-white">
+        <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-fg/10 bg-shade/35 px-4 py-3 backdrop-blur-md">
+          <p className="text-sm font-semibold text-fg">
             {mode === "point" ? "Place a point" : "Draw area"}
           </p>
-          <p className="mt-1 text-xs text-white/70">
+          <p className="mt-1 text-xs text-fg/70">
             {mode === "point"
               ? "Click on the map to place a point. Press Delete to remove it."
               : "Draw a polygon. Edit the WKT to update the map. Press Delete to remove it."}
