@@ -36,7 +36,10 @@ function LoginPageInner() {
 
     try {
       await login(email, password);
-      router.push("/profile");
+      // Back to the page that sent them here. Only same-site paths, so a
+      // crafted link can't redirect to another site.
+      const next = searchParams.get("next");
+      router.push(next?.startsWith("/") && !next.startsWith("//") ? next : "/profile");
     } catch (e: any) {
       setErr(e?.message ?? "Login failed");
     } finally {
