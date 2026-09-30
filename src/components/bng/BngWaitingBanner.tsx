@@ -25,32 +25,32 @@ export function BngWaitingBanner({ cases }: { cases: CaseListItem[] }) {
   const names = new Map(cases.map((item) => [item.caseId, item.name]));
 
   return (
-    <section className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-5 py-3">
+    <section className="rounded-2xl border border-warning-400/25 bg-warning-500/10 px-5 py-3">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls="bng-waiting-list"
-        className="flex w-full items-center justify-between gap-3 py-1 text-left text-sm font-semibold text-amber-50"
+        className="flex w-full items-center justify-between gap-3 py-1 text-left text-sm font-semibold text-warning-50"
       >
         <span className="flex items-center gap-2">
-          <BellRing className="h-4 w-4 text-amber-300" aria-hidden="true" />
+          <BellRing className="h-4 w-4 text-warning-300" aria-hidden="true" />
           Waiting for you ({waiting.length})
-          <span className="font-normal text-amber-100/70">· BNG steps for your roles</span>
+          <span className="font-normal text-warning-100/70">· BNG steps for your roles</span>
         </span>
-        <ChevronDown className={`h-4 w-4 text-amber-200 transition ${open ? "rotate-180" : ""}`} aria-hidden="true" />
+        <ChevronDown className={`h-4 w-4 text-warning-200 transition ${open ? "rotate-180" : ""}`} aria-hidden="true" />
       </button>
       {open && (
         <ul id="bng-waiting-list" className="mb-2 mt-3 space-y-2 text-sm">
           {waiting.map((item) => (
             <li key={item.case_id} className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-white/85">
-                <span className="font-semibold text-white">{names.get(item.case_id) || "BNG project"}</span>
+              <span className="text-fg/85">
+                <span className="font-semibold text-fg">{names.get(item.case_id) || "BNG project"}</span>
                 {" · "}
                 {item.step_title ?? item.step_code}
-                <span className="text-white/55"> (as {roleNames(item.roles)})</span>
+                <span className="text-fg/55"> (as {roleNames(item.roles)})</span>
               </span>
-              <Link href={`/pathways/${item.case_id}`} className="font-semibold !text-amber-100 hover:!text-white">
+              <Link href={`/pathways/${item.case_id}`} className="font-semibold !text-warning-100 hover:!text-fg">
                 Continue →
               </Link>
             </li>

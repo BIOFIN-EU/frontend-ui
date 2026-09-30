@@ -23,7 +23,8 @@ import { unitsLine } from "./BngDashboardCards";
 import { BngMonitoringCard } from "./BngMonitoringCard";
 import { BngSignoffsCard } from "./BngSignoffsCard";
 import { capacityFor, useBngMyAccess } from "./useBngMyAccess";
-import { buttonBaseSm, buttonGhost, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { Alert } from "@/components/ui/Alert";
 
 type Props = {
   caseId: number;
@@ -39,7 +40,7 @@ const DECIDING_ROLES: Record<"habitat_bank" | "development", BngRole[]> = {
   development: ["developer"],
 };
 
-const card = "rounded-2xl border border-white/10 bg-black/20 p-5";
+const card = "rounded-2xl surface-card p-5";
 
 /**
  * The BNG part of the project dashboard: the metric, the marketplace
@@ -100,7 +101,7 @@ export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
       <div className="flex justify-end">
         <Link
           href={`/bng/report/${caseId}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold !text-emerald-200 hover:!text-emerald-100"
+          className="inline-flex items-center gap-2 text-sm font-semibold !text-accent-200 hover:!text-accent-100"
         >
           <FileText className="h-4 w-4" aria-hidden="true" />
           Open project report
@@ -113,35 +114,35 @@ export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
 
       <section className={card}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-base font-semibold text-white">
+          <h3 className="text-base font-semibold text-fg">
             {isBank ? "Reservation requests and allocations" : "Off-site units"}
           </h3>
-          <Link href="/bng/marketplace" className="text-sm font-semibold !text-emerald-200 hover:!text-emerald-100">
+          <Link href="/bng/marketplace" className="text-sm font-semibold !text-accent-200 hover:!text-accent-100">
             Marketplace →
           </Link>
         </div>
 
         {error && (
-          <p className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-2 text-sm text-red-200">{error}</p>
+          <Alert tone="danger" as="p" className="mt-3">{error}</Alert>
         )}
 
         {capacity.kind === "on_behalf" && open.some((a) => (isBank ? a.status === "requested" : a.status === "requested" || a.status === "reserved")) && (
-          <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border border-amber-400/25 bg-amber-500/10 p-3 text-sm text-amber-50">
-            <input type="checkbox" checked={onBehalf} onChange={(e) => setOnBehalf(e.target.checked)} className="mt-0.5 h-4 w-4 accent-amber-400" />
+          <Alert tone="warning" as="label" className="mt-3 flex cursor-pointer items-start gap-3">
+            <input type="checkbox" checked={onBehalf} onChange={(e) => setOnBehalf(e.target.checked)} className="mt-0.5 h-4 w-4 accent-warning-400" />
             <span>
               These decisions are for the {roleNames(deciding)}. I am recording them on their behalf.
             </span>
-          </label>
+          </Alert>
         )}
 
         {allocations === null ? (
-          <p className="mt-3 text-sm text-white/60">Loading…</p>
+          <p className="mt-3 text-sm text-fg/60">Loading…</p>
         ) : open.length === 0 ? (
-          <p className="mt-3 text-sm text-white/60">
+          <p className="mt-3 text-sm text-fg/60">
             {isBank ? "No developments have requested units from this habitat bank yet." : "No off-site units requested."}
           </p>
         ) : (
-          <ul className="mt-3 divide-y divide-white/10">
+          <ul className="mt-3 divide-y divide-fg/10">
             {open.map((allocation) => {
               const otherName = isBank ? allocation.development_name : allocation.habitat_bank_name;
               const busy = busyId === allocation.id;
@@ -149,12 +150,12 @@ export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
                 <li key={allocation.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-white">
+                      <span className="font-semibold text-fg">
                         {otherName ?? (isBank ? "Development" : "Habitat bank")}
                       </span>
                       {allocation.status && <AllocationStatusBadge status={allocation.status} />}
                     </div>
-                    <p className="text-white/70 tabular-nums">
+                    <p className="text-fg/70 tabular-nums">
                       {unitsLine(allocation)}
                       {allocation.total_price != null && ` · ${formatMoney(allocation.total_price)}`}
                     </p>
@@ -162,16 +163,16 @@ export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
                   <div className="flex gap-2">
                     {canDecide && isBank && allocation.status === "requested" && (
                       <>
-                        <button type="button" disabled={busy} onClick={() => act(allocation, "accept")} className={`${buttonBaseSm} ${buttonPrimary} disabled:opacity-60`}>
+                        <button type="button" disabled={busy} onClick={() => act(allocation, "accept")} className={`${buttonClass("primary", "sm")} disabled:opacity-60`}>
                           Accept
                         </button>
-                        <button type="button" disabled={busy} onClick={() => act(allocation, "decline")} className={`${buttonBaseSm} ${buttonGhost} disabled:opacity-60`}>
+                        <button type="button" disabled={busy} onClick={() => act(allocation, "decline")} className={`${buttonClass("ghost", "sm")} disabled:opacity-60`}>
                           Decline
                         </button>
                       </>
                     )}
                     {canDecide && !isBank && (allocation.status === "requested" || allocation.status === "reserved") && (
-                      <button type="button" disabled={busy} onClick={() => act(allocation, "release")} className={`${buttonBaseSm} ${buttonGhost} disabled:opacity-60`}>
+                      <button type="button" disabled={busy} onClick={() => act(allocation, "release")} className={`${buttonClass("ghost", "sm")} disabled:opacity-60`}>
                         Release
                       </button>
                     )}
@@ -183,7 +184,7 @@ export function BngCaseSummary({ caseId, summary, steps, signoffs }: Props) {
         )}
 
         {closed.length > 0 && (
-          <p className="mt-3 text-xs text-white/50">
+          <p className="mt-3 text-xs text-fg/50">
             {closed.length} earlier request{closed.length === 1 ? "" : "s"} declined or released.
           </p>
         )}
@@ -211,16 +212,16 @@ function FinancialsCard({ financials }: { financials: BngFinancials }) {
   ];
   return (
     <section className={card}>
-      <h3 className="text-base font-semibold text-white">Finances</h3>
+      <h3 className="text-base font-semibold text-fg">Finances</h3>
       {!financials.prices_set && (
-        <p className="mt-2 text-sm text-amber-200">Set your unit prices in the Unit Pricing step to see revenue.</p>
+        <p className="mt-2 text-sm text-warning-200">Set your unit prices in the Unit Pricing step to see revenue.</p>
       )}
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {items.map(([label, value, hint]) => (
-          <div key={label} className="rounded-xl border border-white/10 bg-black/20 p-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/45">{label}</p>
-            <p className="mt-1 text-lg font-semibold tabular-nums text-white">{formatMoney(value)}</p>
-            <p className="text-xs text-white/50">{hint}</p>
+          <div key={label} className="rounded-xl surface-card p-3">
+            <p className="text-eyebrow tracking-wider">{label}</p>
+            <p className="mt-1 text-lg font-semibold tabular-nums text-fg">{formatMoney(value)}</p>
+            <p className="text-xs text-fg/50">{hint}</p>
           </div>
         ))}
       </div>
@@ -234,7 +235,7 @@ function RevenueSplit({ financials }: { financials: BngFinancials }) {
   const distribution = financials.revenue_distribution;
   if (!shares && !distribution?.retired_revenue) {
     return (
-      <p className="mt-4 text-sm text-white/55">
+      <p className="mt-4 text-sm text-fg/55">
         Set the revenue split (landowner, investor, habitat manager) in the Unit Pricing step.
       </p>
     );
@@ -242,16 +243,16 @@ function RevenueSplit({ financials }: { financials: BngFinancials }) {
   const parties = Object.keys(BNG_REVENUE_PARTY_LABEL) as BngRevenueParty[];
   return (
     <div className="mt-4 overflow-x-auto">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/45">Revenue split</p>
+      <p className="mb-2 text-eyebrow tracking-wider">Revenue split</p>
       <table className="w-full min-w-[420px] text-left text-sm">
-        <thead className="text-xs uppercase tracking-wider text-white/50">
+        <thead className="text-xs uppercase tracking-wider text-fg/50">
           <tr>
             <th className="py-1.5 pr-3 font-semibold">Party</th>
             <th className="py-1.5 pr-3 text-right font-semibold">Current share</th>
             <th className="py-1.5 text-right font-semibold">Earned from retired units</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/10 text-white/85">
+        <tbody className="divide-y divide-fg/10 text-fg/85">
           {parties.map((party) => (
             <tr key={party}>
               <td className="py-2 pr-3">{BNG_REVENUE_PARTY_LABEL[party]}</td>
@@ -262,7 +263,7 @@ function RevenueSplit({ financials }: { financials: BngFinancials }) {
         </tbody>
       </table>
       {(distribution?.not_split ?? 0) > 0 && (
-        <p className="mt-2 text-xs text-white/50">
+        <p className="mt-2 text-xs text-fg/50">
           {formatMoney(distribution?.not_split ?? null)} was sold before a split was set and isn&apos;t divided.
         </p>
       )}
@@ -273,26 +274,26 @@ function RevenueSplit({ financials }: { financials: BngFinancials }) {
 function TransactionsCard({ transactions, isBank }: { transactions: BngTransaction[] | null; isBank: boolean }) {
   return (
     <section className={card}>
-      <h3 className="text-base font-semibold text-white">Transactions</h3>
+      <h3 className="text-base font-semibold text-fg">Transactions</h3>
       {!transactions || transactions.length === 0 ? (
-        <p className="mt-3 text-sm text-white/60">
+        <p className="mt-3 text-sm text-fg/60">
           None yet. A transaction is recorded when the development&apos;s gain plan is approved.
         </p>
       ) : (
-        <ul className="mt-3 divide-y divide-white/10 text-sm">
+        <ul className="mt-3 divide-y divide-fg/10 text-sm">
           {transactions.map((transaction) => {
             const otherName = isBank ? transaction.development_name : transaction.habitat_bank_name;
             return (
               <li key={transaction.reference} className="flex flex-wrap items-baseline justify-between gap-2 py-3">
                 <div>
-                  <p className="font-mono text-white">{transaction.reference}</p>
-                  <p className="text-white/60">
+                  <p className="font-mono text-fg">{transaction.reference}</p>
+                  <p className="text-fg/60">
                     {otherName ?? (isBank ? "Development" : "Habitat bank")}
                     {transaction.created_at && ` · ${formatDay(transaction.created_at)}`}
                   </p>
                 </div>
-                <p className="text-white/75 tabular-nums">
-                  {unitsLine(transaction)} · <span className="font-semibold text-white">{formatMoney(transaction.total_price)}</span>
+                <p className="text-fg/75 tabular-nums">
+                  {unitsLine(transaction)} · <span className="font-semibold text-fg">{formatMoney(transaction.total_price)}</span>
                 </p>
               </li>
             );

@@ -11,6 +11,7 @@ import Providers from "./providers";
 import ApiErrorBridge from "@/components/ApiErrorBridge";
 import HeaderAuthClient from "@/components/HeaderAuthClient";
 import NavClient from "@/components/NavClient";
+import ThemeToggle, { themeInitScript } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "BIOFIN-EU Dashboard",
@@ -30,21 +31,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="min-h-screen bg-[#06131a] font-sans text-white antialiased">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="min-h-screen bg-canvas font-sans text-fg antialiased">
         <Providers>
           <ApiErrorBridge />
 
-          <div className="relative flex min-h-screen flex-col overflow-x-clip bg-[linear-gradient(180deg,#07141b_0%,#081821_48%,#07141b_100%)]">
+          <div className="relative flex min-h-screen flex-col overflow-x-clip bg-app">
             {/* Background glow */}
             <div className="pointer-events-none absolute inset-0">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.10),transparent_24%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_22%),radial-gradient(circle_at_bottom,rgba(168,85,247,0.08),transparent_26%)]" />
+              <div className="absolute inset-0 bg-app-glow" />
             </div>
 
             {/* HEADER */}
             {/* Sticky: stays at the top while the page scrolls. Works because the
                 wrapper uses overflow-x-clip, which (unlike overflow-hidden) does
                 not create a scroll container. */}
-            <header className="sticky top-0 z-20 border-b border-white/10 bg-[#08151d]/80 backdrop-blur-xl">
+            <header className="sticky top-0 z-20 border-b border-fg/10 bg-header/80 backdrop-blur-xl">
               <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
 
                 {/* LEFT GROUP */}
@@ -70,7 +74,8 @@ export default function RootLayout({
                 </div>
 
                 {/* RIGHT GROUP */}
-                <div className="flex items-center">
+                <div className="flex items-center gap-3">
+                  <ThemeToggle />
                   <HeaderAuthClient />
                 </div>
               </div>
@@ -84,7 +89,7 @@ export default function RootLayout({
             </main>
 
             {/* FOOTER */}
-            <footer className="relative z-10 border-t border-white/10 bg-black/20 backdrop-blur-md">
+            <footer className="relative z-10 border-t border-fg/10 bg-shade/20 backdrop-blur-md">
               <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 text-sm">
                 <div className="flex items-start gap-4">
                   <Image
@@ -94,7 +99,7 @@ export default function RootLayout({
                     height={32}
                     className="h-8 w-12 flex-none rounded-sm object-cover"
                   />
-                  <p className="text-white/70 leading-relaxed">
+                  <p className="text-fg/70 leading-relaxed">
                     Funded by the European Union. Views and opinions expressed are
                     however those of the author(s) only and do not necessarily
                     reflect those of the European Union or the European Research
@@ -102,7 +107,7 @@ export default function RootLayout({
                   </p>
                 </div>
 
-                <div className="text-white/50">
+                <div className="text-fg/50">
                   © {new Date().getFullYear()} ® BIOFIN-EU
                 </div>
               </div>

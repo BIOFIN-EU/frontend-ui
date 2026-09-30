@@ -7,8 +7,10 @@ import type { CaseLocationEntry } from "@/types/case-location";
 import RiskMap from "@/components/maps/RiskMap";
 import { RequirementBadge } from "@/components/FormRenderer";
 import { FieldHelp } from "@/components/ui/FieldHelp";
-import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import type { PathwayStepMode } from "./PathwayStepScreen";
+import { Alert } from "@/components/ui/Alert";
 
 type Props = {
   state: WorkflowState;
@@ -396,23 +398,23 @@ export function PathwayLocationStep({
   }
 
   if (!activeEntry) {
-    return <p className="text-sm text-white/70">No location step available.</p>;
+    return <p className="text-sm text-fg/70">No location step available.</p>;
   }
 
   const entryHelp =
     step.fields.find((field) => field.type === "location_table")?.entry_help_text ?? {};
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+    <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6">
       <div className="mb-6">
         <div className="flex items-center gap-1.5">
-          <h2 className="text-lg font-semibold text-white">{step.title}</h2>
+          <h2 className="text-lg font-semibold text-fg">{step.title}</h2>
           <FieldHelp
             text={step.fields.find((field) => field.type === "location_table")?.help_text}
             label={step.title}
           />
         </div>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-sm text-fg/60">
           Draw one or more polygons, or drop lat/long points, to mark the
           locations for this project. Click a card to make it active on the
           map.
@@ -420,15 +422,15 @@ export function PathwayLocationStep({
       </div>
 
       {error && (
-        <div className="mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <Alert tone="danger" className="mb-4">
           {error}
-        </div>
+        </Alert>
       )}
 
       {fieldErrors.locations && (
-        <div className="mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <Alert tone="danger" className="mb-4">
           {fieldErrors.locations}
-        </div>
+        </Alert>
       )}
 
       <div className="space-y-4">
@@ -442,17 +444,17 @@ export function PathwayLocationStep({
               className={[
                 "rounded-xl border p-4 transition",
                 isActive
-                  ? "border-emerald-400/40 bg-emerald-500/5"
-                  : "border-white/10 bg-black/20 hover:bg-white/[0.04]",
+                  ? "border-accent-400/40 bg-accent-500/5"
+                  : "border-fg/10 bg-shade/20 hover:bg-fg/[0.04]",
               ].join(" ")}
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
+                <p className="text-xs font-semibold uppercase tracking-wider text-fg/40">
                   Location {index + 1}
                 </p>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex overflow-hidden rounded-lg border border-white/10">
+                  <div className="flex overflow-hidden rounded-lg border border-fg/10">
                     <button
                       type="button"
                       onClick={(e) => {
@@ -462,8 +464,8 @@ export function PathwayLocationStep({
                       className={[
                         "px-3 py-1.5 text-xs font-semibold transition",
                         entry.location_type === "polygon"
-                          ? "bg-emerald-400 text-emerald-950"
-                          : "bg-transparent text-white/60 hover:bg-white/10",
+                          ? "bg-accent-400 text-accent-950"
+                          : "bg-transparent text-fg/60 hover:bg-fg/10",
                       ].join(" ")}
                     >
                       Polygon
@@ -477,8 +479,8 @@ export function PathwayLocationStep({
                       className={[
                         "px-3 py-1.5 text-xs font-semibold transition",
                         entry.location_type === "point"
-                          ? "bg-emerald-400 text-emerald-950"
-                          : "bg-transparent text-white/60 hover:bg-white/10",
+                          ? "bg-accent-400 text-accent-950"
+                          : "bg-transparent text-fg/60 hover:bg-fg/10",
                       ].join(" ")}
                     >
                       Lat/Long point
@@ -492,7 +494,7 @@ export function PathwayLocationStep({
                       removeEntry(entry.key);
                     }}
                     disabled={entries.length === 1}
-                    className={`disabled:cursor-not-allowed disabled:opacity-40 ${buttonBaseSm} ${buttonGhost}`}
+                    className={`disabled:cursor-not-allowed disabled:opacity-40 ${buttonClass("ghost", "sm")}`}
                   >
                     Remove
                   </button>
@@ -504,7 +506,7 @@ export function PathwayLocationStep({
                   <div>
                     <div className="mb-1 flex items-center justify-between gap-2">
                       <span className="flex items-center gap-1.5">
-                        <label className="block text-xs font-medium text-white/70">
+                        <label className="block text-label">
                           Name
                         </label>
                         {/* Inside the clickable card: don't also select it. */}
@@ -521,7 +523,7 @@ export function PathwayLocationStep({
                         updateEntry(entry.key, { friendly_name: e.target.value })
                       }
                       placeholder="e.g. North Field"
-                      className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                      className={fieldClass()}
                     />
                   </div>
 
@@ -529,7 +531,7 @@ export function PathwayLocationStep({
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <div className="mb-1 flex items-center justify-between gap-2">
-                          <label className="block text-xs font-medium text-white/70">
+                          <label className="block text-label">
                             Latitude
                           </label>
                           <RequirementBadge required={true} />
@@ -544,12 +546,12 @@ export function PathwayLocationStep({
                             updateEntry(entry.key, { latitude: e.target.value })
                           }
                           placeholder="50.85"
-                          className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                          className={fieldClass()}
                         />
                       </div>
                       <div>
                         <div className="mb-1 flex items-center justify-between gap-2">
-                          <label className="block text-xs font-medium text-white/70">
+                          <label className="block text-label">
                             Longitude
                           </label>
                           <RequirementBadge required={true} />
@@ -564,14 +566,14 @@ export function PathwayLocationStep({
                             updateEntry(entry.key, { longitude: e.target.value })
                           }
                           placeholder="4.35"
-                          className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                          className={fieldClass()}
                         />
                       </div>
                     </div>
                   ) : (
                     <div>
                       <div className="mb-1 flex items-center justify-between gap-2">
-                        <label className="block text-xs font-medium text-white/70">
+                        <label className="block text-label">
                           Polygon WKT
                         </label>
                         <RequirementBadge required={true} />
@@ -584,14 +586,14 @@ export function PathwayLocationStep({
                           updateEntry(entry.key, { geometry_wkt: e.target.value })
                         }
                         placeholder="Draw on the map, or paste/edit polygon WKT here"
-                        className="min-h-24 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 font-mono text-xs text-white outline-none focus:border-emerald-400"
+                        className={`min-h-24 font-mono !text-xs ${fieldClass()}`}
                       />
                     </div>
                   )}
 
                   <div>
                     <div className="mb-1 flex items-center justify-between gap-2">
-                      <label className="block text-xs font-medium text-white/70">
+                      <label className="block text-label">
                         Notes
                       </label>
                       <RequirementBadge required={false} />
@@ -602,14 +604,14 @@ export function PathwayLocationStep({
                       onChange={(e) =>
                         updateEntry(entry.key, { notes: e.target.value })
                       }
-                      className="min-h-20 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                      className={`min-h-20 ${fieldClass()}`}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-xs font-medium text-white/70">Country</p>
-                      <p className="mt-1 text-sm text-white">
+                      <p className="text-label">Country</p>
+                      <p className="mt-1 text-sm text-fg">
                         {entry.country.status === "loading" && "Detecting…"}
                         {entry.country.status === "resolved" &&
                           entry.country.label}
@@ -620,9 +622,9 @@ export function PathwayLocationStep({
                     </div>
 
                     <div>
-                      <p className="text-xs font-medium text-white/70">Area</p>
+                      <p className="text-label">Area</p>
                       {entry.location_type === "polygon" ? (
-                        <p className="mt-1 text-sm text-white">
+                        <p className="mt-1 text-sm text-fg">
                           {formatArea(entry.areaSqm)}
                         </p>
                       ) : (
@@ -638,7 +640,7 @@ export function PathwayLocationStep({
                             })
                           }
                           placeholder="Area (hectares, optional)"
-                          className="mt-1 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                          className={`mt-1 ${fieldClass()}`}
                         />
                       )}
                     </div>
@@ -667,7 +669,7 @@ export function PathwayLocationStep({
                     <button
                       type="button"
                       onClick={() => setActiveKey(entry.key)}
-                      className="flex h-[460px] w-full items-center justify-center rounded-2xl border border-dashed border-white/10 bg-black/20 text-sm text-white/50 transition hover:bg-white/[0.04]"
+                      className="flex h-[460px] w-full items-center justify-center rounded-2xl surface-card border-dashed text-sm text-fg/50 transition hover:bg-fg/[0.04]"
                     >
                       Click to edit this location on the map
                     </button>
@@ -685,7 +687,7 @@ export function PathwayLocationStep({
             <button
               type="button"
               onClick={onBack}
-              className={`${buttonBase} ${buttonGhost}`}
+              className={buttonClass("ghost")}
             >
               Back
             </button>
@@ -694,7 +696,7 @@ export function PathwayLocationStep({
           <button
             type="button"
             onClick={addEntry}
-            className={`${buttonBase} ${buttonSecondary}`}
+            className={buttonClass("secondary")}
           >
             Add another location
           </button>
@@ -702,7 +704,7 @@ export function PathwayLocationStep({
 
         <div className="flex items-center gap-3">
           {draftMessage && (
-            <span className="text-xs font-medium text-emerald-300">
+            <span className="text-xs font-medium text-accent-300">
               {draftMessage}
             </span>
           )}
@@ -710,7 +712,7 @@ export function PathwayLocationStep({
           <button
             type="button"
             onClick={handleSaveDraft}
-            className={`${buttonBase} ${buttonGhost}`}
+            className={buttonClass("ghost")}
           >
             Save draft
           </button>
@@ -719,7 +721,7 @@ export function PathwayLocationStep({
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass("primary")}`}
           >
             {isSubmitting
               ? "Submitting..."

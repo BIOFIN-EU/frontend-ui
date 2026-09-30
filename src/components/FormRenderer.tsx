@@ -3,10 +3,12 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import type { FieldSchema, StepSchema } from "@/types/forms";
-import { buttonBase, buttonGhost, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import { Select } from "@/components/ui/Select";
 import { FieldHelp } from "@/components/ui/FieldHelp";
 import { DatePicker } from "@/components/ui/DatePicker";
+import { Badge } from "@/components/ui/Badge";
 
 function isVisible(field: FieldSchema, values: Record<string, any>) {
   if (!field.visible_if) return true;
@@ -16,15 +18,7 @@ function isVisible(field: FieldSchema, values: Record<string, any>) {
 }
 
 export function RequirementBadge({ required }: { required: boolean }) {
-  return required ? (
-    <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-200 ring-1 ring-amber-400/25">
-      Required
-    </span>
-  ) : (
-    <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/40 ring-1 ring-white/10">
-      Optional
-    </span>
-  );
+  return required ? <Badge tone="warning">Required</Badge> : <Badge tone="muted">Optional</Badge>;
 }
 
 function Field({
@@ -47,9 +41,7 @@ function Field({
     ...register(field.id, { required: !!field.required }),
   };
 
-  const inputClass = `w-full rounded-xl border bg-black/20 px-3 py-2 text-white ring-1 ring-white/5 ${
-    error ? "border-red-400/60" : "border-white/10"
-  }`;
+  const inputClass = fieldClass("step", { invalid: !!error });
 
   switch (field.type) {
     case "text": {
@@ -60,7 +52,7 @@ function Field({
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
-              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              <label htmlFor={field.id} className="text-sm font-semibold text-fg">
                 {field.label}
               </label>
               <FieldHelp text={field.help} label={field.label} />
@@ -73,7 +65,7 @@ function Field({
             autoComplete={autoComplete}
             className={inputClass}
           />
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
 }
@@ -83,7 +75,7 @@ function Field({
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
-              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              <label htmlFor={field.id} className="text-sm font-semibold text-fg">
                 {field.label}
               </label>
               <FieldHelp text={field.help} label={field.label} />
@@ -96,7 +88,7 @@ function Field({
             className={inputClass}
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
 
@@ -107,7 +99,7 @@ function Field({
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
-              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              <label htmlFor={field.id} className="text-sm font-semibold text-fg">
                 {field.label}
               </label>
               <FieldHelp text={field.help} label={field.label} />
@@ -121,7 +113,7 @@ function Field({
             invalid={!!error}
             onChange={(iso) => setValue(field.id, iso, { shouldValidate: true, shouldDirty: true })}
           />
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
 
@@ -130,7 +122,7 @@ function Field({
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
-              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              <label htmlFor={field.id} className="text-sm font-semibold text-fg">
                 {field.label}
               </label>
               <FieldHelp text={field.help} label={field.label} />
@@ -138,7 +130,7 @@ function Field({
             <RequirementBadge required={!!field.required} />
           </div>
           <textarea {...common} rows={4} className={inputClass} />
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
 
@@ -149,7 +141,7 @@ function Field({
             {field.label}
           </h3>
 
-          <div className="text-sm leading-relaxed text-white/80 whitespace-pre-wrap">
+          <div className="text-sm leading-relaxed text-fg/80 whitespace-pre-wrap">
             {field.content}
           </div>
         </div>
@@ -160,7 +152,7 @@ function Field({
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
-              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              <label htmlFor={field.id} className="text-sm font-semibold text-fg">
                 {field.label}
               </label>
               <FieldHelp
@@ -192,7 +184,7 @@ function Field({
             ]}
           />
 
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
 
@@ -201,13 +193,13 @@ function Field({
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
-              <div className="text-sm font-semibold text-white">{field.label}</div>
+              <div className="text-sm font-semibold text-fg">{field.label}</div>
               <FieldHelp text={field.help} label={field.label} />
             </span>
             <RequirementBadge required={!!field.required} />
           </div>
           {(field.options || []).map((o) => (
-            <label key={o.value} className="flex items-center gap-2 text-white/80">
+            <label key={o.value} className="flex items-center gap-2 text-fg/80">
               <input
                 type="radio"
                 value={o.value}
@@ -216,7 +208,7 @@ function Field({
               {o.label}
             </label>
           ))}
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
 
@@ -224,7 +216,7 @@ function Field({
       return (
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <label className="flex items-center gap-2 text-white">
+            <label className="flex items-center gap-2 text-fg">
               <input
                 type="checkbox"
                 {...register(field.id, { required: !!field.required })}
@@ -234,7 +226,7 @@ function Field({
             <FieldHelp text={field.help} label={field.label} />
             <RequirementBadge required={!!field.required} />
           </div>
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
 
@@ -243,7 +235,7 @@ function Field({
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
-              <label htmlFor={field.id} className="text-sm font-semibold text-white">
+              <label htmlFor={field.id} className="text-sm font-semibold text-fg">
                 {field.label}
               </label>
               <FieldHelp text={field.help} label={field.label} />
@@ -252,8 +244,8 @@ function Field({
           </div>
 
           <div
-            className={`rounded-2xl border bg-black/20 p-4 ring-1 ring-white/5 ${
-              error ? "border-red-400/60" : "border-white/10"
+            className={`rounded-2xl border bg-shade/20 p-4 ring-1 ring-fg/5 ${
+              error ? "border-danger-400/60" : "border-fg/10"
             }`}
           >
             <input
@@ -263,11 +255,11 @@ function Field({
                 const file = e.target.files?.[0] ?? null;
                 setValue(field.id, file, { shouldValidate: true, shouldDirty: true });
               }}
-              className="block w-full text-sm text-white file:mr-4 file:rounded-xl file:border file:border-emerald-300 file:bg-emerald-400/15 file:px-4 file:py-2 file:font-semibold file:!text-white hover:file:bg-emerald-300"
+              className="block w-full text-sm text-fg file:mr-4 file:rounded-xl file:border file:border-accent-300 file:bg-accent-400/15 file:px-4 file:py-2 file:font-semibold file:!text-fg hover:file:!text-on-solid hover:file:bg-accent-300"
             />
           </div>
 
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
 
@@ -339,7 +331,7 @@ export function FormRenderer({
           <button
             type="button"
             onClick={onPrev}
-            className={`${buttonBase} ${buttonGhost}`}
+            className={buttonClass("ghost")}
           >
             Back
           </button>
@@ -347,7 +339,7 @@ export function FormRenderer({
 
         <button
           type="submit"
-          className={`${buttonBase} ${buttonPrimary}`}
+          className={buttonClass("primary")}
         >
           {submitLabel ?? (isLast ? "Finish" : "Next")}
         </button>
@@ -355,7 +347,7 @@ export function FormRenderer({
         <button
           type="button"
           onClick={form.handleSubmit(async (vals) => onSaveDraft(vals))}
-          className={`ml-auto ${buttonBase} ${buttonGhost}`}
+          className={`ml-auto ${buttonClass("ghost")}`}
         >
           Save draft
         </button>

@@ -7,8 +7,10 @@ import type { LookupOption } from "@/types/lookups";
 import type { WorkflowField, WorkflowState, WorkflowStep } from "@/types/workflow";
 import { RequirementBadge } from "@/components/FormRenderer";
 import { FieldHelp } from "@/components/ui/FieldHelp";
-import { buttonBase, buttonBaseSm, buttonGhost, buttonPrimary, buttonSecondary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import type { PathwayStepMode } from "./PathwayStepScreen";
+import { Alert } from "@/components/ui/Alert";
 
 type Props = {
   state: WorkflowState;
@@ -359,13 +361,13 @@ export function PathwayAssignmentStep({
   }
 
   if (!assignmentField || !rowFields.length) {
-    return <p className="text-sm text-white/70">No assignment step available.</p>;
+    return <p className="text-sm text-fg/70">No assignment step available.</p>;
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+    <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6">
       <div className="mb-6 flex items-start gap-1.5">
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-sm text-fg/60">
           Create one or more assignments and define the role for each.
         </p>
         {assignmentField && (
@@ -376,22 +378,22 @@ export function PathwayAssignmentStep({
       </div>
 
       {fieldErrors.assignments && (
-        <div className="mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <Alert tone="danger" className="mb-4">
           {fieldErrors.assignments}
-        </div>
+        </Alert>
       )}
 
       <div className="space-y-3">
         {rows.map((row, index) => (
           <div
             key={index}
-            className="grid gap-3 rounded-xl border border-white/10 bg-black/20 p-4 md:grid-cols-[1fr_1fr_auto]"
+            className="grid gap-3 rounded-xl surface-card p-4 md:grid-cols-[1fr_1fr_auto]"
           >
             {rowFields.map((field) => (
               <div key={field.name}>
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="flex items-center gap-1.5">
-                    <label className="block text-sm font-medium text-white/80">
+                    <label className="block text-sm font-medium text-fg/80">
                       {field.display_name}
                     </label>
                     <FieldHelp text={field.help_text} label={field.display_name} />
@@ -408,7 +410,7 @@ export function PathwayAssignmentStep({
                         updateRow(index, field.name, e.target.value)
                       }
                       disabled={disabled}
-                      className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:border-emerald-400 disabled:cursor-not-allowed disabled:text-white/45"
+                      className={`${fieldClass()} disabled:cursor-not-allowed disabled:text-fg/45`}
                     >
                       <option value="">{placeholder}</option>
                       {options.map((option) => (
@@ -424,7 +426,7 @@ export function PathwayAssignmentStep({
                     onChange={(e) =>
                       updateRow(index, field.name, e.target.value)
                     }
-                    className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:border-emerald-400"
+                    className={fieldClass()}
                   />
                 )}
               </div>
@@ -435,7 +437,7 @@ export function PathwayAssignmentStep({
                 type="button"
                 onClick={() => removeRow(index)}
                 disabled={rows.length === 1}
-                className={`disabled:cursor-not-allowed disabled:opacity-40 ${buttonBaseSm} ${buttonGhost}`}
+                className={`disabled:cursor-not-allowed disabled:opacity-40 ${buttonClass("ghost", "sm")}`}
               >
                 Remove
               </button>
@@ -448,14 +450,14 @@ export function PathwayAssignmentStep({
         <button
           type="button"
           onClick={addRow}
-          className={`${buttonBase} ${buttonSecondary}`}
+          className={buttonClass("secondary")}
         >
           Add another assignment
         </button>
 
         <div className="flex items-center gap-3">
           {draftMessage && (
-            <span className="text-xs font-medium text-emerald-300">
+            <span className="text-xs font-medium text-accent-300">
               {draftMessage}
             </span>
           )}
@@ -463,7 +465,7 @@ export function PathwayAssignmentStep({
           <button
             type="button"
             onClick={handleSaveDraft}
-            className={`${buttonBase} ${buttonGhost}`}
+            className={buttonClass("ghost")}
           >
             Save draft
           </button>
@@ -472,7 +474,7 @@ export function PathwayAssignmentStep({
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass("primary")}`}
           >
             {isSubmitting
               ? "Submitting..."

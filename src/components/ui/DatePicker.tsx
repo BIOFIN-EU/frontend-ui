@@ -98,20 +98,20 @@ export function DatePicker({ id, value, onChange, invalid, className = "", ...re
           }}
           aria-invalid={showError || undefined}
           aria-label={rest["aria-label"]}
-          className={`w-full rounded-xl border bg-black/20 py-2 pl-3 pr-10 text-white ring-1 ring-white/5 outline-none placeholder:text-white/30 focus:border-emerald-400 ${
-            showError ? "border-red-400/60" : "border-white/10"
+          className={`w-full rounded-xl border bg-shade/20 py-2 pl-3 pr-10 text-fg ring-1 ring-fg/5 outline-none placeholder:text-fg/30 focus:border-accent-400 ${
+            showError ? "border-danger-400/60" : "border-fg/10"
           }`}
         />
         <Popover className="absolute inset-y-0 right-0 flex items-center pr-1.5">
           <PopoverButton
             aria-label="Choose a date"
-            className="rounded-lg p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+            className="rounded-lg p-1.5 text-fg/60 transition hover:bg-fg/10 hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400"
           >
             <CalendarDays className="h-4 w-4" aria-hidden="true" />
           </PopoverButton>
           <PopoverPanel
             anchor={{ to: "bottom end", gap: 6 }}
-            className="z-50 w-72 rounded-2xl border border-white/10 bg-slate-950 p-3 shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            className="z-50 w-72 rounded-2xl field p-3 shadow-overlay"
           >
             {({ close }) => (
               <Calendar
@@ -125,7 +125,7 @@ export function DatePicker({ id, value, onChange, invalid, className = "", ...re
           </PopoverPanel>
         </Popover>
       </div>
-      {typingError && <p className="mt-1 text-sm text-red-300">Enter a date as dd/mm/yyyy.</p>}
+      {typingError && <p className="mt-1 text-sm text-danger-300">Enter a date as dd/mm/yyyy.</p>}
     </div>
   );
 }
@@ -151,9 +151,9 @@ function Calendar({ value, onPick }: { value: string | null; onPick: (iso: strin
   }
 
   return (
-    <div className="text-sm text-white">
+    <div className="text-sm text-fg">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <button type="button" onClick={() => shift(-1)} aria-label="Previous month" className="rounded-lg p-1.5 hover:bg-white/10">
+        <button type="button" onClick={() => shift(-1)} aria-label="Previous month" className="rounded-lg p-1.5 hover:bg-fg/10">
           <ChevronLeft className="h-4 w-4" aria-hidden="true" />
         </button>
         <div className="flex items-center gap-1">
@@ -161,10 +161,10 @@ function Calendar({ value, onPick }: { value: string | null; onPick: (iso: strin
             value={month}
             onChange={(e) => setMonth(Number(e.target.value))}
             aria-label="Month"
-            className="rounded-lg bg-white/5 px-1.5 py-1 text-sm text-white outline-none"
+            className="rounded-lg bg-fg/5 px-1.5 py-1 text-sm text-fg outline-none"
           >
             {MONTHS.map((name, index) => (
-              <option key={name} value={index} className="bg-slate-900">
+              <option key={name} value={index} className="bg-field-2">
                 {name}
               </option>
             ))}
@@ -177,17 +177,17 @@ function Calendar({ value, onPick }: { value: string | null; onPick: (iso: strin
               if (next >= 1900 && next <= 2200) setYear(next);
             }}
             aria-label="Year"
-            className="w-20 rounded-lg bg-white/5 px-1.5 py-1 text-sm text-white outline-none"
+            className="w-20 rounded-lg bg-fg/5 px-1.5 py-1 text-sm text-fg outline-none"
           />
         </div>
-        <button type="button" onClick={() => shift(1)} aria-label="Next month" className="rounded-lg p-1.5 hover:bg-white/10">
+        <button type="button" onClick={() => shift(1)} aria-label="Next month" className="rounded-lg p-1.5 hover:bg-fg/10">
           <ChevronRight className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center">
         {WEEKDAYS.map((day) => (
-          <span key={day} className="py-1 text-[11px] font-semibold uppercase text-white/45">
+          <span key={day} className="py-1 text-[11px] font-semibold uppercase text-fg/45">
             {day}
           </span>
         ))}
@@ -205,10 +205,10 @@ function Calendar({ value, onPick }: { value: string | null; onPick: (iso: strin
               className={[
                 "rounded-lg py-1.5 tabular-nums transition",
                 selected
-                  ? "bg-emerald-500 font-semibold text-slate-950"
+                  ? "bg-accent-500 font-semibold text-slate-950"
                   : iso === todayIso
-                    ? "text-emerald-200 ring-1 ring-emerald-400/50 hover:bg-white/10"
-                    : "text-white/85 hover:bg-white/10",
+                    ? "text-accent-200 ring-1 ring-accent-400/50 hover:bg-fg/10"
+                    : "text-fg/85 hover:bg-fg/10",
               ].join(" ")}
             >
               {day}
@@ -217,12 +217,12 @@ function Calendar({ value, onPick }: { value: string | null; onPick: (iso: strin
         })}
       </div>
 
-      <div className="mt-2 flex justify-between border-t border-white/10 pt-2">
-        <button type="button" onClick={() => onPick(todayIso)} className="rounded-lg px-2 py-1 text-xs font-semibold text-emerald-200 hover:bg-white/10">
+      <div className="mt-2 flex justify-between border-t border-fg/10 pt-2">
+        <button type="button" onClick={() => onPick(todayIso)} className="rounded-lg px-2 py-1 text-xs font-semibold text-accent-200 hover:bg-fg/10">
           Today
         </button>
         {value && (
-          <button type="button" onClick={() => onPick("")} className="rounded-lg px-2 py-1 text-xs font-semibold text-white/60 hover:bg-white/10">
+          <button type="button" onClick={() => onPick("")} className="rounded-lg px-2 py-1 text-xs font-semibold text-fg/60 hover:bg-fg/10">
             Clear
           </button>
         )}

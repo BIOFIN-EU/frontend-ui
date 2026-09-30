@@ -7,6 +7,7 @@ import { caseListService } from "@/services/case-list.service";
 import type { CaseListItem } from "@/types/case-list";
 import { ProjectListScreen } from "@/components/projects/ProjectListScreen";
 import { BngWaitingBanner } from "@/components/bng/BngWaitingBanner";
+import { Alert } from "@/components/ui/Alert";
 
 // useSearchParams needs a Suspense boundary for the production build.
 export default function CasesPage() {
@@ -53,10 +54,10 @@ function CasesPageInner() {
   if (!user) {
     return (
       <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">
+        <h1 className="text-3xl font-semibold tracking-tight text-fg">
           Projects
         </h1>
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-fg/70">
           Loading project access…
         </p>
       </section>
@@ -66,32 +67,29 @@ function CasesPageInner() {
   return (
     <div className="space-y-8">
       {deletedCaseId && (
-        <div
-          role="status"
-          className="flex items-center justify-between gap-4 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
-        >
+        <Alert tone="success" className="flex items-center justify-between gap-4">
           <span>Project #{deletedCaseId} deleted.</span>
           <button
             type="button"
             onClick={() => setDeletedCaseId(null)}
             aria-label="Dismiss"
-            className="rounded-md px-2 py-1 text-emerald-100/80 hover:bg-white/10 hover:text-white"
+            className="rounded-md px-2 py-1 text-accent-100/80 hover:bg-fg/10 hover:text-fg"
           >
             ✕
           </button>
-        </div>
+        </Alert>
       )}
 
       {loading && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
+        <div className="rounded-2xl surface-panel p-6 text-fg/70">
           Loading projects...
         </div>
       )}
 
       {!loading && error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+        <Alert tone="danger">
           {error}
-        </div>
+        </Alert>
       )}
 
       {/* BNG only: steps waiting for one of the user's roles (hidden when none). */}

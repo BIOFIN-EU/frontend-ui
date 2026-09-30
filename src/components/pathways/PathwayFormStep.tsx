@@ -200,7 +200,7 @@ export function PathwayFormStep({
       />
 
       {draftMessage && (
-        <p className="mt-2 text-xs font-medium text-emerald-300">{draftMessage}</p>
+        <p className="mt-2 text-xs font-medium text-accent-300">{draftMessage}</p>
       )}
     </div>
   );

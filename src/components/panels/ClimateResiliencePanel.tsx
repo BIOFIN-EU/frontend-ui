@@ -90,9 +90,9 @@ export default function ClimateResiliencePanel({
   return (
     <>
       {/* Header */}
-      <div className="sticky top-0 flex items-center justify-between border-b border-white/10 bg-black/30 backdrop-blur-md p-5">
+      <div className="sticky top-0 flex items-center justify-between border-b border-fg/10 bg-shade/30 backdrop-blur-md p-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+          <p className="text-eyebrow tracking-[0.2em]">
             Climate Analysis
           </p>
           <div className="flex items-center gap-2 mt-1">
@@ -104,33 +104,33 @@ export default function ClimateResiliencePanel({
         </div>
         <button
           onClick={onClose}
-          className="rounded-full p-2 hover:bg-white/10 transition-colors ring-1 ring-white/10"
+          className="rounded-full p-2 hover:bg-fg/10 transition-colors ring-1 ring-fg/10"
         >
-          <X className="h-5 w-5 text-white/70" />
+          <X className="h-5 w-5 text-fg/70" />
         </button>
       </div>
 
       {/* Content */}
       <div className="h-[calc(100%-80px)] overflow-y-auto p-6 space-y-6 pb-32">
         {/* Climate Resilience Overview */}
-        <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-          <h3 className="text-lg font-semibold text-emerald-200 mb-3">
+        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+          <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Climate Resilience Assessment
           </h3>
-          <p className="text-sm leading-relaxed text-white/70 mb-4">
+          <p className="text-sm leading-relaxed text-fg/70 mb-4">
             Climate resilience is assessed by integrating habitat risk and landscape resilience to determine priority management actions. The BIOFIN-EU Biodiversity Vulnerability Index evaluates current habitat risk levels, while landscape resilience is derived from Species Richness Index (SRI) projections under future climate scenarios.
           </p>
-          <p className="text-sm leading-relaxed text-white/70">
+          <p className="text-sm leading-relaxed text-fg/70">
             This combined approach enables identification of zones requiring active protection, passive protection, active restoration, or passive restoration based on their resilience trajectory and current risk exposure.
           </p>
         </div>
 
         {/* Management Priority Framework - 5x5 Matrix */}
-        <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-        <h3 className="text-lg font-semibold text-emerald-200 mb-4">
+        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <h3 className="text-lg font-semibold text-accent-200 mb-4">
             Management Priority Framework
         </h3>
-        <p className="text-sm text-white/60 mb-4">
+        <p className="text-sm text-fg/60 mb-4">
             Decision matrix combining Climate Resiliency (vertical axis) vs Biodiversity Risk (horizontal axis):
         </p>
 
@@ -139,11 +139,11 @@ export default function ClimateResiliencePanel({
             {/* Header row */}
             <thead>
                 <tr>
-                <th className="p-2 text-left text-white/60 font-medium bg-black/40 rounded-tl-xl border border-white/20">
+                <th className="p-2 text-left text-fg/60 font-medium bg-shade/40 rounded-tl-xl border border-fg/20">
                     Climate Resiliency ↓ / Biodiversity Risk →
                 </th>
                 {riskLevels.map((risk) => (
-                    <th key={risk} className="p-2 text-center text-white/60 font-medium bg-black/40 border border-white/20">
+                    <th key={risk} className="p-2 text-center text-fg/60 font-medium bg-shade/40 border border-fg/20">
                     {risk.charAt(0).toUpperCase() + risk.slice(1)}
                     </th>
                 ))}
@@ -152,13 +152,13 @@ export default function ClimateResiliencePanel({
             <tbody>
                 {resiliencyLevels.map((resiliency, rowIndex) => (
                 <tr key={resiliency}>
-                    <td className="p-2 font-medium text-white/80 bg-black/30 border border-white/20">
+                    <td className="p-2 font-medium text-fg/80 bg-shade/30 border border-fg/20">
                     {resiliency.charAt(0).toUpperCase() + resiliency.slice(1)}
                     </td>
                     {matrix[rowIndex].map((value, colIndex) => (
                     <td
                         key={`${rowIndex}-${colIndex}`}
-                        className="p-2 text-center border border-white/20 text-white"
+                        className="p-2 text-center border border-fg/20 text-fg"
                         style={{ backgroundColor: getCellColor(value) }}
                         title={getActionDescription(value)}
                     >
@@ -172,8 +172,8 @@ export default function ClimateResiliencePanel({
         </div>
 
           {/* Legend */}
-          <div className="mt-6 pt-4 border-t border-white/10">
-            <h4 className="text-sm font-semibold text-white/70 mb-3">Legend</h4>
+          <div className="mt-6 pt-4 border-t border-fg/10">
+            <h4 className="text-sm font-semibold text-fg/70 mb-3">Legend</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
               {Object.entries(recommendationsMeta || {})
                 .sort(([a], [b]) => Number(a) - Number(b))
@@ -184,7 +184,7 @@ export default function ClimateResiliencePanel({
                       style={{ backgroundColor: meta.color }}
                     />
                     <span
-                      className="text-white/60 cursor-help"
+                      className="text-fg/60 cursor-help"
                       title={`${meta.description}\n\nExamples: ${meta.examples}`}
                     >
                       {meta.label_short || meta.label}
@@ -198,20 +198,20 @@ export default function ClimateResiliencePanel({
         {/* Key Metrics Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Biodiversity Risk Metric */}
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-red-950/20 to-black/20 p-5 ring-1 ring-white/5">
+          <div className="rounded-2xl border border-fg/10 bg-gradient-to-br from-danger-950/20 to-shade/20 p-5 ring-1 ring-fg/5">
             <div className="flex items-center gap-2 mb-3">
-              <Activity className="h-5 w-5 text-red-400" />
-              <h3 className="text-lg font-semibold text-red-200">
+              <Activity className="h-5 w-5 text-danger-400" />
+              <h3 className="text-lg font-semibold text-danger-200">
                 Biodiversity Risk
               </h3>
             </div>
             <div className="space-y-2">
               <div>
-                <p className="text-xs text-white/45">Mean Risk Value</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs text-fg/45">Mean Risk Value</p>
+                <p className="text-2xl font-bold text-fg">
                   {formatMeanValue(biodiversityRiskData?.mean_raster_value)}
                 </p>
-                <p className="text-xs text-white/40 mt-1">
+                <p className="text-xs text-fg/40 mt-1">
                   Std Dev: {formatMeanValue(biodiversityRiskData?.std_raster_value)}
                 </p>
               </div>
@@ -219,17 +219,17 @@ export default function ClimateResiliencePanel({
           </div>
 
           {/* Climate Resiliency Metric */}
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-950/20 to-black/20 p-5 ring-1 ring-white/5">
+          <div className="rounded-2xl border border-fg/10 bg-gradient-to-br from-accent-950/20 to-shade/20 p-5 ring-1 ring-fg/5">
             <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="h-5 w-5 text-emerald-400" />
-              <h3 className="text-lg font-semibold text-emerald-200">
+              <BarChart3 className="h-5 w-5 text-accent-400" />
+              <h3 className="text-lg font-semibold text-accent-200">
                 Climate Resiliency
               </h3>
             </div>
             <div className="space-y-2">
               <div>
-                <p className="text-xs text-white/45">Dominant Resiliency Class</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs text-fg/45">Dominant Resiliency Class</p>
+                <p className="text-2xl font-bold text-fg">
                   {resiliencyData?.resilience_dominant_class}
                 </p>
               </div>
@@ -238,49 +238,49 @@ export default function ClimateResiliencePanel({
         </div>
 
         {/* Model Configuration */}
-        <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
-          <h3 className="text-lg font-semibold text-emerald-200 mb-3">
+        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+          <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Model Configuration
           </h3>
           <div className="grid grid-cols-2 gap-3 text-sm mb-4">
             <div>
-              <p className="text-xs text-white/45">Climate Model</p>
-              <p className="text-white/80 font-medium">
+              <p className="text-xs text-fg/45">Climate Model</p>
+              <p className="text-fg/80 font-medium">
                 {caseData?.climate_model ?? "current"}
               </p>
             </div>
             <div>
-              <p className="text-xs text-white/45">Climate Scenario</p>
-              <p className="text-white/80 font-medium">
+              <p className="text-xs text-fg/45">Climate Scenario</p>
+              <p className="text-fg/80 font-medium">
                 {resiliencyData?.climate_scenarios
                   ? resiliencyData.climate_scenarios.toUpperCase()
                   : (caseData?.climate_scenario ?? "SSP585 (worst-case)")}
               </p>
             </div>
             <div>
-              <p className="text-xs text-white/45">Time Period</p>
-              <p className="text-white/80 font-medium">
+              <p className="text-xs text-fg/45">Time Period</p>
+              <p className="text-fg/80 font-medium">
                 {resiliencyData?.periods}
               </p>
             </div>
             <div>
-              <p className="text-xs text-white/45">Country Code</p>
-              <p className="text-white/80 font-medium">{caseData?.country_code ?? "NL"}</p>
+              <p className="text-xs text-fg/45">Country Code</p>
+              <p className="text-fg/80 font-medium">{caseData?.country_code ?? "NL"}</p>
             </div>
           </div>
 
           {/* Additional Resiliency Parameters */}
           {resiliencyData && (resiliencyData.climate_scenarios || resiliencyData.climate_model) && (
-            <div className="mt-3 pt-3 border-t border-white/10">
-              <p className="text-xs text-white/45 mb-2">Resiliency SRI Parameters</p>
+            <div className="mt-3 pt-3 border-t border-fg/10">
+              <p className="text-xs text-fg/45 mb-2">Resiliency SRI Parameters</p>
               <div className="flex flex-wrap gap-2">
                 {resiliencyData.sri_logic_type && (
-                  <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                  <span className="text-xs px-2 py-1 rounded-full bg-accent-500/10 text-accent-300 border border-accent-500/20">
                     SRI Logic: {resiliencyData.sri_logic_type}
                   </span>
                 )}
                 {resiliencyData.sri_correction_method && (
-                  <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                  <span className="text-xs px-2 py-1 rounded-full bg-accent-500/10 text-accent-300 border border-accent-500/20">
                     Correction: {resiliencyData.sri_correction_method}
                   </span>
                 )}
@@ -290,14 +290,14 @@ export default function ClimateResiliencePanel({
         </div>
 
         {/* Future Projections */}
-        <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
           <div className="flex items-center gap-2 mb-3">
             <Calendar className="h-5 w-5 text-orange-400" />
-            <h3 className="text-lg font-semibold text-emerald-200">
+            <h3 className="text-lg font-semibold text-accent-200">
               Future Projections {resiliencyData?.periods }
             </h3>
           </div>
-          <p className="text-sm leading-relaxed text-white/70 mb-4">
+          <p className="text-sm leading-relaxed text-fg/70 mb-4">
             Future Species Richness Index calculations are trained using an ensemble of models under the {resiliencyData?.climate_scenarios?.toUpperCase() ?? "SSP585"} climate scenarios, ensuring a cautious and conservative approach to climate resilience assessment. These projections are subsequently corrected using the {resiliencyData?.sri_correction_method ?? "Human Footprint Index (HFI)"} to account for anticipated anthropogenic pressures.
           </p>
           <div className="rounded-lg bg-orange-500/5 border border-orange-500/20 p-3">
@@ -305,7 +305,7 @@ export default function ClimateResiliencePanel({
               <TrendingUp className="h-4 w-4 text-orange-400" />
               <p className="text-xs font-semibold text-orange-300 uppercase tracking-wider">Methodology Note</p>
             </div>
-            <p className="text-xs text-white/60">
+            <p className="text-xs text-fg/60">
               Ensemble modeling reduces prediction uncertainty by aggregating multiple model outputs. Among the {resiliencyData?.climate_scenarios?.toUpperCase() ?? "SSP585"} scenarios, one represents a high-emission trajectory with radiative forcing reaching 8.5 W/m² by 2100.
             </p>
           </div>
@@ -313,21 +313,21 @@ export default function ClimateResiliencePanel({
 
 
         {/* Methodology Reference */}
-        <div className="rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5">
+        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-emerald-200">
+            <h3 className="text-lg font-semibold text-accent-200">
               Methodology & Reference
             </h3>
-            <BookOpen className="h-4 w-4 text-white/40" />
+            <BookOpen className="h-4 w-4 text-fg/40" />
           </div>
-          <p className="text-sm leading-relaxed text-white/70 mb-3">
+          <p className="text-sm leading-relaxed text-fg/70 mb-3">
             This climate resilience framework integrates habitat risk and landscape resilience to prioritize management actions. The methodology follows established approaches for mapping priority areas for protection and restoration under climate change scenarios.
           </p>
           <a
             href="https://doi.org/10.1016/j.landurbplan.2024.105111"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-accent-400 hover:text-accent-300 transition-colors"
           >
             <LinkIcon className="h-3.5 w-3.5" />
             <span>10.1016/j.landurbplan.2024.105111 - Landscape and Urban Planning</span>

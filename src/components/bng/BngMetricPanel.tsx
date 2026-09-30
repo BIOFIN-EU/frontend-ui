@@ -35,22 +35,22 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
   const showPending = !isBank && rows.some((entry) => (entry.pending_units ?? 0) > 0);
 
   return (
-    <section className="rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.06] p-5">
+    <section className="rounded-2xl border border-accent-400/20 bg-accent-500/[0.06] p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-base font-semibold text-white">{title}</h3>
-        <p className="text-xs text-white/55">
+        <h3 className="text-base font-semibold text-fg">{title}</h3>
+        <p className="text-xs text-fg/55">
           Simplified prototype metric, not the Statutory Biodiversity Metric
         </p>
       </div>
 
       {loading && !summary ? (
-        <p className="mt-4 text-sm text-white/60">Calculating…</p>
+        <p className="mt-4 text-sm text-fg/60">Calculating…</p>
       ) : rows.length === 0 ? (
-        <p className="mt-4 text-sm text-white/60">No habitats recorded yet.</p>
+        <p className="mt-4 text-sm text-fg/60">No habitats recorded yet.</p>
       ) : (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[560px] text-left text-sm">
-            <thead className="text-xs uppercase tracking-wider text-white/50">
+            <thead className="text-xs uppercase tracking-wider text-fg/50">
               <tr>
                 <th className="py-2 pr-3 font-semibold">Category</th>
                 <th className="py-2 pr-3 text-right font-semibold">Baseline</th>
@@ -71,23 +71,23 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10 text-white/85">
+            <tbody className="divide-y divide-fg/10 text-fg/85">
               {rows.map((entry) => (
                 <tr key={entry.category}>
                   <td className="py-2.5 pr-3">
-                    <p className="font-semibold text-white">{BNG_CATEGORY_LABEL[entry.category]}</p>
-                    <p className="text-xs text-white/50">{BNG_UNIT_NAME[entry.category]}</p>
+                    <p className="font-semibold text-fg">{BNG_CATEGORY_LABEL[entry.category]}</p>
+                    <p className="text-xs text-fg/50">{BNG_UNIT_NAME[entry.category]}</p>
                   </td>
                   <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.baseline_units)}</td>
                   <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.proposed_units)}</td>
                   <td className="py-2.5 pr-3 text-right tabular-nums">
                     {formatUnits(entry.change_units)}
-                    <span className="ml-1 text-xs text-white/50">{formatPercent(entry.change_percent)}</span>
+                    <span className="ml-1 text-xs text-fg/50">{formatPercent(entry.change_percent)}</span>
                   </td>
                   {isBank ? (
                     <>
                       <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.allocated_units)}</td>
-                      <td className="py-2.5 text-right font-semibold tabular-nums text-emerald-200">
+                      <td className="py-2.5 text-right font-semibold tabular-nums text-accent-200">
                         {formatUnits(entry.available_units)}
                       </td>
                     </>
@@ -96,11 +96,11 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
                       <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.target_units)}</td>
                       <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.allocated_units)}</td>
                       {showPending && (
-                        <td className="py-2.5 pr-3 text-right tabular-nums text-amber-200">{formatUnits(entry.pending_units)}</td>
+                        <td className="py-2.5 pr-3 text-right tabular-nums text-warning-200">{formatUnits(entry.pending_units)}</td>
                       )}
                       <td
                         className={`py-2.5 text-right font-semibold tabular-nums ${
-                          entry.meets_target ? "text-emerald-200" : "text-amber-200"
+                          entry.meets_target ? "text-accent-200" : "text-warning-200"
                         }`}
                       >
                         {entry.meets_target ? "Met" : formatUnits(entry.remaining_shortfall_units)}
@@ -118,8 +118,8 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
         <p
           className={`mt-4 rounded-xl px-3 py-2 text-sm ${
             summary.meets_target
-              ? "border border-emerald-400/25 bg-emerald-500/10 text-emerald-100"
-              : "border border-amber-400/25 bg-amber-500/10 text-amber-100"
+              ? "border border-accent-400/25 bg-accent-500/10 text-accent-100"
+              : "border border-warning-400/25 bg-warning-500/10 text-warning-100"
           }`}
         >
           {summary.meets_target
@@ -131,7 +131,7 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
       )}
 
       {isBank && summary && rows.length > 0 && (
-        <p className="mt-4 text-sm text-white/65">
+        <p className="mt-4 text-sm text-fg/65">
           Available units are the uplift over the baseline, less what developments have already taken.
           They can be allocated once this habitat bank is registered (all steps completed).
         </p>

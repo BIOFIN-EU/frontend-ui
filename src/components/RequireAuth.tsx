@@ -22,8 +22,8 @@ export default function RequireAuth({
   if (isInitializing) {
     return (
       <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">Loading…</h1>
-        <p className="text-sm text-white/70">Checking your session.</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-fg">Loading…</h1>
+        <p className="text-sm text-fg/70">Checking your session.</p>
       </section>
     );
   }

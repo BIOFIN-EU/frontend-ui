@@ -10,7 +10,7 @@ import { HabitatTableStep } from "@/components/bng/HabitatTableStep";
 import { BngMetricStep } from "@/components/bng/BngMetricStep";
 import { UnitAllocationStep } from "@/components/bng/UnitAllocationStep";
 import { BngStepGate } from "@/components/bng/BngStepGate";
-import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
 
 export type PathwayStepMode = "submit" | "edit";
 
@@ -62,16 +62,16 @@ export function PathwayStepScreen({
 }: Props) {
   if (mode === "submit" && (state.status === "completed" || !state.step)) {
     return (
-      <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+      <div className="rounded-2xl border border-accent-400/30 bg-accent-500/10 p-6 shadow-panel">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-200/80">
+            <p className="text-xs font-semibold uppercase tracking-wider text-accent-200/80">
               Completed
             </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-fg">
               Your project has been created successfully
             </h2>
-            <p className="mt-3 max-w-2xl text-sm text-white/75">
+            <p className="mt-3 max-w-2xl text-sm text-fg/75">
               You have completed all required steps. You can now open your project
               dashboard to review the submitted information, documents, and next
               steps.
@@ -81,7 +81,7 @@ export function PathwayStepScreen({
           <div className="shrink-0">
             <Link
               href={`/projects/${state.case_id}`}
-              className={`${buttonBase} ${buttonPrimary}`}
+              className={buttonClass("primary")}
             >
               View project #{state.case_id}
             </Link>
@@ -94,7 +94,7 @@ export function PathwayStepScreen({
   const step = stepConfig ?? state.step;
 
   if (!step) {
-    return <p className="text-sm text-white/70">No step available.</p>;
+    return <p className="text-sm text-fg/70">No step available.</p>;
   }
 
   const effectiveStepCode = stepCode ?? state.current_step ?? "";
@@ -153,12 +153,12 @@ function StepTags({ stage, actor }: { stage?: string; actor?: string }) {
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
       {stage && (
-        <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-white/70">
+        <span className="rounded-full border border-fg/10 bg-fg/[0.06] px-3 py-1 text-fg/70">
           {stage}
         </span>
       )}
       {actor && (
-        <span className="rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-emerald-100">
+        <span className="rounded-full border border-accent-400/25 bg-accent-500/10 px-3 py-1 text-accent-100">
           Actor: {actor}
         </span>
       )}

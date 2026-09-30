@@ -20,7 +20,10 @@ import {
   type BngMetricSummary,
 } from "@/types/bng";
 import type { CaseListItem } from "@/types/case-list";
-import { buttonBaseSm, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
+import { Alert } from "@/components/ui/Alert";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 type SortKey = "match" | "available" | "price";
 type Units = Record<BngCategory, number>;
@@ -28,8 +31,7 @@ type Units = Record<BngCategory, number>;
 const ZERO: Units = { area: 0, hedgerow: 0, watercourse: 0 };
 const ALLOCATION_STEP = "offsite_allocation";
 
-const inputClass =
-  "rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400";
+const inputClass = fieldClass("compact", { inline: true });
 
 // The development the marketplace is showing matches for.
 type Development = {
@@ -171,27 +173,25 @@ export default function BngMarketplacePage() {
 
   return (
     <div className="space-y-6 pb-10">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">BNG Marketplace</h1>
-        <p className="max-w-3xl text-sm text-white/70">
-          Registered habitat banks with biodiversity units still available. Choose one of your developments to see
-          how much of its shortfall each bank covers, and reserve units from it.
-        </p>
-        <p className="text-xs text-white/50">Prototype · Simplified metric, not the Statutory Biodiversity Metric</p>
-      </header>
+      <PageHeader
+        title="BNG Marketplace"
+        subtitle="Registered habitat banks with biodiversity units still available. Choose one of your developments to see how much of its shortfall each bank covers, and reserve units from it."
+      >
+        <p className="text-xs text-fg/50">Prototype · Simplified metric, not the Statutory Biodiversity Metric</p>
+      </PageHeader>
 
-      <section className="rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.06] p-5">
+      <section className="rounded-2xl border border-accent-400/20 bg-accent-500/[0.06] p-5">
         {developments.length === 0 ? (
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-fg/70">
             To see matches and reserve units, create a{" "}
-            <Link href="/pathways?tab=bng" className="font-semibold !text-emerald-200 hover:!text-emerald-100">
+            <Link href="/pathways?tab=bng" className="font-semibold !text-accent-200 hover:!text-accent-100">
               BNG Development
             </Link>{" "}
             project.
           </p>
         ) : (
           <div className="flex flex-wrap items-center gap-3">
-            <label className="flex flex-wrap items-center gap-2 text-sm text-white/80">
+            <label className="flex flex-wrap items-center gap-2 text-sm text-fg/80">
               Showing matches for
               <select value={developmentId} onChange={(e) => chooseDevelopment(e.target.value)} className={inputClass}>
                 <option value="">No development (browse only)</option>
@@ -202,12 +202,12 @@ export default function BngMarketplacePage() {
                 ))}
               </select>
             </label>
-            {loadingDevelopment && <span className="text-sm text-white/55">Loading…</span>}
+            {loadingDevelopment && <span className="text-sm text-fg/55">Loading…</span>}
           </div>
         )}
 
         {development && !loadingDevelopment && (
-          <p className="mt-3 text-sm text-white/75">
+          <p className="mt-3 text-sm text-fg/75">
             {development.reservable === "not_needed"
               ? "This development meets its 10% target on-site, so it doesn't need off-site units."
               : totalNeed <= 0
@@ -223,7 +223,7 @@ export default function BngMarketplacePage() {
 
       <div className="flex flex-wrap items-center gap-3">
         {!development && (
-          <label className="flex items-center gap-2 text-sm text-white/70">
+          <label className="flex items-center gap-2 text-sm text-fg/70">
             Units
             <select value={category} onChange={(e) => setCategory(e.target.value as BngCategory)} className={inputClass}>
               {BNG_CATEGORIES.map((option) => (
@@ -234,7 +234,7 @@ export default function BngMarketplacePage() {
             </select>
           </label>
         )}
-        <label className="flex items-center gap-2 text-sm text-white/70">
+        <label className="flex items-center gap-2 text-sm text-fg/70">
           Sort by
           <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className={inputClass}>
             {development && <option value="match">Best match</option>}
@@ -245,15 +245,15 @@ export default function BngMarketplacePage() {
       </div>
 
       {error && (
-        <div role="alert" className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+        <Alert tone="danger" role="alert">
           {error}
-        </div>
+        </Alert>
       )}
 
       {!user || banks === null ? (
-        !error && <p className="text-sm text-white/60">Loading habitat banks…</p>
+        !error && <p className="text-sm text-fg/60">Loading habitat banks…</p>
       ) : listed.length === 0 ? (
-        <p className="text-sm text-white/60">
+        <p className="text-sm text-fg/60">
           {development
             ? "No registered habitat banks have units available yet."
             : `No registered habitat banks have ${BNG_CATEGORY_LABEL[category].toLowerCase()} units available yet.`}
@@ -261,10 +261,10 @@ export default function BngMarketplacePage() {
       ) : (
         <section className="grid gap-4 lg:grid-cols-2">
           {listed.map(({ bank, fit }) => (
-            <article key={bank.case_id} className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+            <article key={bank.case_id} className="flex flex-col rounded-2xl border border-fg/10 bg-fg/[0.035] p-5">
               <div>
-                <h2 className="text-lg font-semibold text-white">{bank.name ?? "Habitat bank"}</h2>
-                <p className="text-sm text-white/60">
+                <h2 className="text-lg font-semibold text-fg">{bank.name ?? "Habitat bank"}</h2>
+                <p className="text-sm text-fg/60">
                   {[bank.site_names?.join(", "), bank.countries?.join(", ")].filter(Boolean).join(" · ") ||
                     "Site details not given"}
                   {bank.site_area_ha ? ` · ${formatUnits(bank.site_area_ha)} ha` : ""}
@@ -272,7 +272,7 @@ export default function BngMarketplacePage() {
               </div>
 
               <table className="mt-4 w-full text-left text-sm">
-                <thead className="text-xs uppercase tracking-wider text-white/50">
+                <thead className="text-xs uppercase tracking-wider text-fg/50">
                   <tr>
                     <th className="py-1.5 pr-3 font-semibold">Category</th>
                     <th className="py-1.5 pr-3 text-right font-semibold">Available</th>
@@ -280,11 +280,11 @@ export default function BngMarketplacePage() {
                     <th className="py-1.5 text-right font-semibold">Price / unit</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10 text-white/85">
+                <tbody className="divide-y divide-fg/10 text-fg/85">
                   {BNG_CATEGORIES.filter((c) => (bank.uplift_units?.[c] ?? bank.available_units[c] ?? 0) > 0).map((c) => (
-                    <tr key={c} className={!development && c === category ? "text-white" : undefined}>
+                    <tr key={c} className={!development && c === category ? "text-fg" : undefined}>
                       <td className="py-2 pr-3">{BNG_CATEGORY_LABEL[c]}</td>
-                      <td className="py-2 pr-3 text-right font-semibold tabular-nums text-emerald-200">
+                      <td className="py-2 pr-3 text-right font-semibold tabular-nums text-accent-200">
                         {formatUnits(bank.available_units[c])}
                       </td>
                       <td className="py-2 pr-3 text-right tabular-nums">{formatUnits(bank.uplift_units?.[c])}</td>
@@ -320,34 +320,34 @@ function MatchFooter({
   const href = `/pathways/${development.id}?step=${ALLOCATION_STEP}&bank=${bank.case_id}`;
 
   return (
-    <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-sm">
-      <p className="text-white/75">
+    <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-fg/10 pt-4 text-sm">
+      <p className="text-fg/75">
         {totalNeed <= 0 ? (
           "Nothing more needed for this development."
         ) : fit.coverage > 0 ? (
           <>
-            Covers <span className="font-semibold text-white">{Math.round(fit.coverage * 100)}%</span> of what{" "}
+            Covers <span className="font-semibold text-fg">{Math.round(fit.coverage * 100)}%</span> of what{" "}
             {development.name} still needs
             {fit.cost != null && (
               <>
-                {" "}· about <span className="font-semibold text-white">{formatMoney(fit.cost)}</span>
+                {" "}· about <span className="font-semibold text-fg">{formatMoney(fit.cost)}</span>
               </>
             )}
           </>
         ) : (
           "Has none of the unit types this development needs."
         )}
-        {alreadyRequested && <span className="block text-xs text-white/50">Already requested by this development.</span>}
+        {alreadyRequested && <span className="block text-xs text-fg/50">Already requested by this development.</span>}
       </p>
 
       {development.reservable === "open" && (fit.coverage > 0 || alreadyRequested) ? (
-        <Link href={href} className={`${buttonBaseSm} ${buttonPrimary}`}>
+        <Link href={href} className={buttonClass("primary", "sm")}>
           {alreadyRequested ? "Change reservation →" : "Reserve units →"}
         </Link>
       ) : development.reservable === "not_reached" && fit.coverage > 0 ? (
-        <span className="text-xs text-white/50">Reserve once the development reaches Off-Site Unit Reservation</span>
+        <span className="text-xs text-fg/50">Reserve once the development reaches Off-Site Unit Reservation</span>
       ) : development.reservable === "completed" ? (
-        <span className="text-xs text-white/50">This development is complete</span>
+        <span className="text-xs text-fg/50">This development is complete</span>
       ) : null}
     </div>
   );

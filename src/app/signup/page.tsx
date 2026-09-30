@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import * as auth from "@/services/auth.service";
 import Link from "next/link";
-import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
+import { Alert } from "@/components/ui/Alert";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -33,31 +35,31 @@ export default function SignupPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <h1 className="text-4xl font-semibold tracking-tight text-white">
+        <h1 className="text-4xl font-semibold tracking-tight text-fg">
           Sign up
         </h1>
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-fg/70">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-semibold text-emerald-200 underline decoration-emerald-300/40 underline-offset-4 transition hover:text-emerald-100"
+            className="font-semibold text-accent-200 underline decoration-accent-300/40 underline-offset-4 transition hover:text-accent-100"
           >
             Login here
           </Link>
         </p>
       </header>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md">
         <div className="mb-4">
-          <p className="text-xs text-white/50">
-            <span className="font-semibold text-red-300">*</span> Required fields
+          <p className="text-xs text-fg/50">
+            <span className="font-semibold text-danger-300">*</span> Required fields
           </p>
         </div>
 
         <form onSubmit={onSubmit} className="grid max-w-md gap-4">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-xs font-medium text-white/70">
-              Email address <span className="text-red-300">*</span>
+            <label htmlFor="email" className="text-label">
+              Email address <span className="text-danger-300">*</span>
             </label>
             <input
               id="email"
@@ -66,13 +68,13 @@ export default function SignupPage() {
               type="email"
               placeholder="Email"
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20"
+              className={fieldClass("roomy")}
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="password" className="text-xs font-medium text-white/70">
-              Password <span className="text-red-300">*</span>
+            <label htmlFor="password" className="text-label">
+              Password <span className="text-danger-300">*</span>
             </label>
             <input
               id="password"
@@ -81,20 +83,20 @@ export default function SignupPage() {
               type="password"
               placeholder="Password"
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20"
+              className={fieldClass("roomy")}
             />
           </div>
 
           {err ? (
-            <div className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100 ring-1 ring-red-400/20">
+            <Alert tone="danger">
               {err}
-            </div>
+            </Alert>
           ) : null}
 
           <button
             type="submit"
             disabled={loading}
-            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass("primary")}`}
           >
             {loading ? "Creating…" : "Create account"}
           </button>

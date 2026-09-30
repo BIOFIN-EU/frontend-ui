@@ -3,7 +3,8 @@
 import { useState } from "react";
 import type { CaseUserAccess } from "@/types/case-access";
 import { addCaseUser } from "@/services/case-access.service";
-import { buttonBase, buttonBaseSm, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 
 type CaseAccessManagementProps = {
   caseId: number;
@@ -43,10 +44,10 @@ export function ProjectAccessManagement({
   }
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+    <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
+          <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">
             Access
           </p>
         </div>
@@ -54,20 +55,20 @@ export function ProjectAccessManagement({
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className={`${buttonBaseSm} ${buttonPrimary}`}
+          className={buttonClass("primary", "sm")}
         >
           Add user
         </button>
       </div>
 
       {showForm && (
-        <div className="mt-6 space-y-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        <div className="mt-6 space-y-4 rounded-xl surface-card p-4">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="User email"
-            className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white outline-none"
+            className="w-full rounded-lg bg-fg/10 px-3 py-2 text-sm text-fg outline-none"
           />
 
           <select
@@ -75,7 +76,7 @@ export function ProjectAccessManagement({
             onChange={(e) =>
               setRole(e.target.value as "borrower" | "funder" | "intermediary")
             }
-            className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white outline-none"
+            className="w-full rounded-lg bg-fg/10 px-3 py-2 text-sm text-fg outline-none"
           >
             <option value="borrower">Borrower</option>
             <option value="funder">Funder</option>
@@ -84,7 +85,7 @@ export function ProjectAccessManagement({
 
           <button
             onClick={handleAddUser}
-            className={`${buttonBase} ${buttonPrimary}`}
+            className={buttonClass("primary")}
           >
             Save
           </button>
@@ -96,14 +97,14 @@ export function ProjectAccessManagement({
           users.map((userAccess) => (
             <div
               key={userAccess.id}
-              className="rounded-xl border border-white/10 bg-black/20 p-4"
+              className="rounded-xl surface-card p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="break-all text-sm font-medium text-white">
+                  <p className="break-all text-sm font-medium text-fg">
                     {userAccess.user_id}
                   </p>
-                  <p className="mt-1 text-xs uppercase tracking-wider text-white/50">
+                  <p className="mt-1 text-xs uppercase tracking-wider text-fg/50">
                     {userAccess.case_role}
                     {userAccess.is_owner ? " · Owner" : ""}
                   </p>
@@ -121,7 +122,7 @@ export function ProjectAccessManagement({
             </div>
           ))
         ) : (
-          <p className="text-sm text-white/50">No users found.</p>
+          <p className="text-sm text-fg/50">No users found.</p>
         )}
       </div>
     </section>
@@ -130,8 +131,8 @@ export function ProjectAccessManagement({
 
 function PermissionPill({ label }: { label: string }) {
   return (
-    <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-200 ring-1 ring-emerald-400/25">
+    <Badge tone="success" size="md">
       {label}
-    </span>
+    </Badge>
   );
 }

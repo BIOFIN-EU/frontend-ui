@@ -10,6 +10,7 @@ import { ProjectDashboardScreen } from "@/components/projects/ProjectDashboardSc
 import { ProjectDashboardMenu } from "@/components/projects/ProjectDashboardMenu";
 import { DeleteProjectDialog } from "@/components/projects/DeleteProjectDialog";
 import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";
+import { Alert } from "@/components/ui/Alert";
 
 export default function CaseDashboardPage() {
   const params = useParams<{ caseId: string }>();
@@ -47,21 +48,21 @@ export default function CaseDashboardPage() {
   }, [caseId, user]);
 
   if (!user) {
-    return <p className="text-sm text-white/70">Loading project access…</p>;
+    return <p className="text-sm text-fg/70">Loading project access…</p>;
   }
 
   return (
     <div className="space-y-8">
       {loading && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
+        <div className="rounded-2xl surface-panel p-6 text-fg/70">
           Loading project dashboard...
         </div>
       )}
 
       {!loading && error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+        <Alert tone="danger">
           {error}
-        </div>
+        </Alert>
       )}
 
       {!loading && state && (

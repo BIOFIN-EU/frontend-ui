@@ -107,18 +107,18 @@ export function ApiErrorProvider({ children }: { children: React.ReactNode }) {
           <div
             key={toast.id}
             role="alert"
-            className="pointer-events-auto rounded-xl border border-red-400/30 bg-red-500/15 px-4 py-3 text-sm text-red-100 shadow-xl backdrop-blur-md"
+            className="pointer-events-auto rounded-xl border border-danger-400/30 bg-danger-500/15 px-4 py-3 text-sm text-danger-100 shadow-xl backdrop-blur-md"
           >
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">{toast.title}</p>
-                <p className="mt-1 break-words text-red-100/90">{toast.message}</p>
+                <p className="mt-1 break-words text-danger-100/90">{toast.message}</p>
               </div>
               <button
                 type="button"
                 onClick={() => dismiss(toast.id)}
                 aria-label="Dismiss"
-                className="rounded-md px-2 py-1 text-red-100/80 hover:bg-white/10 hover:text-white"
+                className="rounded-md px-2 py-1 text-danger-100/80 hover:bg-fg/10 hover:text-fg"
               >
                 ✕
               </button>

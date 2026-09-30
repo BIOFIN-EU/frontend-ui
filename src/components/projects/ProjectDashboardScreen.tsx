@@ -12,6 +12,7 @@ import type { CaseDashboardState } from "@/types/case-dashboard";
 import type { CaseLocationEntry } from "@/types/case-location";
 import type { CaseDocument } from "@/types/case-document";
 import type { WorkflowField, WorkflowStep } from "@/types/workflow";
+import { Badge } from "@/components/ui/Badge";
 
 type OrderedStep = {
   code: string;
@@ -204,18 +205,16 @@ function LocationCard({
   const mapWkt = locationMapWkt(location);
 
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+    <div className="rounded-xl surface-card p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-medium text-white">
+        <p className="text-sm font-medium text-fg">
           {location.friendly_name?.trim() || `Location ${index + 1}`}
         </p>
 
-        <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/60 ring-1 ring-white/10">
-          {location.location_type}
-        </span>
+        <Badge size="md">{location.location_type}</Badge>
       </div>
 
-      <div className="mt-3 overflow-hidden rounded-xl border border-white/10">
+      <div className="mt-3 overflow-hidden rounded-xl border border-fg/10">
         {mapWkt ? (
           <RiskMap
             polygonWkt={mapWkt}
@@ -224,7 +223,7 @@ function LocationCard({
             heightClassName="h-[220px]"
           />
         ) : (
-          <div className="flex h-[220px] items-center justify-center bg-black/30 text-sm text-white/40">
+          <div className="flex h-[220px] items-center justify-center bg-shade/30 text-sm text-fg/40">
             No geometry
           </div>
         )}
@@ -232,33 +231,33 @@ function LocationCard({
 
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div>
-          <p className="text-xs font-medium text-white/40">Country</p>
-          <p className="mt-1 text-sm text-white/80">
+          <p className="text-xs font-medium text-fg/40">Country</p>
+          <p className="mt-1 text-sm text-fg/80">
             {location.country?.name ?? "—"}
           </p>
         </div>
 
         <div>
-          <p className="text-xs font-medium text-white/40">Area</p>
-          <p className="mt-1 text-sm text-white/80">
+          <p className="text-xs font-medium text-fg/40">Area</p>
+          <p className="mt-1 text-sm text-fg/80">
             {formatLocationArea(location)}
           </p>
         </div>
       </div>
 
       <div className="mt-3">
-        <p className="text-xs font-medium text-white/40">
+        <p className="text-xs font-medium text-fg/40">
           {location.location_type === "polygon" ? "Polygon WKT" : "Coordinates"}
         </p>
-        <p className="mt-1 max-h-24 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-black/30 p-2 font-mono text-xs text-white/70">
+        <p className="mt-1 max-h-24 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-shade/30 p-2 font-mono text-xs text-fg/70">
           {formatLocationValue(location)}
         </p>
       </div>
 
       {location.notes && (
         <div className="mt-3">
-          <p className="text-xs font-medium text-white/40">Notes</p>
-          <p className="mt-1 whitespace-pre-wrap break-words text-sm text-white/70">
+          <p className="text-xs font-medium text-fg/40">Notes</p>
+          <p className="mt-1 whitespace-pre-wrap break-words text-sm text-fg/70">
             {location.notes}
           </p>
         </div>
@@ -270,7 +269,7 @@ function LocationCard({
 function LocationsSection({ locations }: { locations: CaseLocationEntry[] }) {
   if (!locations.length) {
     return (
-      <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/50 md:col-span-2">
+      <div className="rounded-xl surface-card p-4 text-sm text-fg/50 md:col-span-2">
         No locations found.
       </div>
     );
@@ -299,17 +298,15 @@ function DocumentFieldCard({
   document: CaseDocument | undefined;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+    <div className="rounded-xl surface-card p-4">
       <div className="flex items-start justify-between gap-3">
         <span className="flex items-center gap-1.5">
-          <p className="text-sm font-medium text-white">{field.display_name}</p>
+          <p className="text-sm font-medium text-fg">{field.display_name}</p>
           <FieldHelp text={field.help_text} label={field.display_name} />
         </span>
 
         {field.required && (
-          <span className="rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-200 ring-1 ring-amber-400/25">
-            Required
-          </span>
+          <Badge tone="warning" size="md">Required</Badge>
         )}
       </div>
 
@@ -317,7 +314,7 @@ function DocumentFieldCard({
         {document ? (
           <DocumentCard caseId={caseId} document={document} />
         ) : (
-          <p className="text-sm text-white/50">No file uploaded.</p>
+          <p className="text-sm text-fg/50">No file uploaded.</p>
         )}
       </div>
     </div>
@@ -332,21 +329,19 @@ function StandardFieldCard({
   value: unknown;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+    <div className="rounded-xl surface-card p-4">
       <div className="flex items-start justify-between gap-3">
         <span className="flex items-center gap-1.5">
-          <p className="text-sm font-medium text-white">{field.display_name}</p>
+          <p className="text-sm font-medium text-fg">{field.display_name}</p>
           <FieldHelp text={field.help_text} label={field.display_name} />
         </span>
 
         {field.required && (
-          <span className="rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-200 ring-1 ring-amber-400/25">
-            Required
-          </span>
+          <Badge tone="warning" size="md">Required</Badge>
         )}
       </div>
 
-      <p className="mt-3 break-words text-sm text-white/70">
+      <p className="mt-3 break-words text-sm text-fg/70">
         {field.type === "date" && typeof value === "string" && value
           ? isoToDisplay(value)
           : formatValue(value)}
@@ -368,7 +363,7 @@ function getObjectLabel(value: unknown): string {
 function AssignmentTableCard({ assignments }: { assignments: unknown[] }) {
   if (!assignments.length) {
     return (
-      <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/50 md:col-span-2">
+      <div className="rounded-xl surface-card p-4 text-sm text-fg/50 md:col-span-2">
         No assignments found.
       </div>
     );
@@ -391,25 +386,25 @@ function AssignmentTableCard({ assignments }: { assignments: unknown[] }) {
         return (
           <div
             key={index}
-            className="rounded-xl border border-white/10 bg-black/20 p-4"
+            className="rounded-xl surface-card p-4"
           >
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
+            <p className="text-xs font-semibold uppercase tracking-wider text-fg/40">
               Assignment {index + 1}
             </p>
 
             <div className="mt-3 grid gap-4 md:grid-cols-2">
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-fg">
                   Assigned Entity
                 </p>
-                <p className="mt-1 text-sm text-white/70">
+                <p className="mt-1 text-sm text-fg/70">
                   {getObjectLabel(assignee)}
                 </p>
               </div>
 
               <div>
-                <p className="text-sm font-medium text-white">Role</p>
-                <p className="mt-1 text-sm text-white/70">
+                <p className="text-sm font-medium text-fg">Role</p>
+                <p className="mt-1 text-sm text-fg/70">
                   {getObjectLabel(role)}
                 </p>
               </div>
@@ -434,7 +429,7 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
 
   if (!activeStep) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-white/70">
+      <div className="rounded-2xl surface-panel p-6 text-fg/70">
         No workflow steps found.
       </div>
     );
@@ -450,13 +445,13 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
 
   return (
     <section className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] lg:sticky lg:top-24">
+      <aside className="h-fit rounded-2xl surface-panel p-5 shadow-panel lg:sticky lg:top-24">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/50">
+          <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">
             Steps
           </p>
 
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-fg/40">
             {completedSteps}/{orderedSteps.length}
           </p>
         </div>
@@ -474,31 +469,24 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
                 className={[
                   "w-full rounded-xl border p-4 text-left transition",
                   active
-                    ? "border-emerald-400/40 bg-emerald-500/10"
-                    : "border-white/10 bg-black/20 hover:bg-white/[0.06]",
+                    ? "border-accent-400/40 bg-accent-500/10"
+                    : "border-fg/10 bg-shade/20 hover:bg-fg/[0.06]",
                 ].join(" ")}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-fg/40">
                       Step {index + 1}
                     </p>
 
-                    <p className="mt-1 text-sm font-semibold text-white">
+                    <p className="mt-1 text-sm font-semibold text-fg">
                       {item.step.title}
                     </p>
                   </div>
 
-                  <span
-                    className={[
-                      "rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wider",
-                      complete
-                        ? "bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-400/25"
-                        : "bg-white/10 text-white/60 ring-1 ring-white/10",
-                    ].join(" ")}
-                  >
+                  <Badge tone={complete ? "success" : "neutral"} size="md">
                     {complete ? "Complete" : "Pending"}
-                  </span>
+                  </Badge>
                 </div>
               </button>
             );
@@ -506,8 +494,8 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
         </div>
       </aside>
 
-      <div className="min-h-[360px] min-w-0 rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
-        <h2 className="text-2xl font-semibold tracking-tight text-white">
+      <div className="min-h-[360px] min-w-0 rounded-2xl surface-panel p-6 shadow-panel">
+        <h2 className="text-2xl font-semibold tracking-tight text-fg">
           {activeStep.step.title}
         </h2>
 
@@ -575,7 +563,7 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
         </div>
 
         {(!activeStep.step.fields || activeStep.step.fields.length === 0) && (
-          <div className="mt-6 rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/50">
+          <div className="mt-6 rounded-xl surface-card p-4 text-sm text-fg/50">
             No fields configured for this step.
           </div>
         )}

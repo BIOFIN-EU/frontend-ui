@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import { formatDate } from "@/lib/format";
-import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
 
 type Props = {
   caseId: string;
@@ -15,18 +15,18 @@ type Props = {
 // Vulnerability Index and Access are project tabs (ProjectTabs), not buttons here.
 export function ProjectDashboardMenu({ caseId, state, onDelete }: Props) {
   return (
-    <div className="h-fit rounded-3xl border border-white/10 bg-white/[0.05] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+    <div className="h-fit rounded-3xl surface-panel p-5 shadow-panel">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+        <p className="text-eyebrow tracking-[0.2em]">
           Project summary
         </p>
 
-        <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">
+        <h2 className="mt-2 text-xl font-semibold tracking-tight text-fg">
           Project Identifier #{state.caseId ?? caseId}
         </h2>
 
         <div className="mt-3">
-          <span className="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
+          <span className="inline-flex rounded-full bg-accent-500/15 px-2.5 py-1 text-xs font-semibold text-accent-200 ring-1 ring-accent-400/25">
             {state.status || "Unknown"}
           </span>
         </div>
@@ -35,7 +35,7 @@ export function ProjectDashboardMenu({ caseId, state, onDelete }: Props) {
       <div className="mt-5 space-y-2">
         <Link
           href={`/pathways/${caseId}`}
-          className={`w-full ${buttonBase} ${buttonPrimary}`}
+          className={`w-full ${buttonClass("primary")}`}
         >
           Edit project
         </Link>
@@ -44,37 +44,37 @@ export function ProjectDashboardMenu({ caseId, state, onDelete }: Props) {
           <button
             type="button"
             onClick={onDelete}
-            className={`w-full ${buttonBase} border border-red-400/30 bg-red-500/10 !text-red-200 hover:bg-red-500/20`}
+            className={`w-full ${buttonClass("danger-soft")}`}
           >
             Delete project
           </button>
         )}
       </div>
 
-      <dl className="mt-5 space-y-4 border-t border-white/10 pt-5 text-sm">
+      <dl className="mt-5 space-y-4 border-t border-fg/10 pt-5 text-sm">
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wider text-white/35">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-fg/35">
             Project type
           </dt>
-          <dd className="mt-1 break-words font-medium text-white/80">
+          <dd className="mt-1 break-words font-medium text-fg/80">
             {state.caseTypeName || state.caseType || "—"}
           </dd>
         </div>
 
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wider text-white/35">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-fg/35">
             Created
           </dt>
-          <dd className="mt-1 font-medium text-white/80">
+          <dd className="mt-1 font-medium text-fg/80">
             {state.createdAt ? formatDate(state.createdAt) : "—"}
           </dd>
         </div>
 
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wider text-white/35">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-fg/35">
             Updated
           </dt>
-          <dd className="mt-1 font-medium text-white/80">
+          <dd className="mt-1 font-medium text-fg/80">
             {state.updatedAt ? formatDate(state.updatedAt) : "—"}
           </dd>
         </div>

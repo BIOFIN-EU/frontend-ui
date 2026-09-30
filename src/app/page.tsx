@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PageBackdrop } from "@/components/PageBackdrop";
 import { photoCredits } from "@/lib/photo-credits";
 import bertraghboyBay from "../../public/images/bertraghboy-bay.jpg";
-import { buttonBase, buttonPrimary, buttonSecondary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
 
 const pillars = [
   {
@@ -52,17 +52,17 @@ const audiences = [
 function TileGraphic({ type }: { type: string }) {
   if (type === "classify") {
     return (
-      <svg viewBox="0 0 320 120" className="h-full w-full">
+      <svg viewBox="0 0 320 120" className="h-full w-full text-fg">
         <defs>
           <linearGradient id="classifyGlow" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="rgba(52,211,153,0.85)" />
             <stop offset="100%" stopColor="rgba(16,185,129,0.25)" />
           </linearGradient>
         </defs>
-        <rect x="26" y="68" width="52" height="24" rx="8" fill="rgba(255,255,255,0.08)" />
-        <rect x="88" y="50" width="52" height="42" rx="8" fill="rgba(255,255,255,0.12)" />
+        <rect x="26" y="68" width="52" height="24" rx="8" fill="currentColor" fillOpacity={0.08} />
+        <rect x="88" y="50" width="52" height="42" rx="8" fill="currentColor" fillOpacity={0.12} />
         <rect x="150" y="34" width="52" height="58" rx="8" fill="url(#classifyGlow)" />
-        <rect x="212" y="58" width="52" height="34" rx="8" fill="rgba(255,255,255,0.1)" />
+        <rect x="212" y="58" width="52" height="34" rx="8" fill="currentColor" fillOpacity={0.1} />
         <path
           d="M52 68 C84 38, 122 28, 176 38 C212 44, 236 54, 252 58"
           fill="none"
@@ -77,7 +77,7 @@ function TileGraphic({ type }: { type: string }) {
 
   if (type === "assess") {
     return (
-      <svg viewBox="0 0 320 120" className="h-full w-full">
+      <svg viewBox="0 0 320 120" className="h-full w-full text-fg">
         <defs>
           <radialGradient id="assessA">
             <stop offset="0%" stopColor="rgba(96,165,250,0.85)" />
@@ -98,7 +98,7 @@ function TileGraphic({ type }: { type: string }) {
         <path
           d="M84 62 L160 48 L224 70"
           fill="none"
-          stroke="rgba(255,255,255,0.28)"
+          stroke="currentColor" strokeOpacity={0.28}
           strokeWidth="2.5"
           strokeDasharray="5 5"
         />
@@ -110,7 +110,7 @@ function TileGraphic({ type }: { type: string }) {
   }
 
   return (
-    <svg viewBox="0 0 320 120" className="h-full w-full">
+    <svg viewBox="0 0 320 120" className="h-full w-full text-fg">
       <defs>
         <linearGradient id="reportBar" x1="0" y1="1" x2="0" y2="0">
           <stop offset="0%" stopColor="rgba(244,114,182,0.35)" />
@@ -118,18 +118,18 @@ function TileGraphic({ type }: { type: string }) {
         </linearGradient>
       </defs>
       <rect x="42" y="58" width="26" height="34" rx="6" fill="url(#reportBar)" />
-      <rect x="82" y="44" width="26" height="48" rx="6" fill="rgba(255,255,255,0.16)" />
-      <rect x="122" y="30" width="26" height="62" rx="6" fill="rgba(255,255,255,0.22)" />
-      <rect x="162" y="52" width="26" height="40" rx="6" fill="rgba(255,255,255,0.14)" />
+      <rect x="82" y="44" width="26" height="48" rx="6" fill="currentColor" fillOpacity={0.16} />
+      <rect x="122" y="30" width="26" height="62" rx="6" fill="currentColor" fillOpacity={0.22} />
+      <rect x="162" y="52" width="26" height="40" rx="6" fill="currentColor" fillOpacity={0.14} />
       <rect x="202" y="22" width="26" height="70" rx="6" fill="url(#reportBar)" />
       <path
         d="M55 52 C92 38, 128 28, 175 42 C196 48, 214 36, 240 24"
         fill="none"
-        stroke="rgba(255,255,255,0.55)"
+        stroke="currentColor" strokeOpacity={0.55}
         strokeWidth="3"
         strokeLinecap="round"
       />
-      <circle cx="240" cy="24" r="5" fill="rgba(255,255,255,0.95)" />
+      <circle cx="240" cy="24" r="5" fill="currentColor" fillOpacity={0.95} />
     </svg>
   );
 }
@@ -149,10 +149,10 @@ export default function HomePage() {
         <section className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
           <div className="flex min-w-0 flex-col justify-center space-y-6 lg:pr-4">
             <div className="space-y-4">
-              <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-fg sm:text-5xl lg:text-6xl">
                 Invest in biodiversity with confidence.
               </h1>
-              <p className="max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
+              <p className="max-w-2xl text-sm leading-7 text-fg/80 sm:text-base">
                 A platform that supports financers and providers to make efficient and transparent investments in Nature-based Solutions.
               </p>
             </div>
@@ -160,14 +160,14 @@ export default function HomePage() {
             <div className="flex flex-col gap-3 pt-2 sm:flex-row">
               <Link
                 href="/support"
-                className={`${buttonBase} ${buttonPrimary}`}
+                className={buttonClass("primary")}
               >
                 Get support
               </Link>
 
               <Link
                 href="https://biofin-project.eu/"
-                className={`${buttonBase} ${buttonSecondary}`}
+                className={buttonClass("secondary")}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -176,48 +176,48 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="min-w-0 self-stretch rounded-3xl border border-white/10 bg-white/[0.05] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
-            <div className="flex h-full flex-col rounded-2xl border border-white/10 bg-black/20 p-4 ring-1 ring-white/5">
+          <div className="min-w-0 self-stretch rounded-3xl surface-panel p-4 shadow-panel backdrop-blur-md sm:p-5">
+            <div className="flex h-full flex-col rounded-2xl surface-card p-4 ring-1 ring-fg/5">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                  <p className="text-eyebrow tracking-[0.2em]">
                     Platform overview
                   </p>
-                  <p className="mt-1 text-lg font-semibold text-white">
+                  <p className="mt-1 text-lg font-semibold text-fg">
                     Biodiversity finance workflow
                   </p>
                 </div>
-                <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-300/20 to-cyan-300/10 ring-1 ring-white/10">
-                  <span className="text-sm font-semibold text-white">NbS</span>
+                <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-300/20 to-cyan-300/10 ring-1 ring-fg/10">
+                  <span className="text-sm font-semibold text-fg">NbS</span>
                 </div>
               </div>
 
               <div className="flex flex-1 flex-col justify-between space-y-4">
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
-                    <p className="text-sm font-semibold text-emerald-100">Classify</p>
-                    <p className="mt-1 text-xs leading-5 text-emerald-50/80">
+                  <div className="rounded-2xl surface-panel p-4">
+                    <p className="text-sm font-semibold text-fg">Classify</p>
+                    <p className="mt-1 text-xs leading-5 text-fg/75">
                       Align projects with biodiversity frameworks.
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-                    <p className="text-sm font-semibold text-white">Assess</p>
-                    <p className="mt-1 text-xs leading-5 text-white/75">
+                  <div className="rounded-2xl surface-panel p-4">
+                    <p className="text-sm font-semibold text-fg">Assess</p>
+                    <p className="mt-1 text-xs leading-5 text-fg/75">
                       Evaluate biodiversity risk and ecosystem services.
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-                    <p className="text-sm font-semibold text-white">Communicate</p>
-                    <p className="mt-1 text-xs leading-5 text-white/75">
+                  <div className="rounded-2xl surface-panel p-4">
+                    <p className="text-sm font-semibold text-fg">Communicate</p>
+                    <p className="mt-1 text-xs leading-5 text-fg/75">
                       Generate standardised reports and decision-ready outputs
                     </p>
                   </div>
                 </div>
                 <div
-                    className="h-40 overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))]">
+                    className="h-40 overflow-hidden rounded-2xl border border-fg/10 bg-sheen">
                   <svg
                       viewBox="0 0 500 140"
-                      className="h-full w-full"
+                      className="h-full w-full text-fg"
                       role="img"
                       aria-label="Project classification, biodiversity assessment and finance-ready reporting workflow"
                   >
@@ -255,7 +255,7 @@ export default function HomePage() {
                     </defs>
 
                     {/* Subtle background grid */}
-                    <g stroke="rgba(255,255,255,0.035)" strokeWidth="1">
+                    <g stroke="currentColor" strokeOpacity={0.035} strokeWidth="1">
                       <path d="M0 35 H500 M0 70 H500 M0 105 H500"/>
                       <path d="M100 0 V140 M200 0 V140 M300 0 V140 M400 0 V140"/>
                     </g>
@@ -420,16 +420,16 @@ export default function HomePage() {
 
         {/* Optional pillar section can be re-enabled later if needed */}
 
-        <section className="mt-10 rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-md sm:p-6">
+        <section className="mt-10 rounded-3xl border border-accent-400/20 bg-accent-500/10 p-5 shadow-panel-soft backdrop-blur-md sm:p-6">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:items-stretch">
             <div className="flex min-w-0 flex-col justify-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100/65">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent-100/65">
                 Call to action
               </p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
                 Are you looking to fund, showcase, or support Nature-Based Solutions?
               </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/80">
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-fg/80">
                 Whether you are an investor, provider, policymaker, or enabling intermediary,
                 this platform helps you understand biodiversity value,
                 assess environmental risk, and move toward trusted action.
@@ -438,7 +438,7 @@ export default function HomePage() {
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/support"
-                  className={`${buttonBase} ${buttonPrimary}`}
+                  className={buttonClass("primary")}
                 >
                   Contact support
                 </Link>
@@ -450,15 +450,15 @@ export default function HomePage() {
                 <Link
                   key={item.key}
                   href={item.href}
-                  className="group flex h-full flex-col justify-between rounded-2xl border border-white/10 bg-black/20 p-5 ring-1 ring-white/5 transition duration-200 hover:border-emerald-300/30 hover:bg-black/30"
+                  className="group flex h-full flex-col justify-between rounded-2xl surface-card p-5 ring-1 ring-fg/5 transition duration-200 hover:border-accent-300/30 hover:bg-shade/30"
                 >
                   <div>
-                    <p className="text-base font-semibold text-white">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-white/75">
+                    <p className="text-base font-semibold text-fg">{item.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-fg/75">
                       {item.text}
                     </p>
                   </div>
-                  <p className="mt-4 text-sm font-semibold text-emerald-200 transition group-hover:text-emerald-100">
+                  <p className="mt-4 text-sm font-semibold text-accent-200 transition group-hover:text-accent-100">
                     {item.cta} →
                   </p>
                 </Link>

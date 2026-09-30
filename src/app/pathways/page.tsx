@@ -6,7 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Layers, Leaf, Sprout, Store, Building2 } from "lucide-react";
 import { useAuth } from "@/context/auth.context";
 import { workflowService } from "@/services/workflow.service";
-import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { Alert } from "@/components/ui/Alert";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const pathways = [
   {
@@ -78,7 +80,7 @@ const pathways = [
 
 function IconFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-400/10 text-emerald-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-accent-300/20 bg-accent-400/10 text-accent-200 shadow-inset-highlight">
       {children}
     </div>
   );
@@ -223,10 +225,10 @@ function PathwaysPageInner() {
   if (!user) {
     return (
       <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">
+        <h1 className="text-3xl font-semibold tracking-tight text-fg">
           Project Pathways
         </h1>
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-fg/70">
           Loading available pathways...
         </p>
       </section>
@@ -256,35 +258,30 @@ function PathwaysPageInner() {
 
   return (
     <div className="space-y-8 pb-10">
-      <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#07101f] px-6 py-6 shadow-[0_22px_70px_rgba(0,0,0,0.28)] sm:px-8">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(16,185,129,0.12),transparent_34%),radial-gradient(circle_at_88%_70%,rgba(59,130,246,0.08),transparent_34%)]" />
-        <div className="relative space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
-            Pathways
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
-            Project Pathways
-          </h1>
-          <p className="max-w-2xl text-sm leading-6 text-white/60">
-            Attract funding for Nature-based Solution projects by selecting a pathway.
-          </p>
-        </div>
+      <header className="relative overflow-hidden rounded-3xl border border-fg/10 bg-deep px-6 py-6 shadow-panel-soft sm:px-8">
+        <div className="pointer-events-none absolute inset-0 bg-hero-glow" />
+        <PageHeader
+          className="relative"
+          eyebrow="Pathways"
+          title="Project Pathways"
+          subtitle="Attract funding for Nature-based Solution projects by selecting a pathway."
+        />
       </header>
 
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] px-5 py-6 shadow-[0_18px_50px_rgba(0,0,0,0.2)] sm:px-7 sm:py-7">
+      <section className="relative overflow-hidden rounded-3xl border border-fg/10 bg-fg/[0.035] px-5 py-6 shadow-panel-soft sm:px-7 sm:py-7">
 
         <div className="relative grid gap-3 lg:grid-cols-3 lg:gap-5">
           {steps.map((step) => (
-            <article key={step.number} className="flex gap-4 rounded-2xl border border-white/[0.07] bg-black/10 p-4 sm:p-5 lg:block lg:border-0 lg:bg-transparent lg:p-3">
+            <article key={step.number} className="flex gap-4 rounded-2xl border border-fg/[0.07] bg-shade/10 p-4 sm:p-5 lg:block lg:border-0 lg:bg-transparent lg:p-3">
               <IconFrame>{step.icon}</IconFrame>
               <div className="min-w-0 lg:mt-5">
-                <div className="text-xs font-semibold tracking-[0.16em] text-emerald-300">
+                <div className="text-xs font-semibold tracking-[0.16em] text-accent-300">
                   {step.number}
                 </div>
-                <h3 className="mt-1.5 text-lg font-semibold text-white">
+                <h3 className="mt-1.5 text-lg font-semibold text-fg">
                   {step.title}
                 </h3>
-                <p className="mt-2 max-w-sm text-sm leading-6 text-white/65">
+                <p className="mt-2 max-w-sm text-sm leading-6 text-fg/65">
                   {step.description}
                 </p>
               </div>
@@ -294,12 +291,12 @@ function PathwaysPageInner() {
       </section>
 
       {error && (
-        <div role="alert" className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+        <Alert tone="danger" role="alert">
           {error}
-        </div>
+        </Alert>
       )}
 
-      <nav aria-label="Pathway groups" role="tablist" className="flex flex-wrap gap-2 border-b border-white/10">
+      <nav aria-label="Pathway groups" role="tablist" className="flex flex-wrap gap-2 border-b border-fg/10">
         {groupTabs.map((tab) => {
           const Icon = tab.icon;
           const active = tab.key === group;
@@ -312,10 +309,10 @@ function PathwaysPageInner() {
               onClick={() => selectGroup(tab.key)}
               className={[
                 "-mb-px inline-flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition",
-                active ? "border-emerald-400 text-white" : "border-transparent text-white/65 hover:text-white",
+                active ? "border-accent-400 text-fg" : "border-transparent text-fg/65 hover:text-fg",
               ].join(" ")}
             >
-              <Icon className="h-4 w-4 text-emerald-300" aria-hidden="true" />
+              <Icon className="h-4 w-4 text-accent-300" aria-hidden="true" />
               {tab.label}
             </button>
           );
@@ -324,59 +321,59 @@ function PathwaysPageInner() {
 
       {group === "bng" && (
         <div className="space-y-4">
-          <p className="max-w-3xl text-sm leading-6 text-white/65">
+          <p className="max-w-3xl text-sm leading-6 text-fg/65">
             Prototype pathways for Biodiversity Net Gain: habitat banks register land and sell biodiversity units,
             developments buy the units they need to reach a 10% net gain.
           </p>
           <Link
             href="/bng/marketplace"
-            className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.07] px-5 py-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/[0.12]"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent-400/20 bg-accent-500/[0.07] px-5 py-4 transition hover:border-accent-300/40 hover:bg-accent-500/[0.12]"
           >
-            <span className="flex items-center gap-3 text-sm text-white/80">
-              <Store className="h-5 w-5 text-emerald-300" aria-hidden="true" />
+            <span className="flex items-center gap-3 text-sm text-fg/80">
+              <Store className="h-5 w-5 text-accent-300" aria-hidden="true" />
               Looking for biodiversity units? Compare registered habitat banks, their prices and what they cover.
             </span>
-            <span className="text-sm font-semibold !text-emerald-200">Browse the marketplace →</span>
+            <span className="text-sm font-semibold !text-accent-200">Browse the marketplace →</span>
           </Link>
         </div>
       )}
 
       <section className="grid items-stretch gap-5 xl:grid-cols-2">
         {pathways.filter((pathway) => pathway.group === group).map((pathway) => (
-          <article key={pathway.code} className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] shadow-[0_20px_60px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-0.5 hover:border-emerald-300/25 hover:shadow-[0_24px_70px_rgba(16,185,129,0.07)]">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/[0.045] via-transparent to-blue-500/[0.025] opacity-60" />
+          <article key={pathway.code} className="group relative overflow-hidden rounded-3xl border border-fg/10 bg-fg/[0.035] shadow-panel-soft transition duration-300 hover:-translate-y-0.5 hover:border-accent-300/25 hover:shadow-card-hover">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent-500/[0.045] via-transparent to-blue-500/[0.025] opacity-60" />
 
             <div className="relative flex h-full flex-col p-6 sm:p-7">
               <div className="flex items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-400/10 text-emerald-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-accent-300/20 bg-accent-400/10 text-accent-200 shadow-inset-highlight">
                   <PathwayIcon code={pathway.code} />
                 </div>
 
                 <div className="min-w-0 pt-0.5">
-                  <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                  <h2 className="text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
                     {pathway.title}
                   </h2>
-                  <p className="mt-1 text-sm font-medium text-emerald-200">
+                  <p className="mt-1 text-sm font-medium text-accent-200">
                     {pathway.subtitle}
                   </p>
                 </div>
               </div>
 
-              <p className="mt-6 text-sm leading-7 text-white/70 sm:text-base">
+              <p className="mt-6 text-sm leading-7 text-fg/70 sm:text-base">
                 {pathway.description}
               </p>
 
-              <div className="my-6 h-px bg-gradient-to-r from-white/10 via-white/[0.06] to-transparent" />
+              <div className="my-6 h-px bg-gradient-to-r from-fg/10 via-fg/[0.06] to-transparent" />
 
               <div>
-                <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
+                <h3 className="mb-4 text-eyebrow tracking-[0.16em]">
                   Key Activities
                 </h3>
 
                 <ul className="grid gap-x-5 gap-y-3 sm:grid-cols-2">
                   {pathway.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5 text-sm leading-5 text-white/75">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-emerald-200">
+                    <li key={feature} className="flex items-start gap-2.5 text-sm leading-5 text-fg/75">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-accent-300/20 bg-accent-400/10 text-accent-200">
                         <CheckIcon />
                       </span>
                       <span>{feature}</span>
@@ -386,7 +383,7 @@ function PathwaysPageInner() {
               </div>
 
               <div className="mt-auto pt-7">
-                <button onClick={() => handleStartPathway(pathway.code)} disabled={creatingCode === pathway.code} className={`w-full gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto ${buttonBase} ${buttonPrimary}`}>
+                <button onClick={() => handleStartPathway(pathway.code)} disabled={creatingCode === pathway.code} className={`w-full gap-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto ${buttonClass("primary")}`}>
                   {creatingCode === pathway.code
                     ? "Creating project..."
                     : "Create project"}

@@ -24,7 +24,7 @@ export function DeleteProjectDialog({ caseId, projectName, open, onClose, onDele
         onDeleted();
       }}
     >
-      {projectName && <p className="font-semibold text-white">{projectName}</p>}
+      {projectName && <p className="font-semibold text-fg">{projectName}</p>}
       <p>
         This cannot be undone. The project and all its data will no longer be available to
         anyone.

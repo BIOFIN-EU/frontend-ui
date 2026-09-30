@@ -2,7 +2,8 @@
 
 import { useRef, useState, type ReactNode } from "react";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
-import { buttonBase, buttonDanger, buttonGhost } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { Alert } from "@/components/ui/Alert";
 
 type Props = {
   open: boolean;
@@ -52,18 +53,18 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={open} onClose={close} initialFocus={cancelRef} className="relative z-[900]">
-      <DialogBackdrop className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
+      <DialogBackdrop className="fixed inset-0 bg-shade/60 backdrop-blur-sm" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0b1a22] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
+        <DialogPanel className="w-full max-w-md rounded-2xl border border-fg/10 bg-dialog p-6 text-fg shadow-overlay">
           <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
 
-          <div className="mt-3 space-y-2 text-sm leading-6 text-white/75">{children}</div>
+          <div className="mt-3 space-y-2 text-sm leading-6 text-fg/75">{children}</div>
 
           {error && (
-            <p className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">
+            <Alert tone="danger" as="p" className="mt-4">
               {error}
-            </p>
+            </Alert>
           )}
 
           <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -72,7 +73,7 @@ export function ConfirmDialog({
               type="button"
               onClick={close}
               disabled={busy}
-              className={`${buttonBase} ${buttonGhost} disabled:opacity-50`}
+              className={`${buttonClass("ghost")} disabled:opacity-50`}
             >
               Cancel
             </button>
@@ -80,7 +81,7 @@ export function ConfirmDialog({
               type="button"
               onClick={confirm}
               disabled={busy}
-              className={`${buttonBase} ${buttonDanger} disabled:opacity-60`}
+              className={`${buttonClass("danger")} disabled:opacity-60`}
             >
               {busy ? busyLabel : confirmLabel}
             </button>

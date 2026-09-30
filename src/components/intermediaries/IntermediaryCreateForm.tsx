@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { getLookupOptions } from "@/services/lookups.service";
 import type { LookupOption } from "@/types/lookups";
 import { createIntermediary } from "@/services/intermediaries.service";
-import { buttonBase, buttonGhost, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
+import { Alert } from "@/components/ui/Alert";
 
 const FUNCTION_LOOKUP_KEY = "intermediary_function";
 
@@ -130,15 +132,15 @@ export function IntermediaryCreateForm() {
     <div className="space-y-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="inline-flex w-fit items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-200 ring-1 ring-emerald-400/25">
+          <div className="inline-flex w-fit items-center rounded-full bg-accent-500/15 px-3 py-1 text-xs font-semibold text-accent-200 ring-1 ring-accent-400/25">
             Intermediary registry
           </div>
 
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-fg">
             Create Intermediary
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-fg/60">
             Add a new intermediary and assign one or more intermediary functions.
           </p>
         </div>
@@ -146,12 +148,12 @@ export function IntermediaryCreateForm() {
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+        className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6"
       >
         {error && (
-          <div className="mb-5 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <Alert tone="danger" className="mb-5">
             {error}
-          </div>
+          </Alert>
         )}
 
         <div className="grid gap-5 md:grid-cols-2">
@@ -217,20 +219,20 @@ export function IntermediaryCreateForm() {
           </div>
         </div>
 
-        <div className="mt-8 rounded-xl border border-white/10 bg-black/20 p-4">
+        <div className="mt-8 rounded-xl surface-card p-4">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className="text-lg font-semibold text-fg">
               Intermediary functions
             </h2>
-            <p className="mt-1 text-sm text-white/60">
+            <p className="mt-1 text-sm text-fg/60">
               Select all functions that apply to this intermediary.
             </p>
           </div>
 
           {loadingLookups ? (
-            <p className="text-sm text-white/60">Loading functions...</p>
+            <p className="text-sm text-fg/60">Loading functions...</p>
           ) : functionOptions.length === 0 ? (
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-fg/60">
               No intermediary functions available.
             </p>
           ) : (
@@ -244,15 +246,15 @@ export function IntermediaryCreateForm() {
                     key={option.value}
                     className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm transition ${
                       checked
-                        ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
-                        : "border-white/10 bg-white/[0.03] text-white/75 hover:bg-white/[0.06]"
+                        ? "border-accent-400/40 bg-accent-400/10 text-accent-100"
+                        : "border-fg/10 bg-fg/[0.03] text-fg/75 hover:bg-fg/[0.06]"
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleFunction(id)}
-                      className="h-4 w-4 rounded border-white/20 bg-slate-950 accent-emerald-400"
+                      className="h-4 w-4 rounded border-fg/20 bg-field accent-accent-400"
                     />
                     <span>{option.label}</span>
                   </label>
@@ -266,7 +268,7 @@ export function IntermediaryCreateForm() {
           <button
             type="button"
             onClick={() => router.back()}
-            className={`${buttonBase} ${buttonGhost}`}
+            className={buttonClass("ghost")}
           >
             Cancel
           </button>
@@ -274,7 +276,7 @@ export function IntermediaryCreateForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass("primary")}`}
           >
             {isSubmitting ? "Creating..." : "Create intermediary"}
           </button>
@@ -295,17 +297,15 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-medium text-white/80">
+      <span className="mb-2 block text-sm font-medium text-fg/80">
         {label}
-        {required && <span className="text-emerald-300"> *</span>}
+        {required && <span className="text-accent-300"> *</span>}
       </span>
       {children}
     </label>
   );
 }
 
-const inputClass =
-  "w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-emerald-400";
+const inputClass = fieldClass();
 
-const textareaClass =
-  "w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-emerald-400";
+const textareaClass = fieldClass();

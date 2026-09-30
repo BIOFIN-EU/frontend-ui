@@ -326,14 +326,14 @@ export default function ManagementActionsMap({
   }, [activeMode]);
 
   return (
-    <div className="relative h-[460px] w-full overflow-hidden rounded-2xl border border-white/10">
-      <div className="absolute left-8 top-4 flex gap-2 rounded-xl z-10 bg-black/50 p-1 backdrop-blur-sm border border-white/10">
+    <div className="relative h-[460px] w-full overflow-hidden rounded-2xl border border-fg/10">
+      <div className="absolute left-8 top-4 flex gap-2 rounded-xl z-10 bg-shade/50 p-1 backdrop-blur-sm border border-fg/10">
         <button
           onClick={() => setActiveMode("recommendations")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             activeMode === "recommendations"
-              ? "bg-emerald-500 text-white"
-              : "text-white/60 hover:text-white hover:bg-white/10"
+              ? "bg-accent-500 text-on-solid"
+              : "text-fg/60 hover:text-fg hover:bg-fg/10"
           }`}
         >
           Recommendations
@@ -342,8 +342,8 @@ export default function ManagementActionsMap({
           onClick={() => setActiveMode("resilience")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             activeMode === "resilience"
-              ? "bg-emerald-500 text-white"
-              : "text-white/60 hover:text-white hover:bg-white/10"
+              ? "bg-accent-500 text-on-solid"
+              : "text-fg/60 hover:text-fg hover:bg-fg/10"
           }`}
         >
           Resilience
@@ -352,8 +352,8 @@ export default function ManagementActionsMap({
           onClick={() => setActiveMode("risk")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             activeMode === "risk"
-              ? "bg-emerald-500 text-white"
-              : "text-white/60 hover:text-white hover:bg-white/10"
+              ? "bg-accent-500 text-on-solid"
+              : "text-fg/60 hover:text-fg hover:bg-fg/10"
           }`}
         >
           Vulnerability
@@ -361,9 +361,9 @@ export default function ManagementActionsMap({
       </div>
       <div ref={mapRef} className="h-full w-full" />
 
-      {/* <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-md">
-        <p className="text-sm font-semibold text-white">Management Actions Map</p>
-        <p className="mt-1 text-xs text-white/70">
+      {/* <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-fg/10 bg-shade/35 px-4 py-3 backdrop-blur-md">
+        <p className="text-sm font-semibold text-fg">Management Actions Map</p>
+        <p className="mt-1 text-xs text-fg/70">
           Click on any colored area to see management action details
         </p>
       </div> */}

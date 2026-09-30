@@ -6,7 +6,9 @@ import Link from "next/link";
 import * as auth from "@/services/auth.service";
 import { useAuth } from "@/context/auth.context";
 import { ApiError } from "@/lib/api";
-import { buttonBase, buttonPrimary } from "@/lib/ui";
+import { buttonClass } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
+import { Alert } from "@/components/ui/Alert";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -55,24 +57,24 @@ export default function ChangePasswordPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <h1 className="text-4xl font-semibold tracking-tight text-white">
+        <h1 className="text-4xl font-semibold tracking-tight text-fg">
           Change password
         </h1>
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-fg/70">
           Back to{" "}
           <Link
             href="/profile"
-            className="font-semibold text-emerald-200 underline decoration-emerald-300/40 underline-offset-4 transition hover:text-emerald-100"
+            className="font-semibold text-accent-200 underline decoration-accent-300/40 underline-offset-4 transition hover:text-accent-100"
           >
             profile
           </Link>
         </p>
       </header>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md">
         <div className="mb-4">
-          <p className="text-xs text-white/50">
-            <span className="font-semibold text-red-300">*</span> Required fields
+          <p className="text-xs text-fg/50">
+            <span className="font-semibold text-danger-300">*</span> Required fields
           </p>
         </div>
 
@@ -80,9 +82,9 @@ export default function ChangePasswordPage() {
           <div className="space-y-2">
             <label
               htmlFor="current-password"
-              className="text-xs font-medium text-white/70"
+              className="text-label"
             >
-              Current password <span className="text-red-300">*</span>
+              Current password <span className="text-danger-300">*</span>
             </label>
             <input
               id="current-password"
@@ -91,10 +93,10 @@ export default function ChangePasswordPage() {
               type="password"
               placeholder="Current password"
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20"
+              className={fieldClass("roomy")}
             />
             {fieldErrors.current_password ? (
-              <p className="text-xs font-medium text-red-200">
+              <p className="text-xs font-medium text-danger-200">
                 {fieldErrors.current_password}
               </p>
             ) : null}
@@ -103,9 +105,9 @@ export default function ChangePasswordPage() {
           <div className="space-y-2">
             <label
               htmlFor="new-password"
-              className="text-xs font-medium text-white/70"
+              className="text-label"
             >
-              New password <span className="text-red-300">*</span>
+              New password <span className="text-danger-300">*</span>
             </label>
             <input
               id="new-password"
@@ -114,10 +116,10 @@ export default function ChangePasswordPage() {
               type="password"
               placeholder="New password"
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20"
+              className={fieldClass("roomy")}
             />
             {fieldErrors.new_password ? (
-              <p className="text-xs font-medium text-red-200">
+              <p className="text-xs font-medium text-danger-200">
                 {fieldErrors.new_password}
               </p>
             ) : null}
@@ -126,9 +128,9 @@ export default function ChangePasswordPage() {
           <div className="space-y-2">
             <label
               htmlFor="confirm-password"
-              className="text-xs font-medium text-white/70"
+              className="text-label"
             >
-              Confirm new password <span className="text-red-300">*</span>
+              Confirm new password <span className="text-danger-300">*</span>
             </label>
             <input
               id="confirm-password"
@@ -137,26 +139,26 @@ export default function ChangePasswordPage() {
               type="password"
               placeholder="Confirm new password"
               required
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white placeholder:text-white/35 ring-1 ring-white/5 outline-none transition focus:border-emerald-300/30 focus:ring-emerald-300/20"
+              className={fieldClass("roomy")}
             />
             {fieldErrors.confirm_password ? (
-              <p className="text-xs font-medium text-red-200">
+              <p className="text-xs font-medium text-danger-200">
                 {fieldErrors.confirm_password}
               </p>
             ) : null}
           </div>
 
           {err ? (
-            <div className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100 ring-1 ring-red-400/20">
+            <Alert tone="danger">
               {err}
-            </div>
+            </Alert>
           ) : null}
 
 
           <button
             type="submit"
             disabled={loading}
-            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonBase} ${buttonPrimary}`}
+            className={`disabled:cursor-not-allowed disabled:opacity-60 ${buttonClass("primary")}`}
           >
             {loading ? "Updating…" : "Change password"}
           </button>
