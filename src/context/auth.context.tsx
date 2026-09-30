@@ -8,6 +8,8 @@ import React, {
   useState,
   useCallback,
 } from "react";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import * as auth from "@/services/auth.service";
 import type { MeResponse } from "@/types/auth";
 import { getAccessToken, getRefreshToken, registerAuthFailureHandler } from "@/lib/api";
@@ -17,9 +19,13 @@ type User = MeResponse;
 type AuthCtx = {
   isAuthed: boolean;
   isInitializing: boolean;
+  // True after the user chose to log out, so RequireAuth doesn't send them
+  // to the login page instead of where logout() is taking them.
+  signedOut: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  // Logs out and goes to redirectTo (the home page by default).
+  logout: (redirectTo?: string) => Promise<void>;
   refreshUser: () => Promise<void>;
 };
 
@@ -29,11 +35,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthed, setIsAuthed] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [signedOut, setSignedOut] = useState(false);
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
+  // Also drops all loaded data, so the next user never sees the last one's.
   const clearAuthState = useCallback(() => {
     setUser(null);
     setIsAuthed(false);
-  }, []);
+    queryClient.clear();
+  }, [queryClient]);
 
   const refreshUser = useCallback(async () => {
     // No tokens means a logged-out visitor: skip the /me call entirely.
@@ -47,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const me = await auth.me();
       setUser(me);
       setIsAuthed(true);
+      setSignedOut(false);
     } catch {
       await auth.logout();
       clearAuthState();
@@ -55,10 +67,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [clearAuthState]);
 
-  const logout = useCallback(async () => {
-    await auth.logout();
-    clearAuthState();
-  }, [clearAuthState]);
+  const logout = useCallback(
+    async (redirectTo = "/") => {
+      setSignedOut(true);
+      await auth.logout();
+      clearAuthState();
+      router.replace(redirectTo);
+    },
+    [clearAuthState, router]
+  );
 
   useEffect(() => {
     registerAuthFailureHandler(() => {
@@ -81,6 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => ({
       isAuthed,
       isInitializing,
+      signedOut,
       user,
       login: async (email, password) => {
         await auth.login(email, password);
@@ -89,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       refreshUser,
     }),
-    [isAuthed, isInitializing, user, logout, refreshUser]
+    [isAuthed, isInitializing, signedOut, user, logout, refreshUser]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

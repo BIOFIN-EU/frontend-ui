@@ -9,15 +9,16 @@ export default function RequireAuth({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthed, isInitializing } = useAuth();
+  const { isAuthed, isInitializing, signedOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isInitializing && !isAuthed) {
+    // After a chosen logout, logout() does the navigating.
+    if (!isInitializing && !isAuthed && !signedOut) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
     }
-  }, [isAuthed, isInitializing, pathname, router]);
+  }, [isAuthed, isInitializing, signedOut, pathname, router]);
 
   if (isInitializing) {
     return (

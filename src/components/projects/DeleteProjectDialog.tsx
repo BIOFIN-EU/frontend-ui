@@ -1,7 +1,7 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { caseListService } from "@/services/case-list.service";
+import { useDeleteCase } from "@/queries/projects";
 
 type Props = {
   caseId: number | string;
@@ -12,6 +12,9 @@ type Props = {
 };
 
 export function DeleteProjectDialog({ caseId, projectName, open, onClose, onDeleted }: Props) {
+  // Also removes the project from the cached project list.
+  const deleteCase = useDeleteCase();
+
   return (
     <ConfirmDialog
       open={open}
@@ -20,7 +23,7 @@ export function DeleteProjectDialog({ caseId, projectName, open, onClose, onDele
       busyLabel="Deleting…"
       onClose={onClose}
       onConfirm={async () => {
-        await caseListService.deleteCase(caseId);
+        await deleteCase.mutateAsync(caseId);
         onDeleted();
       }}
     >
