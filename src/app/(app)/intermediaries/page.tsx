@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { buttonClass } from "@/components/ui/Button";
 import { PageBackdrop } from "@/components/PageBackdrop";
 import { photoCredits } from "@/lib/photo-credits";
-import forest from "../../../public/images/forest-dieny-portinanni.jpg";
+import forest from "../../../../public/images/forest-dieny-portinanni.jpg";
 
 import { listIntermediaries } from "@/services/intermediaries.service";
 import type { Intermediary } from "@/types/intermediaries";

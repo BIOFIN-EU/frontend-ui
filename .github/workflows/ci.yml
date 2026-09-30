@@ -1,0 +1,38 @@
+name: CI
+
+# Type check, lint and build every pull request and push, so a broken
+# change is caught before it reaches main (which builds the image).
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint src
+
+      - name: Build
+        run: npm run build
+        env:
+          # Any value works here; the real one is set in the image build.
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
