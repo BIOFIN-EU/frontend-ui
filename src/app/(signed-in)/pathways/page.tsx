@@ -4,8 +4,7 @@ import { Suspense, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Layers, Leaf, Sprout, Store, Building2 } from "lucide-react";
-import { useAuth } from "@/context/auth.context";
-import { workflowService } from "@/services/workflow.service";
+import { useStartWorkflow } from "@/queries/workflow";
 import { buttonClass } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -210,7 +209,6 @@ export default function PathwaysPage() {
 
 function PathwaysPageInner() {
   const router = useRouter();
-  const { user } = useAuth();
   // ?tab=bng opens the BNG tab (kept in the URL so it survives a reload).
   const searchParams = useSearchParams();
   const group: PathwayGroup = searchParams.get("tab") === "bng" ? "bng" : "standard";
@@ -221,26 +219,15 @@ function PathwaysPageInner() {
 
   const [creatingCode, setCreatingCode] = useState<string | null>(null);
   const [error, setError] = useState("");
-
-  if (!user) {
-    return (
-      <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-fg">
-          Project Pathways
-        </h1>
-        <p className="text-sm text-fg/70">
-          Loading available pathways...
-        </p>
-      </section>
-    );
-  }
+  // Also refreshes the project list, which gains the new project.
+  const startWorkflow = useStartWorkflow();
 
   async function handleStartPathway(code: string) {
     try {
       setCreatingCode(code);
       setError("");
 
-      const created = await workflowService.startWorkflow(code);
+      const created = await startWorkflow.mutateAsync(code);
 
       router.push(`/pathways/${created.case_id}`);
     } catch (err) {

@@ -17,7 +17,6 @@ export type PathwayStepMode = "submit" | "edit";
 type Props = {
   state: WorkflowState;
   onStateUpdated: (state: WorkflowState) => void;
-  onReload: () => Promise<void>;
   /** Step config to render. Defaults to `state.step` (the live current step). */
   stepConfig?: WorkflowStep | null;
   /** Step code matching `stepConfig`. Defaults to `state.current_step`. */
@@ -51,7 +50,6 @@ function inferMode(step: WorkflowStep) {
 export function PathwayStepScreen({
   state,
   onStateUpdated,
-  onReload,
   stepConfig = null,
   stepCode,
   mode = "submit",

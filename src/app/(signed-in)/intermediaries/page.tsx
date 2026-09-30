@@ -1,53 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { buttonClass } from "@/components/ui/Button";
 import { PageBackdrop } from "@/components/PageBackdrop";
 import { photoCredits } from "@/lib/photo-credits";
 import forest from "../../../../public/images/forest-dieny-portinanni.jpg";
 
-import { listIntermediaries } from "@/services/intermediaries.service";
-import type { Intermediary } from "@/types/intermediaries";
+import { useIntermediaries } from "@/queries/intermediaries";
 import { Alert } from "@/components/ui/Alert";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function IntermediariesPage() {
-  const [intermediaries, setIntermediaries] = useState<Intermediary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadIntermediaries() {
-      try {
-        setLoading(true);
-        const data = await listIntermediaries();
-
-        if (!cancelled) {
-          setIntermediaries(data);
-          setError("");
-        }
-      } catch (err: any) {
-        console.error("load intermediaries failed", err);
-
-        if (!cancelled) {
-          setError(err?.message || "Could not load intermediaries.");
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadIntermediaries();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { data: intermediaries = [], isPending: loading, error: loadError } = useIntermediaries();
+  const error = loadError ? loadError.message || "Could not load intermediaries." : "";
 
   return (
     <div className="relative isolate space-y-8">
