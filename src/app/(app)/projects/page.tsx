@@ -1,10 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAuth } from "@/context/auth.context";
+import { useCases } from "@/queries/projects";
 import { caseListService } from "@/services/case-list.service";
-import type { CaseListItem } from "@/types/case-list";
 import { ProjectListScreen } from "@/components/projects/ProjectListScreen";
 import { BngWaitingBanner } from "@/components/bng/BngWaitingBanner";
 import { Alert } from "@/components/ui/Alert";
@@ -19,7 +18,6 @@ export default function CasesPage() {
 }
 
 function CasesPageInner() {
-  const { user } = useAuth();
   // Set by the project dashboard after deleting, or by a delete from this list.
   const searchParams = useSearchParams();
   const deletedParam = searchParams.get("deleted");
@@ -27,42 +25,7 @@ function CasesPageInner() {
     deletedParam && /^\d+$/.test(deletedParam) ? deletedParam : null
   );
 
-  const [cases, setCases] = useState<CaseListItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  async function loadCases() {
-    try {
-      setLoading(true);
-      const data = await caseListService.getCases();
-      setCases(data);
-      setError("");
-    } catch (err) {
-      console.error("load cases failed", err);
-      setError(caseListService.extractErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    if (user) {
-      loadCases();
-    }
-  }, [user]);
-
-  if (!user) {
-    return (
-      <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-fg">
-          Projects
-        </h1>
-        <p className="text-sm text-fg/70">
-          Loading project access…
-        </p>
-      </section>
-    );
-  }
+  const { data: cases, isPending, error } = useCases();
 
   return (
     <div className="space-y-8">
@@ -80,29 +43,26 @@ function CasesPageInner() {
         </Alert>
       )}
 
-      {loading && (
+      {isPending && (
         <div className="rounded-2xl surface-panel p-6 text-fg/70">
           Loading projects...
         </div>
       )}
 
-      {!loading && error && (
+      {error && (
         <Alert tone="danger">
-          {error}
+          {caseListService.extractErrorMessage(error)}
         </Alert>
       )}
 
-      {/* BNG only: steps waiting for one of the user's roles (hidden when none). */}
-      {!loading && !error && <BngWaitingBanner cases={cases} />}
+      {cases && (
+        <>
+          {/* BNG only: steps waiting for one of the user's roles (hidden when none). */}
+          <BngWaitingBanner cases={cases} />
 
-      {!loading && !error && (
-        <ProjectListScreen
-          cases={cases}
-          onDeleted={(caseId) => {
-            setCases((current) => current.filter((item) => item.caseId !== caseId));
-            setDeletedCaseId(String(caseId));
-          }}
-        />
+          {/* A delete removes the project from the list itself (useDeleteCase). */}
+          <ProjectListScreen cases={cases} onDeleted={(caseId) => setDeletedCaseId(String(caseId))} />
+        </>
       )}
     </div>
   );

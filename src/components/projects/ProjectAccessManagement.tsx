@@ -2,21 +2,21 @@
 
 import { useState } from "react";
 import type { CaseUserAccess } from "@/types/case-access";
-import { addCaseUser } from "@/services/case-access.service";
+import { useAddCaseUser } from "@/queries/projects";
 import { buttonClass } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
 type CaseAccessManagementProps = {
   caseId: number;
   users: CaseUserAccess[];
-  onUserAdded: () => void;
 };
 
 export function ProjectAccessManagement({
   caseId,
   users,
-  onUserAdded,
 }: CaseAccessManagementProps) {
+  // Refreshes the user list once the user is added.
+  const addUser = useAddCaseUser(caseId);
   const [showForm, setShowForm] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ export function ProjectAccessManagement({
 
   async function handleAddUser() {
     try {
-      await addCaseUser(caseId, {
+      await addUser.mutateAsync({
         email,
         case_role: role,
         can_view: true,
@@ -37,7 +37,6 @@ export function ProjectAccessManagement({
 
       setEmail("");
       setShowForm(false);
-      onUserAdded();
     } catch (err) {
       console.error("Failed to add user", err);
     }
@@ -85,9 +84,10 @@ export function ProjectAccessManagement({
 
           <button
             onClick={handleAddUser}
+            disabled={addUser.isPending}
             className={buttonClass("primary")}
           >
-            Save
+            {addUser.isPending ? "Saving…" : "Save"}
           </button>
         </div>
       )}

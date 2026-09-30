@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import * as auth from "@/services/auth.service";
 import { useAuth } from "@/context/auth.context";
@@ -11,7 +10,6 @@ import { fieldClass } from "@/components/ui/Field";
 import { Alert } from "@/components/ui/Alert";
 
 export default function ChangePasswordPage() {
-  const router = useRouter();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -39,9 +37,8 @@ export default function ChangePasswordPage() {
     try {
         await auth.changePassword(currentPassword, newPassword);
 
-        await logout(); // 🔥 CRITICAL FIX
-
-        router.replace("/login?reason=password-changed");
+        // The old tokens are no longer valid, so sign in again.
+        await logout("/login?reason=password-changed");
       } catch (e: unknown) {
       if (e instanceof ApiError) {
         setErr(e.message || "Could not change password");

@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 
 import { useAuth } from "@/context/auth.context";
-import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";
+import { useMyCaseAccess } from "@/queries/projects";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 
 // Shared header and section tabs for every page of a project
@@ -13,12 +13,10 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const caseId = params.caseId;
 
   const { user } = useAuth();
-  const { users, loading } = useCaseUsers(Number(caseId));
-
-  const myAccess = users.find((u) => u.user_id === user?.id);
-  // Hidden until the access list has loaded, so it never flashes in for
-  // users who can't manage it.
-  const canManageUsers = !loading && Boolean(myAccess?.can_assign_users);
+  // Undefined until the access list has loaded, so the Access tab never
+  // flashes in for users who can't manage it.
+  const { data: myAccess } = useMyCaseAccess(caseId, user?.id);
+  const canManageUsers = Boolean(myAccess?.can_assign_users);
 
   return (
     <div className="space-y-8">

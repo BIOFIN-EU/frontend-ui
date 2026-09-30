@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 
 import { useAuth } from "@/context/auth.context";
-import { useCaseUsers } from "@/components/projects/hooks/useCaseUsers";
+import { useCaseUsers } from "@/queries/projects";
 import { ProjectAccessManagement } from "@/components/projects/ProjectAccessManagement";
 import { BngRolesPanel } from "@/components/bng/BngRolesPanel";
 import { Alert } from "@/components/ui/Alert";
@@ -14,12 +14,12 @@ export default function CaseAccessPage() {
   const numericCaseId = Number(caseId);
 
   const { user } = useAuth();
-  const { users, loading } = useCaseUsers(numericCaseId);
+  const { data: users = [], isPending } = useCaseUsers(caseId);
 
   const myAccess = users.find((u) => u.user_id === user?.id);
   const canManageUsers = Boolean(myAccess?.can_assign_users);
 
-  if (!user || loading) {
+  if (isPending) {
     return (
       <div className="rounded-2xl surface-panel p-6 text-fg/70">
         Loading project access…
@@ -42,11 +42,7 @@ export default function CaseAccessPage() {
         Project access management
       </h2>
 
-      <ProjectAccessManagement
-        caseId={numericCaseId}
-        users={users}
-        onUserAdded={() => window.location.reload()}
-      />
+      <ProjectAccessManagement caseId={numericCaseId} users={users} />
 
       {/* BNG projects only; renders nothing for other projects. */}
       <BngRolesPanel caseId={numericCaseId} users={users} currentUserId={user?.id} />
