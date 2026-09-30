@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
 import { bngService } from "@/services/bng.service";
+import { useBngReferenceData } from "@/queries/bng";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import {
   BNG_CATEGORIES,
@@ -10,7 +11,6 @@ import {
   BNG_SIZE_UNIT,
   type BngCategory,
   type BngMetricSummary,
-  type BngReferenceData,
 } from "@/types/bng";
 import { FieldHelp } from "@/components/ui/FieldHelp";
 import { BngMetricPanel } from "./BngMetricPanel";
@@ -109,7 +109,7 @@ export function HabitatTableStep({
   const tableField = step.fields.find((field) => field.type === "habitat_table");
   const phase = tableField?.phase ?? "baseline";
 
-  const [reference, setReference] = useState<BngReferenceData | null>(null);
+  const reference = useBngReferenceData().data ?? null;
   const [rows, setRows] = useState<ParcelRow[]>(() => {
     const initial = rowsFromInitial(initialValues);
     return initial.length > 0 ? initial : [emptyRow()];
@@ -120,10 +120,6 @@ export function HabitatTableStep({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [draftMessage, setDraftMessage] = useState("");
   const previewRun = useRef(0);
-
-  useEffect(() => {
-    bngService.getReferenceData().then(setReference).catch(() => setReference(null));
-  }, []);
 
   const completeRows = useMemo(() => rows.filter(isComplete), [rows]);
 

@@ -8,7 +8,8 @@ import { BNG_ROLE_LABEL, roleNames, type BngRole } from "@/types/bng";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import { buttonClass } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
-import { capacityFor, useBngMyAccess } from "./useBngMyAccess";
+import { useBngMyAccess } from "@/queries/bng";
+import { capacityFor } from "./capacity";
 import { Alert } from "@/components/ui/Alert";
 
 type Props = {

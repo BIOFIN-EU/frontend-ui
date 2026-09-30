@@ -1,19 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { bngService } from "@/services/bng.service";
 import {
   BNG_MONITORING_STATUS_LABEL,
   formatDay,
   roleNames,
-  type BngMonitoring,
   type BngMonitoringReport,
   type BngMonitoringStatus,
   type BngRole,
 } from "@/types/bng";
 import { buttonClass } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
-import { capacityFor, useBngMyAccess } from "./useBngMyAccess";
+import { useBngMyAccess, useMonitoring } from "@/queries/bng";
+import { useRefreshCaseData } from "@/queries/workflow";
+import { capacityFor } from "./capacity";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
 
@@ -37,16 +38,14 @@ const inputClass = fieldClass();
  */
 export function BngMonitoringCard({ caseId }: { caseId: number }) {
   const access = useBngMyAccess(caseId);
-  const [monitoring, setMonitoring] = useState<BngMonitoring | null>(null);
+  const monitoring = useMonitoring(caseId).data ?? null;
+  const refreshCaseData = useRefreshCaseData();
   const [openId, setOpenId] = useState<number | null>(null);
 
-  const load = useCallback(async () => {
-    setMonitoring(await bngService.getMonitoring(caseId).catch(() => null));
-  }, [caseId]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  // After an action: reload the reports, and anything waiting on them.
+  const load = async () => {
+    await refreshCaseData(caseId);
+  };
 
   const summary = monitoring?.summary;
 

@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/auth.context";
-import { bngService } from "@/services/bng.service";
-import { caseListService } from "@/services/case-list.service";
-import { caseDashboardService } from "@/services/case-dashboard.service";
-import { workflowService } from "@/services/workflow.service";
+import { useHabitatBanks } from "@/queries/bng";
+import { useCaseDashboard, useCases } from "@/queries/projects";
+import { useWorkflowState } from "@/queries/workflow";
+import type { CaseDashboardState } from "@/types/case-dashboard";
+import type { WorkflowState } from "@/types/workflow";
 import {
   BNG_ACTIVE_STATUSES,
   BNG_CATEGORIES,
@@ -48,11 +48,7 @@ function readParam(name: string): string | null {
   return new URLSearchParams(window.location.search).get(name);
 }
 
-async function loadDevelopment(item: CaseListItem): Promise<Development> {
-  const [dashboard, state] = await Promise.all([
-    caseDashboardService.getCaseDashboard(item.caseId),
-    workflowService.getCaseState(item.caseId),
-  ]);
+function toDevelopment(item: CaseListItem, dashboard: CaseDashboardState, state: WorkflowState): Development {
   const metric = dashboard.bng_metric as BngMetricSummary | undefined;
   const need = { ...ZERO };
   for (const entry of metric?.categories ?? []) {
@@ -103,56 +99,46 @@ function match(bank: BngHabitatBank, need: Units) {
 // Marketplace (diagram steps 9-10): registered habitat banks with units for
 // sale; for a chosen development, how well each covers what it still needs.
 export default function BngMarketplacePage() {
-  const { user } = useAuth();
   const router = useRouter();
-  const [banks, setBanks] = useState<BngHabitatBank[] | null>(null);
-  const [developments, setDevelopments] = useState<CaseListItem[]>([]);
-  const [developmentId, setDevelopmentId] = useState<string>("");
-  const [development, setDevelopment] = useState<Development | null>(null);
-  const [loadingDevelopment, setLoadingDevelopment] = useState(false);
-  const [error, setError] = useState("");
+  const banksQuery = useHabitatBanks();
+  const banks = banksQuery.data ?? null;
+  const error = banksQuery.error ? banksQuery.error.message || "Could not load the marketplace." : "";
   const [category, setCategory] = useState<BngCategory>("area");
-  const [sort, setSort] = useState<SortKey>("available");
 
-  useEffect(() => {
-    if (!user) return;
-    bngService
-      .listHabitatBanks()
-      .then(setBanks)
-      .catch((err) => setError(err?.message || "Could not load the marketplace."));
-    caseListService
-      .getCases()
-      .then((cases) => {
-        const mine = cases.filter((item) => item.caseType === "bng_development_v1");
-        setDevelopments(mine);
-        const requested = readParam("development");
-        if (requested && mine.some((item) => String(item.caseId) === requested)) setDevelopmentId(requested);
-      })
-      .catch(() => setDevelopments([]));
-  }, [user]);
+  // The user's developments (from the shared project list).
+  const { data: cases } = useCases();
+  const developments = useMemo(
+    () => (cases ?? []).filter((item) => item.caseType === "bng_development_v1"),
+    [cases]
+  );
 
-  useEffect(() => {
-    const item = developments.find((candidate) => String(candidate.caseId) === developmentId);
-    if (!item) {
-      setDevelopment(null);
-      return;
-    }
-    let current = true;
-    setLoadingDevelopment(true);
-    loadDevelopment(item)
-      .then((value) => current && setDevelopment(value))
-      .catch(() => current && setDevelopment(null))
-      .finally(() => current && setLoadingDevelopment(false));
-    setSort("match");
-    return () => {
-      current = false;
-    };
-  }, [developmentId, developments]);
+  // ?development=<id> from the URL until the user picks one ("" = none).
+  const [picked, setPicked] = useState<string | null>(null);
+  const requested = readParam("development");
+  const developmentId =
+    picked ?? (requested && developments.some((item) => String(item.caseId) === requested) ? requested : "");
+  const selected = developments.find((item) => String(item.caseId) === developmentId);
+
+  // Its data and workflow state, shared with its project and pathway pages.
+  const dashboardQuery = useCaseDashboard(selected?.caseId ?? "");
+  const stateQuery = useWorkflowState(selected?.caseId ?? "");
+  const development = useMemo(
+    () =>
+      selected && dashboardQuery.data && stateQuery.data
+        ? toDevelopment(selected, dashboardQuery.data, stateQuery.data)
+        : null,
+    [selected, dashboardQuery.data, stateQuery.data]
+  );
+  const loadingDevelopment = Boolean(selected) && (dashboardQuery.isPending || stateQuery.isPending);
+
+  // Best match first when a development is chosen, until the user sorts.
+  const [sortChoice, setSort] = useState<SortKey | null>(null);
+  const sort: SortKey = sortChoice ?? (developmentId ? "match" : "available");
 
   function chooseDevelopment(id: string) {
-    setDevelopmentId(id);
+    setPicked(id);
     router.replace(id ? `/bng/marketplace?development=${id}` : "/bng/marketplace", { scroll: false });
-    if (!id && sort === "match") setSort("available");
+    setSort(null);
   }
 
   const totalNeed = development ? BNG_CATEGORIES.reduce((sum, c) => sum + development.need[c], 0) : 0;
@@ -250,7 +236,7 @@ export default function BngMarketplacePage() {
         </Alert>
       )}
 
-      {!user || banks === null ? (
+      {banks === null ? (
         !error && <p className="text-sm text-fg/60">Loading habitat banks…</p>
       ) : listed.length === 0 ? (
         <p className="text-sm text-fg/60">

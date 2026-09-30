@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { workflowService } from "@/services/workflow.service";
-import { bngService } from "@/services/bng.service";
+import { useCaseMetric, useHabitatBanks } from "@/queries/bng";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import {
   BNG_ALLOCATION_UNIT_FIELD,
@@ -17,7 +17,6 @@ import {
   type BngAllocationStatus,
   type BngCategory,
   type BngHabitatBank,
-  type BngMetricSummary,
 } from "@/types/bng";
 import { FieldHelp } from "@/components/ui/FieldHelp";
 import { AllocationStatusBadge } from "./AllocationStatusBadge";
@@ -101,6 +100,9 @@ function cost(units: Units, prices?: Record<BngCategory, number | null>): number
   return total;
 }
 
+// One shared empty list, so memos on `banks` don't rerun every render.
+const NO_BANKS: BngHabitatBank[] = [];
+
 // Where a bank is, so two banks with the same name can be told apart.
 function bankPlace(bank: BngHabitatBank): string {
   return [bank.site_names?.join(", "), bank.countries?.join(", ")].filter(Boolean).join(", ");
@@ -122,8 +124,10 @@ export function UnitAllocationStep({
   // Declined / released requests are history, not editable rows.
   const history = saved.filter((a) => a.status === "declined" || a.status === "released");
 
-  const [banks, setBanks] = useState<BngHabitatBank[] | null>(null);
-  const [summary, setSummary] = useState<BngMetricSummary | null>(null);
+  // Null while loading (banks: empty if they fail to load).
+  const banksQuery = useHabitatBanks();
+  const banks = banksQuery.data ?? (banksQuery.isError ? NO_BANKS : null);
+  const summary = useCaseMetric(state.case_id).data ?? null;
   const [rows, setRows] = useState<AllocationRow[]>(() => {
     const initial = savedAllocations(initialValues)
       .filter((a) => a.status !== "declined" && a.status !== "released")
@@ -140,11 +144,6 @@ export function UnitAllocationStep({
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [draftMessage, setDraftMessage] = useState("");
-
-  useEffect(() => {
-    bngService.listHabitatBanks().then(setBanks).catch(() => setBanks([]));
-    bngService.getCaseMetric(state.case_id).then(setSummary).catch(() => setSummary(null));
-  }, [state.case_id]);
 
   // Listed availability already excludes this development's own active
   // allocations; add them back so a saved request can be kept or changed.
