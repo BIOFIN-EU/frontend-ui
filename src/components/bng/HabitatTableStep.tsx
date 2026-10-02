@@ -369,6 +369,7 @@ export function HabitatTableStep({
         summary={summary}
         loading={previewing}
         title={phase === "baseline" ? "Metric preview (baseline)" : "Metric preview (after works)"}
+        scope="workflow"
       />
     </div>
   );

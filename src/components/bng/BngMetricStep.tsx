@@ -12,7 +12,7 @@ export function BngMetricStep(props: Props) {
 
   return (
     <div className="space-y-5">
-      <BngMetricPanel summary={summary} loading={isPending} />
+      <BngMetricPanel summary={summary} loading={isPending} scope="workflow" />
       <PathwayFormStep {...props} />
     </div>
   );
