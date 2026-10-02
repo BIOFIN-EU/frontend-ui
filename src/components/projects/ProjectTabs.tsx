@@ -2,19 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Download, LayoutDashboard, Leaf, Users } from "lucide-react";
+import { Download, LayoutDashboard, Leaf, Sprout, Users } from "lucide-react";
 
 type Props = {
   caseId: string;
   canManageUsers: boolean;
+  // Biodiversity Net Gain projects get a tab for what happens around and
+  // after their pathway (metric, requests, sales, monitoring).
+  isBng?: boolean;
 };
 
-export function ProjectTabs({ caseId, canManageUsers }: Props) {
+export function ProjectTabs({ caseId, canManageUsers, isBng = false }: Props) {
   const pathname = usePathname();
   const base = `/projects/${caseId}`;
 
   const tabs = [
     { href: base, label: "Overview", icon: LayoutDashboard, active: pathname === base },
+    ...(isBng
+      ? [{ href: `${base}/bng`, label: "Biodiversity Net Gain", icon: Sprout, active: pathname.startsWith(`${base}/bng`) }]
+      : []),
     {
       href: `${base}/vulnerability`,
       label: "Vulnerability Index",

@@ -3,17 +3,18 @@
 import {
   BNG_ALLOCATION_UNIT_FIELD,
   BNG_CATEGORIES,
-  formatMoney,
   formatUnits,
   type BngAllocation,
   type BngAllocationStepData,
   type BngHabitatParcel,
 } from "@/types/bng";
 import { useBngLabels } from "@/queries/bng";
-import { AllocationStatusBadge } from "./AllocationStatusBadge";
 
-/** Read-only habitat parcels of one phase (project dashboard). */
-export function HabitatParcelsCard({ parcels }: { parcels: unknown }) {
+/**
+ * Read-only habitat parcels of one phase. The Overview shows them as entered;
+ * the BNG tab adds their calculated units (`showUnits`).
+ */
+export function HabitatParcelsCard({ parcels, showUnits = false }: { parcels: unknown; showUnits?: boolean }) {
   const labels = useBngLabels();
   const rows = Array.isArray(parcels) ? (parcels as BngHabitatParcel[]) : [];
 
@@ -31,7 +32,7 @@ export function HabitatParcelsCard({ parcels }: { parcels: unknown }) {
             <th className="px-4 py-3 text-right font-semibold">Size</th>
             <th className="px-4 py-3 font-semibold">Condition</th>
             <th className="px-4 py-3 font-semibold">Significance</th>
-            <th className="px-4 py-3 text-right font-semibold">Units</th>
+            {showUnits && <th className="px-4 py-3 text-right font-semibold">Units</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-fg/10 text-fg/85">
@@ -49,7 +50,9 @@ export function HabitatParcelsCard({ parcels }: { parcels: unknown }) {
                 </td>
                 <td className="px-4 py-3">{parcel.condition_name}</td>
                 <td className="px-4 py-3">{parcel.strategic_significance_name}</td>
-                <td className="px-4 py-3 text-right font-semibold tabular-nums">{formatUnits(parcel.units)}</td>
+                {showUnits && (
+                  <td className="px-4 py-3 text-right font-semibold tabular-nums">{formatUnits(parcel.units)}</td>
+                )}
               </tr>
             );
           })}
@@ -63,7 +66,11 @@ export function unitsLine(allocation: Pick<BngAllocation, "habitat_units" | "hed
   return `${formatUnits(allocation.habitat_units)} habitat · ${formatUnits(allocation.hedgerow_units)} hedgerow · ${formatUnits(allocation.watercourse_units)} watercourse`;
 }
 
-/** A development's off-site units, per habitat bank, with their status. */
+/**
+ * The off-site units a development requested in its reservation step, per
+ * habitat bank, as entered. Their status and price (what happened after)
+ * are on the BNG tab.
+ */
 export function AllocationsCard({ data }: { data: unknown }) {
   const labels = useBngLabels();
   const step = data as (BngAllocationStepData & { _skipped?: boolean }) | null;
@@ -80,12 +87,9 @@ export function AllocationsCard({ data }: { data: unknown }) {
     <div className="space-y-3">
       {allocations.map((allocation) => (
         <div key={allocation.id ?? allocation.habitat_bank_case_id} className="rounded-xl surface-card p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-fg">
-              {allocation.habitat_bank_name ?? "Habitat bank"}
-            </p>
-            {allocation.status && <AllocationStatusBadge status={allocation.status} />}
-          </div>
+          <p className="text-sm font-semibold text-fg">
+            {allocation.habitat_bank_name ?? "Habitat bank"}
+          </p>
           <div className="mt-2 grid gap-2 text-sm sm:grid-cols-3">
             {BNG_CATEGORIES.map((category) => (
               <p key={category} className="text-fg/75">
@@ -96,11 +100,6 @@ export function AllocationsCard({ data }: { data: unknown }) {
               </p>
             ))}
           </div>
-          {allocation.total_price != null && (
-            <p className="mt-2 text-sm text-fg/70">
-              Price: <span className="font-semibold text-fg">{formatMoney(allocation.total_price)}</span>
-            </p>
-          )}
         </div>
       ))}
     </div>

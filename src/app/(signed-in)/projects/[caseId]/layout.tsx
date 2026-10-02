@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 
 import { useAuth } from "@/context/auth.context";
-import { useMyCaseAccess } from "@/queries/projects";
+import { useCaseDashboard, useMyCaseAccess } from "@/queries/projects";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 
 // Shared header and section tabs for every page of a project
@@ -16,6 +16,8 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   // Undefined until the access list has loaded, so the Access tab never
   // flashes in for users who can't manage it.
   const { data: myAccess } = useMyCaseAccess(caseId, user?.id);
+  // The backend adds BNG data (bng_metric) to BNG projects only.
+  const isBng = Boolean(useCaseDashboard(caseId).data?.bng_metric);
   const canManageUsers = Boolean(myAccess?.can_assign_users);
 
   return (
@@ -35,7 +37,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
           </p>
         </div>
 
-        <ProjectTabs caseId={caseId} canManageUsers={canManageUsers} />
+        <ProjectTabs caseId={caseId} canManageUsers={canManageUsers} isBng={isBng} />
       </header>
 
       {children}

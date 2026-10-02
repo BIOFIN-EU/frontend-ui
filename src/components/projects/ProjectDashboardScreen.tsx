@@ -5,8 +5,8 @@ import RiskMap from "@/components/maps/RiskMap";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { FieldHelp } from "@/components/ui/FieldHelp";
 import { isoToDisplay } from "@/components/ui/DatePicker";
-import { BngCaseSummary } from "@/components/bng/BngCaseSummary";
 import { AllocationsCard, HabitatParcelsCard } from "@/components/bng/BngDashboardCards";
+import { BngMetricPanel } from "@/components/bng/BngMetricPanel";
 import type { BngMetricSummary } from "@/types/bng";
 import type { CaseDashboardState } from "@/types/case-dashboard";
 import type { CaseLocationEntry } from "@/types/case-location";
@@ -499,14 +499,10 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
           {activeStep.step.title}
         </h2>
 
+        {/* The metric as the step showed it (what happened after is on the BNG tab). */}
         {activeStep.step.ui_mode === "bng_metric" && (
-          <div className="mt-6 space-y-4">
-            <BngCaseSummary
-              caseId={state.caseId}
-              summary={state.bng_metric as BngMetricSummary | undefined}
-              steps={state.workflow_config?.steps}
-              signoffs={state.bng_signoffs}
-            />
+          <div className="mt-6">
+            <BngMetricPanel summary={state.bng_metric as BngMetricSummary | undefined} scope="workflow" />
           </div>
         )}
 

@@ -11,6 +11,11 @@ type Props = {
   summary: BngMetricSummary | null | undefined;
   loading?: boolean;
   title?: string;
+  // "workflow": what the pathway's steps are about - baseline, proposed,
+  // change and (developments) the on-site position against the target.
+  // "full" adds what changes after the pathway: allocated and available
+  // units (banks), off-site units secured and still needed (developments).
+  scope?: "workflow" | "full";
 };
 
 function formatPercent(value: number | null) {
@@ -27,12 +32,13 @@ function hasData(entry: BngCategoryMetric) {
  * Biodiversity units per habitat category: baseline, proposed and change,
  * plus what a habitat bank can sell or what a development still needs.
  */
-export function BngMetricPanel({ summary, loading, title = "Biodiversity metric" }: Props) {
+export function BngMetricPanel({ summary, loading, title = "Biodiversity metric", scope = "full" }: Props) {
   const labels = useBngLabels();
   const rows = (summary?.categories ?? []).filter(hasData);
   const isBank = summary?.role === "habitat_bank";
+  const full = scope === "full";
   // development: units requested but not yet accepted by the habitat bank
-  const showPending = !isBank && rows.some((entry) => (entry.pending_units ?? 0) > 0);
+  const showPending = full && !isBank && rows.some((entry) => (entry.pending_units ?? 0) > 0);
 
   return (
     <section className="rounded-2xl border border-accent-400/20 bg-accent-500/[0.06] p-5">
@@ -57,16 +63,23 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
                 <th className="py-2 pr-3 text-right font-semibold">Proposed</th>
                 <th className="py-2 pr-3 text-right font-semibold">Change</th>
                 {isBank ? (
-                  <>
-                    <th className="py-2 pr-3 text-right font-semibold">Allocated</th>
-                    <th className="py-2 text-right font-semibold">Available</th>
-                  </>
-                ) : (
+                  full && (
+                    <>
+                      <th className="py-2 pr-3 text-right font-semibold">Allocated</th>
+                      <th className="py-2 text-right font-semibold">Available</th>
+                    </>
+                  )
+                ) : full ? (
                   <>
                     <th className="py-2 pr-3 text-right font-semibold">+10% target</th>
                     <th className="py-2 pr-3 text-right font-semibold">Off-site secured</th>
                     {showPending && <th className="py-2 pr-3 text-right font-semibold">Awaiting bank</th>}
                     <th className="py-2 text-right font-semibold">Still needed</th>
+                  </>
+                ) : (
+                  <>
+                    <th className="py-2 pr-3 text-right font-semibold">+10% target</th>
+                    <th className="py-2 text-right font-semibold">On-site shortfall</th>
                   </>
                 )}
               </tr>
@@ -85,10 +98,23 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
                     <span className="ml-1 text-xs text-fg/50">{formatPercent(entry.change_percent)}</span>
                   </td>
                   {isBank ? (
+                    full && (
                     <>
                       <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.allocated_units)}</td>
                       <td className="py-2.5 text-right font-semibold tabular-nums text-accent-200">
                         {formatUnits(entry.available_units)}
+                      </td>
+                    </>
+                    )
+                  ) : !full ? (
+                    <>
+                      <td className="py-2.5 pr-3 text-right tabular-nums">{formatUnits(entry.target_units)}</td>
+                      <td
+                        className={`py-2.5 text-right font-semibold tabular-nums ${
+                          (entry.onsite_shortfall_units ?? 0) <= 0 ? "text-accent-200" : "text-warning-200"
+                        }`}
+                      >
+                        {(entry.onsite_shortfall_units ?? 0) <= 0 ? "Met" : formatUnits(entry.onsite_shortfall_units)}
                       </td>
                     </>
                   ) : (
@@ -122,7 +148,7 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
               : "border border-warning-400/25 bg-warning-500/10 text-warning-100"
           }`}
         >
-          {summary.meets_target
+          {full && summary.meets_target
             ? `The ${summary.net_gain_target_percent}% biodiversity net gain target is met for every category.`
             : summary.onsite_meets_target
               ? "The target is met on-site."
@@ -130,7 +156,7 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
         </p>
       )}
 
-      {isBank && summary && rows.length > 0 && (
+      {full && isBank && summary && rows.length > 0 && (
         <p className="mt-4 text-sm text-fg/65">
           Available units are the uplift over the baseline, less what developments have already taken.
           They can be allocated once this habitat bank is registered (all steps completed).
