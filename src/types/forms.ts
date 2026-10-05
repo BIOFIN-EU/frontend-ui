@@ -4,7 +4,13 @@ export type VisibleIfRule = {
   value: any;
 };
 
-export type FieldOption = { label: string; value: string; description?: string | null };
+export type FieldOption = {
+  label: string;
+  value: string;
+  description?: string | null;
+  // Shown under this heading in the list (options of a group are adjacent).
+  groupLabel?: string;
+};
 
 export type FieldSchema = {
   id: string;
@@ -28,6 +34,20 @@ export type FieldSchema = {
   required?: boolean;
   options?: FieldOption[];
   visible_if?: VisibleIfRule;
+
+  // A select whose options depend on another field's value (the workflow
+  // config's filter_by): options are those that fit it. Changing that field
+  // clears this one if its value no longer fits.
+  filterBy?: string;
+  // The value of that field the options are for (options lag a render
+  // behind the form while a new list loads).
+  optionsFor?: string;
+  // Options are loading, or can't be chosen yet (the field above is empty).
+  optionsLoading?: boolean;
+  disabled?: boolean;
+  placeholder?: string;
+  // Every option, to name a saved value that no longer fits.
+  allOptions?: FieldOption[];
 };
 
 export type StepSchema = {

@@ -171,7 +171,7 @@ export default function HomePage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Learn more
+                Visit BIOFIN-EU Project Website
               </Link>
             </div>
           </div>
