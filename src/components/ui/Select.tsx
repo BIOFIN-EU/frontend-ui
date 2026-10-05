@@ -15,12 +15,18 @@ import { createPortal } from "react-dom";
 type Option = {
   label: string;
   value: string;
+  // Options with a group are listed under its heading (keep a group's
+  // options adjacent).
+  groupLabel?: string;
 };
 
 type Props = {
   value: string;
   onChange: (value: string) => void;
   options: Option[];
+  // Shown when nothing is chosen.
+  placeholder?: string;
+  disabled?: boolean;
 };
 
 // Hooks can't run inside Listbox's render-prop callback, so the "reposition
@@ -35,7 +41,7 @@ function RepositionOnOpen({ open, reposition }: { open: boolean; reposition: () 
   return null;
 }
 
-export function Select({ value, onChange, options }: Props) {
+export function Select({ value, onChange, options, placeholder = "Select...", disabled = false }: Props) {
   const selected = useMemo(
     () => options.find((o) => o.value === value),
     [options, value]
@@ -85,7 +91,7 @@ export function Select({ value, onChange, options }: Props) {
   }, []);
 
   return (
-    <Listbox value={value} onChange={onChange}>
+    <Listbox value={value} onChange={onChange} disabled={disabled}>
       {({ open }) => {
         return (
           <>
@@ -93,9 +99,11 @@ export function Select({ value, onChange, options }: Props) {
             <div className="relative">
               <Listbox.Button
                 ref={buttonRef}
-                className="w-full rounded-xl surface-card px-4 py-3 text-left text-sm text-fg outline-none"
+                className={`w-full rounded-xl surface-card px-4 py-3 text-left text-sm outline-none ${
+                  disabled ? "cursor-not-allowed text-fg/40" : "text-fg"
+                }`}
               >
-                <span>{selected?.label || "Select..."}</span>
+                <span>{selected?.label || placeholder}</span>
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 opacity-60">
                   <ChevronsUpDown className="h-5 w-5" strokeWidth={1.75} />
                 </span>
@@ -111,8 +119,14 @@ export function Select({ value, onChange, options }: Props) {
                     style={panelStyle}
                     className="max-h-60 overflow-auto rounded-xl border border-fg/10 bg-popover p-1 shadow-2xl ring-1 ring-shade/40 focus:outline-none"
                   >
-                    {options.map((opt) => (
-                      <Listbox.Option key={opt.value} value={opt.value} as={Fragment}>
+                    {options.map((opt, index) => (
+                      <Fragment key={opt.value}>
+                      {opt.groupLabel && opt.groupLabel !== options[index - 1]?.groupLabel && (
+                        <div className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wider text-fg/45">
+                          {opt.groupLabel}
+                        </div>
+                      )}
+                      <Listbox.Option value={opt.value} as={Fragment}>
                         {({ focus, selected }) => (
                           <div
                             className={`cursor-pointer rounded-lg px-4 py-3 text-sm ${
@@ -123,6 +137,7 @@ export function Select({ value, onChange, options }: Props) {
                           </div>
                         )}
                       </Listbox.Option>
+                      </Fragment>
                     ))}
                   </Listbox.Options>,
                   document.body

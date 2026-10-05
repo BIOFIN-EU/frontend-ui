@@ -147,7 +147,26 @@ function Field({
         </div>
       );
 
-    case "select":
+    case "select": {
+      const value = String(values?.[field.id] ?? "");
+      const options = (field.options || []).map((o) => ({
+        label: o.label,
+        value: String(o.value),
+        groupLabel: o.groupLabel,
+      }));
+      // A saved value that isn't offered (e.g. it no longer fits the field
+      // above) is still shown, so it isn't silently replaced.
+      if (value && !options.some((o) => o.value === value)) {
+        const known = field.allOptions?.find((o) => String(o.value) === value);
+        const settled = !field.optionsLoading && !field.disabled;
+        options.push({
+          label: `${known?.label ?? value}${settled ? " (no longer matches)" : ""}`,
+          value,
+          groupLabel: undefined,
+        });
+      }
+      const placeholder = field.optionsLoading ? "Loading options..." : (field.placeholder ?? "Select...");
+
       return (
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
@@ -167,7 +186,7 @@ function Field({
           <input type="hidden" {...common} />
 
           <Select
-            value={String(values?.[field.id] ?? "")}
+            value={value}
             onChange={(nextValue) => {
               setValue(field.id, nextValue, {
                 shouldValidate: true,
@@ -175,18 +194,15 @@ function Field({
                 shouldTouch: true,
               });
             }}
-            options={[
-              { label: "Select...", value: "" },
-              ...((field.options || []).map((o) => ({
-                label: o.label,
-                value: String(o.value),
-              }))),
-            ]}
+            options={[{ label: placeholder, value: "" }, ...options]}
+            placeholder={placeholder}
+            disabled={field.disabled}
           />
 
           {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
       );
+    }
 
     case "radio":
       return (
@@ -274,6 +290,7 @@ export function FormRenderer({
   onSaveDraft,
   onNext,
   onPrev,
+  onValuesChange,
   isFirst,
   isLast,
   fieldErrors = {},
@@ -287,6 +304,8 @@ export function FormRenderer({
   ) => Promise<void>;
   onNext: (values: Record<string, any>) => Promise<void>;
   onPrev?: () => void;
+  // Called with the form's values whenever they change.
+  onValuesChange?: (values: Record<string, any>) => void;
   isFirst: boolean;
   isLast: boolean;
   fieldErrors?: Record<string, string>;
@@ -307,6 +326,36 @@ export function FormRenderer({
     }, 900);
     return () => clearTimeout(t);
   }, [JSON.stringify(values)]);
+
+  // Dependent selects (filterBy): when the field above changes, clear the
+  // value if it doesn't fit the new choice, once the new options are in.
+  // Clearing a field this way can in turn clear the ones below it.
+  const previousValues = React.useRef(values);
+  const toCheck = React.useRef(new Set<string>());
+  React.useEffect(() => {
+    onValuesChange?.(values);
+
+    const fields = stepSchema?.fields ?? [];
+    fields.forEach((f) => {
+      if (f.filterBy && String(values[f.filterBy] ?? "") !== String(previousValues.current[f.filterBy] ?? "")) {
+        toCheck.current.add(f.id);
+      }
+    });
+    previousValues.current = values;
+
+    toCheck.current.forEach((id) => {
+      const f = fields.find((field) => field.id === id);
+      if (!f?.filterBy) return toCheck.current.delete(id);
+      const ready = !f.optionsLoading && (f.optionsFor ?? "") === String(values[f.filterBy] ?? "");
+      if (!ready) return;
+      toCheck.current.delete(id);
+      const value = String(values[id] ?? "");
+      if (value && !(f.options ?? []).some((o) => String(o.value) === value)) {
+        form.setValue(id, "", { shouldDirty: true, shouldValidate: true });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(values), stepSchema]);
 
   return (
     <form
