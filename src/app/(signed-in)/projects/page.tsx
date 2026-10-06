@@ -5,7 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useCases } from "@/queries/projects";
 import { caseListService } from "@/services/case-list.service";
 import { ProjectListScreen } from "@/components/projects/ProjectListScreen";
-import { BngWaitingBanner } from "@/components/bng/BngWaitingBanner";
+import { WaitingBanner } from "@/components/projects/WaitingBanner";
+import { AllProjectsPanel } from "@/components/projects/AllProjectsPanel";
 import { Alert } from "@/components/ui/Alert";
 
 // useSearchParams needs a Suspense boundary for the production build.
@@ -57,8 +58,11 @@ function CasesPageInner() {
 
       {cases && (
         <>
-          {/* BNG only: steps waiting for one of the user's roles (hidden when none). */}
-          <BngWaitingBanner cases={cases} />
+          {/* Steps waiting for one of the user's roles (hidden when none). */}
+          <WaitingBanner cases={cases} />
+
+          {/* Administrators only. */}
+          <AllProjectsPanel />
 
           {/* A delete removes the project from the list itself (useDeleteCase). */}
           <ProjectListScreen cases={cases} onDeleted={(caseId) => setDeletedCaseId(String(caseId))} />

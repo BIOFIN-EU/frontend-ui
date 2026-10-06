@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { workflowService } from "@/services/workflow.service";
 import { projectKeys } from "@/queries/projects";
 import { riskKeys } from "@/queries/risk";
+import { accessKeys } from "@/queries/project-access";
 import { bngKeys } from "@/queries/bng";
 
 type CaseId = number | string;
@@ -60,6 +61,8 @@ export function useRefreshCaseData() {
       queryClient.invalidateQueries({ queryKey: projectKeys.all }),
       queryClient.invalidateQueries({ queryKey: bngKeys.all }),
       queryClient.invalidateQueries({ queryKey: riskKeys.case(caseId) }),
+      // A saved step can change whose turn it is.
+      queryClient.invalidateQueries({ queryKey: accessKeys.waiting() }),
     ]);
 }
 

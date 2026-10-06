@@ -6,13 +6,12 @@ import { Download, LayoutDashboard, Leaf, Sprout, Users } from "lucide-react";
 
 type Props = {
   caseId: string;
-  canManageUsers: boolean;
   // Biodiversity Net Gain projects get a tab for what happens around and
   // after their pathway (metric, requests, sales, monitoring).
   isBng?: boolean;
 };
 
-export function ProjectTabs({ caseId, canManageUsers, isBng = false }: Props) {
+export function ProjectTabs({ caseId, isBng = false }: Props) {
   const pathname = usePathname();
   const base = `/projects/${caseId}`;
 
@@ -33,16 +32,13 @@ export function ProjectTabs({ caseId, canManageUsers, isBng = false }: Props) {
       icon: Download,
       active: pathname.startsWith(`${base}/export`),
     },
-    ...(canManageUsers
-      ? [
-          {
-            href: `${base}/access`,
-            label: "Access",
-            icon: Users,
-            active: pathname.startsWith(`${base}/access`),
-          },
-        ]
-      : []),
+    // Every member sees who is on the project; managers can change it.
+    {
+      href: `${base}/access`,
+      label: "Access",
+      icon: Users,
+      active: pathname.startsWith(`${base}/access`),
+    },
   ];
 
   return (

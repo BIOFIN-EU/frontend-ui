@@ -8,12 +8,14 @@ import { buttonClass } from "@/components/ui/Button";
 type Props = {
   caseId: string;
   state: CaseDashboardState;
-  // Shown only when set (the user has can_delete).
+  // Shown only when set (the user is a manager).
   onDelete?: () => void;
+  // Editors and up (not viewers, nor an administrator's support view).
+  canEdit?: boolean;
 };
 
 // Vulnerability Index and Access are project tabs (ProjectTabs), not buttons here.
-export function ProjectDashboardMenu({ caseId, state, onDelete }: Props) {
+export function ProjectDashboardMenu({ caseId, state, onDelete, canEdit = false }: Props) {
   return (
     <div className="h-fit rounded-3xl surface-panel p-5 shadow-panel">
       <div>
@@ -33,12 +35,14 @@ export function ProjectDashboardMenu({ caseId, state, onDelete }: Props) {
       </div>
 
       <div className="mt-5 space-y-2">
-        <Link
-          href={`/pathways/${caseId}`}
-          className={`w-full ${buttonClass("primary")}`}
-        >
-          Edit project
-        </Link>
+        {canEdit && (
+          <Link
+            href={`/pathways/${caseId}`}
+            className={`w-full ${buttonClass("primary")}`}
+          >
+            Edit project
+          </Link>
+        )}
 
         {onDelete && (
           <button

@@ -16,14 +16,12 @@ export const bngKeys = {
   all: ["bng"] as const,
   reference: () => [...bngKeys.all, "reference"] as const,
   marketplace: (developmentId: string) => [...bngKeys.all, "marketplace", developmentId] as const,
-  waiting: () => [...bngKeys.all, "waiting"] as const,
   case: (caseId: CaseId) => [...bngKeys.all, "case", String(caseId)] as const,
   metric: (caseId: CaseId) => [...bngKeys.case(caseId), "metric"] as const,
   allocations: (caseId: CaseId) => [...bngKeys.case(caseId), "allocations"] as const,
   transactions: (caseId: CaseId) => [...bngKeys.case(caseId), "transactions"] as const,
   financials: (caseId: CaseId) => [...bngKeys.case(caseId), "financials"] as const,
   myAccess: (caseId: CaseId) => [...bngKeys.case(caseId), "my-access"] as const,
-  roles: (caseId: CaseId) => [...bngKeys.case(caseId), "roles"] as const,
   monitoring: (caseId: CaseId) => [...bngKeys.case(caseId), "monitoring"] as const,
   report: (caseId: CaseId) => [...bngKeys.case(caseId), "report"] as const,
   allocationOptions: (caseId: CaseId) => [...bngKeys.case(caseId), "allocation-options"] as const,
@@ -120,11 +118,6 @@ export function useAllocationSuggestions(caseId: CaseId, need: Record<string, nu
   });
 }
 
-/** BNG steps across projects waiting for one of the user's roles. */
-export function useBngWaiting() {
-  return useQuery({ queryKey: bngKeys.waiting(), queryFn: () => bngService.getWaiting() });
-}
-
 export function useCaseMetric(caseId: CaseId) {
   return useQuery({ queryKey: bngKeys.metric(caseId), queryFn: () => bngService.getCaseMetric(caseId) });
 }
@@ -159,11 +152,6 @@ export function useBngMyAccess(caseId: CaseId, enabled = true): BngMyAccess | nu
     enabled,
   });
   return query.data ?? (query.isError ? NO_ACCESS : null);
-}
-
-/** Each member's BNG roles (fails for a project that isn't BNG). */
-export function useCaseRoles(caseId: CaseId) {
-  return useQuery({ queryKey: bngKeys.roles(caseId), queryFn: () => bngService.getCaseRoles(caseId) });
 }
 
 export function useMonitoring(caseId: CaseId) {

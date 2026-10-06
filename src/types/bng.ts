@@ -187,8 +187,8 @@ export type BngMyAccess = {
   roles: BngRole[];
   can_update: boolean;
   can_record_on_behalf: boolean;
+  // Steps: the project's my-access (types/project-access).
   capacities?: {
-    steps: Record<string, BngCapacity>;
     allocations: BngCapacity;
     monitoring_submit: BngCapacity | null;
     monitoring_verify: BngCapacity | null;
@@ -207,12 +207,7 @@ export type BngSignoff = {
   created_at: string | null;
 };
 
-export type BngWaiting = {
-  case_id: number;
-  step_code: string;
-  step_title: string | null;
-  roles: BngRole[];
-};
+
 
 export type BngMonitoringStatus = "due" | "submitted" | "passed" | "failed" | "remediated";
 

@@ -12,9 +12,7 @@ import type {
   BngMonitoring,
   BngMyAccess,
   BngReport,
-  BngRole,
   BngSignoff,
-  BngWaiting,
 } from "@/types/bng";
 
 const BASE = "/api/bng";
@@ -98,23 +96,8 @@ export const bngService = {
     return apiFetch<BngMyAccess>(`${BASE}/cases/${caseId}/my-access`, { silent: true });
   },
 
-  getCaseRoles(caseId: number | string): Promise<Record<string, BngRole[]>> {
-    return apiFetch<Record<string, BngRole[]>>(`${BASE}/cases/${caseId}/roles`, { silent: true });
-  },
-
-  setUserRoles(caseId: number | string, userId: string, roles: BngRole[]): Promise<{ user_id: string; roles: BngRole[] }> {
-    return apiFetch(`${BASE}/cases/${caseId}/roles/${userId}`, {
-      method: "PUT",
-      body: JSON.stringify({ roles }),
-    });
-  },
-
   getSignoffs(caseId: number | string): Promise<BngSignoff[]> {
     return apiFetch<BngSignoff[]>(`${BASE}/cases/${caseId}/signoffs`);
-  },
-
-  getWaiting(): Promise<BngWaiting[]> {
-    return apiFetch<BngWaiting[]>(`${BASE}/waiting`, { silent: true });
   },
 
   getMonitoring(caseId: number | string): Promise<BngMonitoring> {

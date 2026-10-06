@@ -2,9 +2,12 @@
 
 import { useParams } from "next/navigation";
 
-import { useAuth } from "@/context/auth.context";
-import { useCaseDashboard, useMyCaseAccess } from "@/queries/projects";
+import { LifeBuoy } from "lucide-react";
+
+import { useCaseDashboard } from "@/queries/projects";
+import { useMyAccess } from "@/queries/project-access";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
+import { Alert } from "@/components/ui/Alert";
 
 // Shared header and section tabs for every page of a project
 // (Overview, Vulnerability Index, Access).
@@ -12,13 +15,9 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const params = useParams<{ caseId: string }>();
   const caseId = params.caseId;
 
-  const { user } = useAuth();
-  // Undefined until the access list has loaded, so the Access tab never
-  // flashes in for users who can't manage it.
-  const { data: myAccess } = useMyCaseAccess(caseId, user?.id);
+  const { data: myAccess } = useMyAccess(caseId);
   // The backend adds BNG data (bng_metric) to BNG projects only.
   const isBng = Boolean(useCaseDashboard(caseId).data?.bng_metric);
-  const canManageUsers = Boolean(myAccess?.can_assign_users);
 
   return (
     <div className="space-y-8">
@@ -37,7 +36,17 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
           </p>
         </div>
 
-        <ProjectTabs caseId={caseId} canManageUsers={canManageUsers} isBng={isBng} />
+        <ProjectTabs caseId={caseId} isBng={isBng} />
+
+        {myAccess?.support_view && (
+          <Alert tone="info" className="flex items-start gap-3">
+            <LifeBuoy className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>
+              <span className="font-semibold">Support view.</span> You can read this project as an administrator but
+              aren&apos;t a member, so you can&apos;t change it. Your visit is shown in its access history.
+            </span>
+          </Alert>
+        )}
       </header>
 
       {children}

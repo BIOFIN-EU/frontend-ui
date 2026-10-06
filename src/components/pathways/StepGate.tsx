@@ -3,12 +3,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ShieldCheck, UserCheck, Clock } from "lucide-react";
 import { workflowService } from "@/services/workflow.service";
-import { setBngSubmitExtras } from "@/lib/bngSubmitExtras";
-import type { BngCapacity, BngRole } from "@/types/bng";
+import { setSubmitExtras } from "@/lib/submitExtras";
+import type { Capacity } from "@/types/project-access";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import { buttonClass } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
-import { useBngLabels, useBngMyAccess } from "@/queries/bng";
+import { useMyAccess } from "@/queries/project-access";
 import { Alert } from "@/components/ui/Alert";
 
 type Props = {
@@ -20,29 +20,35 @@ type Props = {
   children: ReactNode;
 };
 
+/** "the Borrower or Intermediary" from role codes. */
+function roleNames(codes: string[] | undefined, labels: Record<string, string>): string {
+  const names = (codes ?? []).map((code) => labels[code] ?? code);
+  return names.length <= 1 ? names.join("") : `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}`;
+}
+
 /**
- * BNG steps with "roles": shows the step to users holding one of them; a
- * project manager must first confirm they record it on the role's behalf;
- * anyone else sees whose turn it is. Approval steps also get Reject.
+ * Steps with "roles" (any pathway): shows the step to users holding one of
+ * them; a project manager must first confirm they record it on the role's
+ * behalf; anyone else sees whose turn it is. Approval steps also get Reject.
  */
-export function BngStepGate({ state, step, stepCode, mode, onStateUpdated, children }: Props) {
-  const access = useBngMyAccess(state.case_id);
-  const labels = useBngLabels();
+export function StepGate({ state, step, stepCode, mode, onStateUpdated, children }: Props) {
+  const { data: access, isError } = useMyAccess(state.case_id);
+  const labels = access?.role_labels ?? {};
   const [onBehalf, setOnBehalf] = useState(false);
   // From the API (the same rule that checks the submission).
-  const capacity: BngCapacity = access?.capacities?.steps[stepCode] ?? {
+  const capacity: Capacity = access?.steps[stepCode] ?? {
     kind: "none",
-    role: (step.roles?.[0] as BngRole | undefined) ?? null,
-    roles: (step.roles ?? []) as BngRole[],
+    role: step.roles?.[0] ?? null,
+    roles: step.roles ?? [],
   };
-  const owners = labels.roleNames(step.roles);
+  const owners = roleNames(step.roles, labels);
 
   useEffect(() => {
-    setBngSubmitExtras(state.case_id, onBehalf && capacity.kind === "on_behalf" ? { _bng_on_behalf: true } : null);
-    return () => setBngSubmitExtras(state.case_id, null);
+    setSubmitExtras(state.case_id, onBehalf && capacity.kind === "on_behalf" ? { _on_behalf: true } : null);
+    return () => setSubmitExtras(state.case_id, null);
   }, [state.case_id, onBehalf, capacity.kind]);
 
-  if (access === null) {
+  if (!access && !isError) {
     return <p className="text-sm text-fg/60">Checking your role on this project…</p>;
   }
 
@@ -61,7 +67,7 @@ export function BngStepGate({ state, step, stepCode, mode, onStateUpdated, child
     );
   }
 
-  const roleLabel = labels.role(capacity.role);
+  const roleLabel = capacity.role ? labels[capacity.role] ?? capacity.role : "";
   const canAct = capacity.kind === "own" || onBehalf;
 
   return (
@@ -80,8 +86,8 @@ export function BngStepGate({ state, step, stepCode, mode, onStateUpdated, child
             className="mt-0.5 h-4 w-4 accent-warning-400"
           />
           <span>
-            <span className="font-semibold">This step is for the {owners}.</span> I am recording their decision on
-            their behalf. It will be shown as recorded on behalf of the {roleLabel}.
+            <span className="font-semibold">This step is for the {owners}.</span> I am completing it on
+            their behalf. It will be shown as done on behalf of the {roleLabel}.
           </span>
         </Alert>
       )}
