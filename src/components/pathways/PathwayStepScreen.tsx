@@ -9,7 +9,7 @@ import { PathwayLocationStep } from "./PathwayLocationStep";
 import { HabitatTableStep } from "@/components/bng/HabitatTableStep";
 import { BngMetricStep } from "@/components/bng/BngMetricStep";
 import { UnitAllocationStep } from "@/components/bng/UnitAllocationStep";
-import { BngStepGate } from "@/components/bng/BngStepGate";
+import { StepGate } from "@/components/pathways/StepGate";
 import { buttonClass } from "@/components/ui/Button";
 
 export type PathwayStepMode = "submit" | "edit";
@@ -127,9 +127,9 @@ export function PathwayStepScreen({
       <PathwayFormStep {...commonProps} />
     );
 
-  // BNG steps with roles only: who may fill it in (other steps unchanged).
+  // Steps with roles: who may fill it in (steps without roles unchanged).
   const body = step.roles?.length ? (
-    <BngStepGate
+    <StepGate
       key={effectiveStepCode}
       state={state}
       step={step}
@@ -138,7 +138,7 @@ export function PathwayStepScreen({
       onStateUpdated={onStateUpdated}
     >
       {stepBody}
-    </BngStepGate>
+    </StepGate>
   ) : (
     stepBody
   );

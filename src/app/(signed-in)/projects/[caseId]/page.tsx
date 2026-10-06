@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { useAuth } from "@/context/auth.context";
-import { useCaseDashboard, useMyCaseAccess } from "@/queries/projects";
+import { useCaseDashboard } from "@/queries/projects";
+import { useMyAccess } from "@/queries/project-access";
 import { caseDashboardService } from "@/services/case-dashboard.service";
 import { ProjectDashboardScreen } from "@/components/projects/ProjectDashboardScreen";
 import { ProjectDashboardMenu } from "@/components/projects/ProjectDashboardMenu";
@@ -15,11 +15,12 @@ export default function CaseDashboardPage() {
   const params = useParams<{ caseId: string }>();
   const caseId = params.caseId;
 
-  const { user } = useAuth();
   const router = useRouter();
 
-  const { data: myAccess } = useMyCaseAccess(caseId, user?.id);
-  const canDelete = Boolean(myAccess?.can_delete);
+  const { data: myAccess } = useMyAccess(caseId);
+  // Managers (and the owner) can delete a project.
+  const canDelete = myAccess?.level === "owner" || myAccess?.level === "manager";
+  const canEdit = Boolean(myAccess?.can_update);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { data: state, isPending, error } = useCaseDashboard(caseId);
@@ -49,6 +50,7 @@ export default function CaseDashboardPage() {
               caseId={caseId}
               state={state}
               onDelete={canDelete ? () => setConfirmDelete(true) : undefined}
+              canEdit={canEdit}
             />
           </aside>
         </div>

@@ -19,14 +19,20 @@ function dashboardStepToWorkflowStep(step: WorkflowStep): WorkflowStep {
     fields: (step.fields ?? []) as unknown as WorkflowStep["fields"],
     ui_mode: step.ui_mode as WorkflowStep["ui_mode"],
     submit_mode: step.submit_mode as WorkflowStep["submit_mode"],
+    // Who may complete it (the step gate).
+    roles: step.roles,
+    allow_on_behalf: step.allow_on_behalf,
+    approval: step.approval,
+    stage: step.stage,
+    actor: step.actor,
   };
 }
 
 /**
  * A running workflow keeps the step config it was started with, so help text
- * added to the config later would never reach older cases. Take each field's
- * help_text / describe_options (including table row fields) from the current
- * config instead.
+ * and roles added to the config later would never reach older cases. Take
+ * each field's help_text / describe_options (including table row fields), and
+ * who may complete the step (as the API checks it), from the current config.
  */
 function withCurrentHelpText(step: WorkflowStep, current?: WorkflowStep): WorkflowStep {
   if (!current) return step;
@@ -35,6 +41,9 @@ function withCurrentHelpText(step: WorkflowStep, current?: WorkflowStep): Workfl
 
   return {
     ...step,
+    roles: current.roles,
+    allow_on_behalf: current.allow_on_behalf,
+    approval: current.approval,
     fields: step.fields.map((field) => {
       const latest = currentFields.get(field.name);
       if (!latest) return field;

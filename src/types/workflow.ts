@@ -78,7 +78,7 @@ export type WorkflowStep = {
   // who performs the step (e.g. "Ecologist"). Shown when present.
   stage?: string;
   actor?: string;
-  // BNG: roles that may submit the step, whether a project manager may
+  // Roles that may submit the step (any pathway), whether a project manager may
   // record it on their behalf, and approval steps that can be rejected.
   roles?: string[];
   allow_on_behalf?: boolean;
