@@ -62,7 +62,7 @@ function LoginPageInner() {
         </p>
       </header>
 
-      <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md">
+      <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel backdrop-blur-md">
 
         {/* ✅ SUCCESS MESSAGE GOES HERE */}
         {reason === "password-changed" && (

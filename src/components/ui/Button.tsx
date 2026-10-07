@@ -15,7 +15,7 @@ export type ButtonSize = "md" | "sm";
 const SIZE: Record<ButtonSize, string> = {
   md: "inline-flex min-h-[48px] items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold transition duration-200",
   // Compact sizing for dense contexts (table rows, cards).
-  sm: "inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition duration-200",
+  sm: "inline-flex min-h-11 min-w-11 sm:min-h-0 sm:min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition duration-200",
 };
 
 const VARIANT: Record<ButtonVariant, string> = {

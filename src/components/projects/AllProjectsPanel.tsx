@@ -31,7 +31,7 @@ export function AllProjectsPanel() {
   if (!cases) return null;
 
   return (
-    <section className="rounded-2xl border border-info-400/20 bg-info-500/[0.06] px-5 py-3">
+    <section className="rounded-2xl border border-info-400/20 bg-info-500/[0.06] px-4 sm:px-5 py-3">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}

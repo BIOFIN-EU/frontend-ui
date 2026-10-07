@@ -17,7 +17,7 @@ export default function ProjectBngPage() {
   const { data: state, isPending, error } = useCaseDashboard(caseId);
 
   if (isPending) {
-    return <div className="rounded-2xl surface-panel p-6 text-fg/70">Loading…</div>;
+    return <div className="rounded-2xl surface-panel p-4 sm:p-6 text-fg/70">Loading…</div>;
   }
   if (error || !state) {
     return <Alert tone="danger">{error?.message || "Could not load the project."}</Alert>;

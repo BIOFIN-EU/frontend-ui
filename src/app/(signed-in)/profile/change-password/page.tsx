@@ -68,7 +68,7 @@ export default function ChangePasswordPage() {
         </p>
       </header>
 
-      <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md">
+      <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel backdrop-blur-md">
         <div className="mb-4">
           <p className="text-xs text-fg/50">
             <span className="font-semibold text-danger-300">*</span> Required fields

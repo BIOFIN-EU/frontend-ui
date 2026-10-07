@@ -103,7 +103,7 @@ export function PathwayStepper({
   if (steps.length === 0) return null;
 
   return (
-    <aside className="h-fit rounded-2xl surface-panel p-5 shadow-panel lg:sticky lg:top-24">
+    <aside className="h-fit rounded-2xl surface-panel p-4 sm:p-5 shadow-panel lg:sticky lg:top-24">
       <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">
         Steps
       </p>

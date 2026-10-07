@@ -113,7 +113,7 @@ export default function ClimateResiliencePanel({
       {/* Content */}
       <div className="h-[calc(100%-80px)] overflow-y-auto p-6 space-y-6 pb-32">
         {/* Climate Resilience Overview */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Climate Resilience Assessment
           </h3>
@@ -126,7 +126,7 @@ export default function ClimateResiliencePanel({
         </div>
 
         {/* Management Priority Framework - 5x5 Matrix */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
         <h3 className="text-lg font-semibold text-accent-200 mb-4">
             Management Priority Framework
         </h3>
@@ -198,7 +198,7 @@ export default function ClimateResiliencePanel({
         {/* Key Metrics Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Biodiversity Risk Metric */}
-          <div className="rounded-2xl border border-fg/10 bg-gradient-to-br from-danger-950/20 to-shade/20 p-5 ring-1 ring-fg/5">
+          <div className="rounded-2xl border border-fg/10 bg-gradient-to-br from-danger-950/20 to-shade/20 p-4 sm:p-5 ring-1 ring-fg/5">
             <div className="flex items-center gap-2 mb-3">
               <Activity className="h-5 w-5 text-danger-400" />
               <h3 className="text-lg font-semibold text-danger-200">
@@ -219,7 +219,7 @@ export default function ClimateResiliencePanel({
           </div>
 
           {/* Climate Resiliency Metric */}
-          <div className="rounded-2xl border border-fg/10 bg-gradient-to-br from-accent-950/20 to-shade/20 p-5 ring-1 ring-fg/5">
+          <div className="rounded-2xl border border-fg/10 bg-gradient-to-br from-accent-950/20 to-shade/20 p-4 sm:p-5 ring-1 ring-fg/5">
             <div className="flex items-center gap-2 mb-3">
               <BarChart3 className="h-5 w-5 text-accent-400" />
               <h3 className="text-lg font-semibold text-accent-200">
@@ -238,7 +238,7 @@ export default function ClimateResiliencePanel({
         </div>
 
         {/* Model Configuration */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Model Configuration
           </h3>
@@ -290,7 +290,7 @@ export default function ClimateResiliencePanel({
         </div>
 
         {/* Future Projections */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <div className="flex items-center gap-2 mb-3">
             <Calendar className="h-5 w-5 text-orange-400" />
             <h3 className="text-lg font-semibold text-accent-200">
@@ -313,7 +313,7 @@ export default function ClimateResiliencePanel({
 
 
         {/* Methodology Reference */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-semibold text-accent-200">
               Methodology & Reference

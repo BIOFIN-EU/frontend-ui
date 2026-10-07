@@ -101,7 +101,7 @@ export function ProjectListScreen({ cases, onDeleted }: Props) {
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-3xl border border-fg/10 bg-gradient-to-br from-fg/[0.08] to-fg/[0.03] p-6 shadow-panel backdrop-blur-xl">
+      <section className="overflow-hidden rounded-3xl border border-fg/10 bg-gradient-to-br from-fg/[0.08] to-fg/[0.03] p-4 sm:p-6 shadow-panel backdrop-blur-xl">
         <PageHeader
           eyebrow="Projects"
           title="Project dashboard"
@@ -146,7 +146,7 @@ export function ProjectListScreen({ cases, onDeleted }: Props) {
         </div>
       </section>
 
-      <section className="rounded-3xl surface-panel p-6 shadow-panel-soft backdrop-blur-xl">
+      <section className="rounded-3xl surface-panel p-4 sm:p-6 shadow-panel-soft backdrop-blur-xl">
         <div className="mb-4 flex items-center justify-between gap-4">
           <p className="text-sm text-fg/50">
             Filter projects

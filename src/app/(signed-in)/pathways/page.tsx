@@ -245,7 +245,7 @@ function PathwaysPageInner() {
 
   return (
     <div className="space-y-8 pb-10">
-      <header className="relative overflow-hidden rounded-3xl border border-fg/10 bg-deep px-6 py-6 shadow-panel-soft sm:px-8">
+      <header className="relative overflow-hidden rounded-3xl border border-fg/10 bg-deep px-4 py-6 shadow-panel-soft sm:px-8">
         <div className="pointer-events-none absolute inset-0 bg-hero-glow" />
         <PageHeader
           className="relative"
@@ -255,7 +255,7 @@ function PathwaysPageInner() {
         />
       </header>
 
-      <section className="relative overflow-hidden rounded-3xl border border-fg/10 bg-fg/[0.035] px-5 py-6 shadow-panel-soft sm:px-7 sm:py-7">
+      <section className="relative overflow-hidden rounded-3xl border border-fg/10 bg-fg/[0.035] px-4 py-6 shadow-panel-soft sm:px-7 sm:py-7">
 
         <div className="relative grid gap-3 lg:grid-cols-3 lg:gap-5">
           {steps.map((step) => (
@@ -314,7 +314,7 @@ function PathwaysPageInner() {
           </p>
           <Link
             href="/bng/marketplace"
-            className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent-400/20 bg-accent-500/[0.07] px-5 py-4 transition hover:border-accent-300/40 hover:bg-accent-500/[0.12]"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent-400/20 bg-accent-500/[0.07] px-4 sm:px-5 py-4 transition hover:border-accent-300/40 hover:bg-accent-500/[0.12]"
           >
             <span className="flex items-center gap-3 text-sm text-fg/80">
               <Store className="h-5 w-5 text-accent-300" aria-hidden="true" />
@@ -330,7 +330,7 @@ function PathwaysPageInner() {
           <article key={pathway.code} className="group relative overflow-hidden rounded-3xl border border-fg/10 bg-fg/[0.035] shadow-panel-soft transition duration-300 hover:-translate-y-0.5 hover:border-accent-300/25 hover:shadow-card-hover">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent-500/[0.045] via-transparent to-blue-500/[0.025] opacity-60" />
 
-            <div className="relative flex h-full flex-col p-6 sm:p-7">
+            <div className="relative flex h-full flex-col p-4 sm:p-7">
               <div className="flex items-start gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-accent-300/20 bg-accent-400/10 text-accent-200 shadow-inset-highlight">
                   <PathwayIcon code={pathway.code} />

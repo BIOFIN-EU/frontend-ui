@@ -45,7 +45,7 @@ function CasesPageInner() {
       )}
 
       {isPending && (
-        <div className="rounded-2xl surface-panel p-6 text-fg/70">
+        <div className="rounded-2xl surface-panel p-4 sm:p-6 text-fg/70">
           Loading projects...
         </div>
       )}

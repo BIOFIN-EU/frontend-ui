@@ -35,7 +35,7 @@ export default function IntermediariesPage() {
       />
 
       {loading && (
-        <div className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-6 text-fg/75">
+        <div className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-4 sm:p-6 text-fg/75">
           Loading intermediaries...
         </div>
       )}
@@ -47,7 +47,7 @@ export default function IntermediariesPage() {
       )}
 
       {!loading && !error && intermediaries.length === 0 && (
-        <div className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-8 text-center">
+        <div className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-4 sm:p-8 text-center">
           <h2 className="text-xl font-semibold text-fg">
             No intermediaries yet
           </h2>
@@ -85,7 +85,7 @@ export default function IntermediariesPage() {
             return (
               <article
                 key={intermediary.id}
-                className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-6"
+                className="rounded-2xl border border-fg/10 bg-scrim/80 backdrop-blur-md p-4 sm:p-6"
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>

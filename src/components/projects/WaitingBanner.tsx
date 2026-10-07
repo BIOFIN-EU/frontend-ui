@@ -21,7 +21,7 @@ export function WaitingBanner({ cases }: { cases: CaseListItem[] }) {
   const names = new Map(cases.map((item) => [item.caseId, item.name]));
 
   return (
-    <section className="rounded-2xl border border-warning-400/25 bg-warning-500/10 px-5 py-3">
+    <section className="rounded-2xl border border-warning-400/25 bg-warning-500/10 px-4 sm:px-5 py-3">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}

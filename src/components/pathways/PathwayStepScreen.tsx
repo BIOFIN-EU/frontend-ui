@@ -60,7 +60,7 @@ export function PathwayStepScreen({
 }: Props) {
   if (mode === "submit" && (state.status === "completed" || !state.step)) {
     return (
-      <div className="rounded-2xl border border-accent-400/30 bg-accent-500/10 p-6 shadow-panel">
+      <div className="rounded-2xl border border-accent-400/30 bg-accent-500/10 p-4 sm:p-6 shadow-panel">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-accent-200/80">

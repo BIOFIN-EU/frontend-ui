@@ -52,8 +52,10 @@ export default function DetailedDataPanel({
       <div className="fixed right-0 top-0 h-full w-full sm:w-1/2 bg-data-panel text-fg shadow-2xl z-50 transform transition-transform duration-300 ease-out border-l border-fg/10">
         {/* "Go Back" button on the left edge of the panel */}
         <button
+          type="button"
+          aria-label="Close data panel"
           onClick={onClose}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full flex items-center gap-3 text-fg/70 hover:text-fg transition-colors duration-200 cursor-pointer px-4 py-3"
+          className="absolute bottom-4 left-4 z-10 min-h-11 rounded-xl bg-popover shadow-overlay sm:bottom-auto sm:left-0 sm:top-1/2 sm:-translate-y-1/2 sm:-translate-x-full sm:bg-transparent sm:shadow-none flex items-center gap-3 text-fg/70 hover:text-fg transition-colors duration-200 cursor-pointer px-4 py-3"
         >
           <svg
             className="w-6 h-6"

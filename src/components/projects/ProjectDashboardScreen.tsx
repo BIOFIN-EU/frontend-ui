@@ -429,7 +429,7 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
 
   if (!activeStep) {
     return (
-      <div className="rounded-2xl surface-panel p-6 text-fg/70">
+      <div className="rounded-2xl surface-panel p-4 sm:p-6 text-fg/70">
         No workflow steps found.
       </div>
     );
@@ -445,7 +445,7 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
 
   return (
     <section className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="h-fit rounded-2xl surface-panel p-5 shadow-panel lg:sticky lg:top-24">
+      <aside className="h-fit rounded-2xl surface-panel p-4 sm:p-5 shadow-panel lg:sticky lg:top-24">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">
             Steps
@@ -494,7 +494,7 @@ export function ProjectDashboardScreen({ state }: { state: CaseDashboardState })
         </div>
       </aside>
 
-      <div className="min-h-[360px] min-w-0 rounded-2xl surface-panel p-6 shadow-panel">
+      <div className="min-h-[360px] min-w-0 rounded-2xl surface-panel p-4 sm:p-6 shadow-panel">
         <h2 className="text-2xl font-semibold tracking-tight text-fg">
           {activeStep.step.title}
         </h2>

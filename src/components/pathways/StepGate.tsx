@@ -54,7 +54,7 @@ export function StepGate({ state, step, stepCode, mode, onStateUpdated, children
 
   if (capacity.kind === "none") {
     return (
-      <div className="flex items-start gap-3 rounded-2xl border border-fg/10 bg-fg/[0.04] p-5 text-sm text-fg/75">
+      <div className="flex items-start gap-3 rounded-2xl border border-fg/10 bg-fg/[0.04] p-4 sm:p-5 text-sm text-fg/75">
         <Clock className="mt-0.5 h-5 w-5 shrink-0 text-warning-300" aria-hidden="true" />
         <div>
           <p className="font-semibold text-fg">Waiting for the {owners}</p>
@@ -135,7 +135,7 @@ function RejectPanel({
   }
 
   return (
-    <div className="rounded-2xl border border-danger-400/20 bg-danger-500/[0.06] p-5">
+    <div className="rounded-2xl border border-danger-400/20 bg-danger-500/[0.06] p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="flex items-center gap-2 text-sm text-fg/80">
           <ShieldCheck className="h-4 w-4 text-danger-300" aria-hidden="true" />
