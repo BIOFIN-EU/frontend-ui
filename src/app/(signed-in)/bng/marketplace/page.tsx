@@ -82,7 +82,7 @@ export default function BngMarketplacePage() {
         <p className="text-xs text-fg/50">Prototype · Simplified metric, not the Statutory Biodiversity Metric</p>
       </PageHeader>
 
-      <section className="rounded-2xl border border-accent-400/20 bg-accent-500/[0.06] p-5">
+      <section className="rounded-2xl border border-accent-400/20 bg-accent-500/[0.06] p-4 sm:p-5">
         {developments.length === 0 ? (
           <p className="text-sm text-fg/70">
             To see matches and reserve units, create a{" "}
@@ -167,7 +167,7 @@ export default function BngMarketplacePage() {
       ) : (
         <section className="grid gap-4 lg:grid-cols-2">
           {listed.map(({ bank, fit }) => (
-            <article key={bank.case_id} className="flex flex-col rounded-2xl border border-fg/10 bg-fg/[0.035] p-5">
+            <article key={bank.case_id} className="flex flex-col rounded-2xl border border-fg/10 bg-fg/[0.035] p-4 sm:p-5">
               <div>
                 <h2 className="text-lg font-semibold text-fg">{bank.name ?? "Habitat bank"}</h2>
                 <p className="text-sm text-fg/60">

@@ -129,7 +129,7 @@ function DownloadCard({ entry, caseId }: { entry: DownloadEntry; caseId: string 
 
   return (
     <li
-      className={`flex flex-col rounded-2xl p-6 ${
+      className={`flex flex-col rounded-2xl p-4 sm:p-6 ${
         comingSoon ? "border border-dashed border-fg/15 bg-fg/[0.02]" : "surface-panel shadow-panel"
       }`}
     >

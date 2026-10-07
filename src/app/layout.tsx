@@ -7,9 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Providers from "./providers";
 import ApiErrorBridge from "@/components/ApiErrorBridge";
-import HeaderAuthClient from "@/components/HeaderAuthClient";
 import NavClient from "@/components/NavClient";
-import ThemeToggle, { themeInitScript } from "@/components/ThemeToggle";
+import { themeInitScript } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "BIOFIN-EU Dashboard",
@@ -47,48 +46,30 @@ export default function RootLayout({
                 wrapper uses overflow-x-clip, which (unlike overflow-hidden) does
                 not create a scroll container. */}
             <header className="sticky top-0 z-20 border-b border-fg/10 bg-header/80 backdrop-blur-xl">
-              <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-
-                {/* LEFT GROUP */}
-                  <div className="flex items-center gap-4">
-
-                    <Link href="/" className="navLink">
-
-                      <Image
-                          src="/biofin-logo-final.png"
-                          alt="BIOFIN-EU"
-                          width={100}
-                          height={50}
-                          priority
-                          className="h-11 w-auto object-contain"
-                      />
-                      </Link>
-
-
-                    <div className="flex flex-col leading-tight">
-                    </div>
-
-                  <NavClient />
-                </div>
-
-                {/* RIGHT GROUP */}
-                <div className="flex items-center gap-3">
-                  <ThemeToggle />
-                  <HeaderAuthClient />
-                </div>
-              </div>
+              <NavClient brand={
+                <Link href="/" className="navLink headerBrand" aria-label="BIOFIN-EU home">
+                  <Image
+                    src="/biofin-logo-final.png"
+                    alt="BIOFIN-EU"
+                    width={100}
+                    height={50}
+                    priority
+                    className="h-11 w-auto object-contain"
+                  />
+                </Link>
+              } />
             </header>
 
             {/* MAIN */}
             <main className="relative z-10 flex-1">
-              <div className="mx-auto max-w-7xl px-6 py-6">
+              <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
                 {children}
               </div>
             </main>
 
             {/* FOOTER */}
             <footer className="relative z-10 border-t border-fg/10 bg-shade/20 backdrop-blur-md">
-              <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 text-sm">
+              <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 text-sm">
                 <div className="flex items-start gap-4">
                   <Image
                     src="/eu-flag.svg"

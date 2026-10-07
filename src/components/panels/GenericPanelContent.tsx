@@ -69,7 +69,7 @@ export default function GenericPanelContent({
         </div>
 
         {/* Description */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Assessment Overview
           </h3>
@@ -80,7 +80,7 @@ export default function GenericPanelContent({
 
         {/* Scientific Reference */}
         {scientificReference && (
-          <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+          <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
             <div className="flex items-center gap-2 mb-4">
               <Database className="h-5 w-5 text-accent-400" />
               <h3 className="text-lg font-semibold text-accent-200">
@@ -145,7 +145,7 @@ export default function GenericPanelContent({
         )}
 
         {/* Additional Technical Details */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Methodology
           </h3>

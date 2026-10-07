@@ -405,7 +405,7 @@ export function PathwayLocationStep({
     step.fields.find((field) => field.type === "location_table")?.entry_help_text ?? {};
 
   return (
-    <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6">
+    <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-4 sm:p-6">
       <div className="mb-6">
         <div className="flex items-center gap-1.5">
           <h2 className="text-lg font-semibold text-fg">{step.title}</h2>

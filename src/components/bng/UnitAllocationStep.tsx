@@ -268,7 +268,7 @@ export function UnitAllocationStep({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6">
+      <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-4 sm:p-6">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-start gap-1.5">
             <p className="text-sm text-fg/60">

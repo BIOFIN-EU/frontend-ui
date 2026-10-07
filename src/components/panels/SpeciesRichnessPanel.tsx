@@ -56,7 +56,7 @@ export default function SpeciesRichnessPanel({
       {/* Content */}
       <div className="h-[calc(100%-80px)] overflow-y-auto p-6 space-y-6 pb-32">
         {/* SRI Overview */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Species Richness Index
           </h3>
@@ -69,7 +69,7 @@ export default function SpeciesRichnessPanel({
         </div>
 
         {/* Model Configuration */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Model Configuration
           </h3>
@@ -94,7 +94,7 @@ export default function SpeciesRichnessPanel({
         </div>
 
         {/* Methodology Reference */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-semibold text-accent-200">
               Methodology & Reference
@@ -119,7 +119,7 @@ export default function SpeciesRichnessPanel({
         </div>
 
         {/* Species List */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <div className="flex items-center gap-2 mb-4">
             <Trees className="h-5 w-5 text-accent-400" />
             <h3 className="text-lg font-semibold text-accent-200">

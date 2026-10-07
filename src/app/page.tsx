@@ -145,7 +145,7 @@ export default function HomePage() {
         scrim="left"
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+      <div className="mx-auto max-w-7xl px-0 py-6 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
         <section className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
           <div className="flex min-w-0 flex-col justify-center space-y-6 lg:pr-4">
             <div className="space-y-4">
@@ -420,7 +420,7 @@ export default function HomePage() {
 
         {/* Optional pillar section can be re-enabled later if needed */}
 
-        <section className="mt-10 rounded-3xl border border-accent-400/20 bg-accent-500/10 p-5 shadow-panel-soft backdrop-blur-md sm:p-6">
+        <section className="mt-10 rounded-3xl border border-accent-400/20 bg-accent-500/10 p-4 shadow-panel-soft backdrop-blur-md sm:p-6">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:items-stretch">
             <div className="flex min-w-0 flex-col justify-center">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent-100/65">
@@ -450,7 +450,7 @@ export default function HomePage() {
                 <Link
                   key={item.key}
                   href={item.href}
-                  className="group flex h-full flex-col justify-between rounded-2xl surface-card p-5 ring-1 ring-fg/5 transition duration-200 hover:border-accent-300/30 hover:bg-shade/30"
+                  className="group flex h-full flex-col justify-between rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5 transition duration-200 hover:border-accent-300/30 hover:bg-shade/30"
                 >
                   <div>
                     <p className="text-base font-semibold text-fg">{item.title}</p>

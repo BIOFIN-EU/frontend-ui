@@ -38,7 +38,7 @@ export default function ProfilePage() {
     <div className="space-y-8">
       <PageHeader size="lg" title="Profile" subtitle="Manage your account details and settings." />
 
-      <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md">
+      <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel backdrop-blur-md">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-4">
             <div className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-fg/10 to-fg/5 ring-1 ring-fg/10 text-fg text-sm font-semibold">
@@ -62,7 +62,7 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md">
+      <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel backdrop-blur-md">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href="/profile/change-password"

@@ -41,7 +41,7 @@ type Props = {
 
 const CANNOT_DECIDE: BngCapacity = { kind: "none", role: null, roles: [] };
 
-const card = "rounded-2xl surface-card p-5";
+const card = "rounded-2xl surface-card p-4 sm:p-5";
 
 /**
  * The BNG part of the project dashboard: the metric, the marketplace

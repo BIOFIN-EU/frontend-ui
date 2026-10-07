@@ -518,7 +518,7 @@ export default function SupportPage() {
 
       <section className="relative overflow-hidden rounded-3xl border border-fg/10 bg-deep/55 shadow-panel backdrop-blur-sm">
         <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative grid min-h-[280px] items-center gap-8 px-7 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-10">
+        <div className="relative grid min-h-[280px] items-center gap-8 px-4 py-6 sm:px-7 sm:py-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-10">
           <header className="max-w-2xl space-y-3">
             <h1 className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl">Support</h1>
             <p className="max-w-xl text-base leading-7 text-fg/70">Need help or want to get in touch? We&apos;re here to support you.</p>
@@ -530,12 +530,12 @@ export default function SupportPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md sm:p-8">
+      <section className="rounded-2xl surface-panel p-4 shadow-panel backdrop-blur-md sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-wider text-fg/50">Help &amp; guidance</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-fg">How can we help you?</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {supportCards.map((card) => (
-            <button key={card.title} type="button" onClick={() => { setReason(card.reason); document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="group rounded-2xl surface-card p-5 text-left ring-1 ring-fg/5 transition hover:-translate-y-1 hover:border-accent-300/25 hover:bg-fg/[0.06]">
+            <button key={card.title} type="button" onClick={() => { setReason(card.reason); document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="group rounded-2xl surface-card p-4 sm:p-5 text-left ring-1 ring-fg/5 transition hover:-translate-y-1 hover:border-accent-300/25 hover:bg-fg/[0.06]">
               <div className="flex items-start justify-between gap-4">
                 <IconFrame>{card.icon}</IconFrame>
                 <span className="text-lg text-fg/25 transition group-hover:translate-x-1 group-hover:text-accent-200">→</span>
@@ -547,7 +547,7 @@ export default function SupportPage() {
         </div>
       </section>
 
-      <section id="contact-form" className="scroll-mt-24 rounded-2xl surface-panel p-6 shadow-panel backdrop-blur-md sm:p-8">
+      <section id="contact-form" className="scroll-mt-24 rounded-2xl surface-panel p-4 shadow-panel backdrop-blur-md sm:p-8">
         <div className="flex items-center gap-4">
           <IconFrame><MailIcon /></IconFrame>
           <div>

@@ -48,7 +48,7 @@ export function BngMonitoringCard({ caseId }: { caseId: number }) {
   const summary = monitoring?.summary;
 
   return (
-    <section className="rounded-2xl surface-card p-5">
+    <section className="rounded-2xl surface-card p-4 sm:p-5">
       <h3 className="text-base font-semibold text-fg">Monitoring and verification</h3>
 
       {!monitoring ? (

@@ -338,7 +338,7 @@ export function PathwayAssignmentStep({
   }
 
   return (
-    <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6">
+    <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-4 sm:p-6">
       <div className="mb-6 flex items-start gap-1.5">
         <p className="mt-2 text-sm text-fg/60">
           Create one or more assignments and define the role for each.

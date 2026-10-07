@@ -473,3 +473,61 @@ html[data-theme="light"] .logout {
 html[data-theme="light"] .footer {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.8));
 }
+
+/* Shared responsive site header. Keep the menu in normal flow on phones. */
+.siteHeaderInner {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 4rem;
+}
+.headerBrand { flex-shrink: 0; padding: 0; }
+.mobileMenuToggle { min-height: 44px; gap: 0.5rem; }
+.siteNavigation { display: none; width: 100%; }
+.siteNavigation.isOpen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: calc(100dvh - 5rem);
+  overflow-y: auto;
+  padding: 0.5rem 0 1rem;
+}
+.siteNavigation .nav { flex-direction: column; align-items: stretch; gap: 0.25rem; }
+.siteNavigation .navLink { min-height: 44px; }
+.headerControls, .authArea { display: flex; align-items: center; gap: 0.75rem; }
+.headerControls { justify-content: flex-end; flex-shrink: 0; }
+.siteNavigation .userDropdown { top: auto; bottom: calc(100% + 10px); }
+
+@media (max-width: 639px) {
+  .avatarButton { width: 44px; height: 44px; }
+}
+
+@media (min-width: 1024px) {
+  /* Match the original desktop header's height, spacing and alignment. */
+  .siteHeaderInner {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    height: 4rem;
+    padding: 0 1.5rem;
+    gap: 0;
+  }
+  .headerBrand { grid-column: 1; padding: 10px 12px; margin-right: 2rem; }
+  .mobileMenuToggle { display: none; }
+  .siteNavigation, .siteNavigation.isOpen {
+    display: contents;
+  }
+  .siteNavigation .nav {
+    grid-column: 2;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .siteNavigation .navLink { min-height: 0; }
+  .headerControls { grid-column: 4; gap: 0.75rem; }
+  .siteNavigation .userDropdown { top: calc(100% + 10px); bottom: auto; }
+}

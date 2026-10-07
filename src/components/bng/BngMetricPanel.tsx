@@ -41,7 +41,7 @@ export function BngMetricPanel({ summary, loading, title = "Biodiversity metric"
   const showPending = full && !isBank && rows.some((entry) => (entry.pending_units ?? 0) > 0);
 
   return (
-    <section className="rounded-2xl border border-accent-400/20 bg-accent-500/[0.06] p-5">
+    <section className="rounded-2xl border border-accent-400/20 bg-accent-500/[0.06] p-4 sm:p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-base font-semibold text-fg">{title}</h3>
         <p className="text-xs text-fg/55">

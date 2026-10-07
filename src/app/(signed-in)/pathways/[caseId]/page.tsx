@@ -185,7 +185,7 @@ export default function WorkflowCasePage() {
       </header>
 
       {loading && (
-        <div className="rounded-2xl surface-panel p-6 text-fg/70">
+        <div className="rounded-2xl surface-panel p-4 sm:p-6 text-fg/70">
           Loading workflow...
         </div>
       )}
@@ -208,7 +208,7 @@ export default function WorkflowCasePage() {
             />
           )}
 
-          <div className="rounded-2xl surface-panel p-6 shadow-panel">
+          <div className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel">
             {savedMessage && (
               <Alert tone="success" className="mb-4">
                 {savedMessage}
@@ -225,7 +225,7 @@ export default function WorkflowCasePage() {
 
             <div className="mt-6">
               {stepDataLoading ? (
-                <div className="rounded-xl surface-card p-6 text-sm text-fg/60">
+                <div className="rounded-xl surface-card p-4 sm:p-6 text-sm text-fg/60">
                   Loading step…
                 </div>
               ) : (

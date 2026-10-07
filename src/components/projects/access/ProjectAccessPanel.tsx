@@ -40,7 +40,7 @@ export function ProjectAccessPanel({ caseId }: { caseId: CaseId }) {
   const { data, isPending, error } = useProjectMembers(caseId);
 
   if (isPending) {
-    return <div className="rounded-2xl surface-panel p-6 text-fg/70">Loading project access…</div>;
+    return <div className="rounded-2xl surface-panel p-4 sm:p-6 text-fg/70">Loading project access…</div>;
   }
   if (error || !data) {
     return <Alert tone="danger">{error?.message || "Could not load the project's members."}</Alert>;
@@ -64,7 +64,7 @@ export function ProjectAccessPanel({ caseId }: { caseId: CaseId }) {
 function MembersSection({ caseId, data }: { caseId: CaseId; data: ProjectMembers }) {
   const levelLabel = Object.fromEntries(data.levels.map((l) => [l.code, l.label]));
   return (
-    <section className="rounded-2xl surface-panel p-6 shadow-panel">
+    <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h2 className="text-lg font-semibold text-fg">Members</h2>
         <p className="text-sm text-fg/60">
@@ -261,7 +261,7 @@ function AddMemberSection({ caseId, data }: { caseId: CaseId; data: ProjectMembe
   }
 
   return (
-    <section className="rounded-2xl surface-panel p-6 shadow-panel">
+    <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel">
       <h2 className="flex items-center gap-2 text-lg font-semibold text-fg">
         <UserPlus className="h-5 w-5 text-accent-300" aria-hidden="true" />
         Add a member
@@ -332,14 +332,14 @@ function AddMemberSection({ caseId, data }: { caseId: CaseId; data: ProjectMembe
 function RolesSection({ data }: { data: ProjectMembers }) {
   if (data.roles.length === 0) {
     return (
-      <section className="rounded-2xl surface-panel p-6 shadow-panel">
+      <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel">
         <h2 className="text-lg font-semibold text-fg">Roles</h2>
         <p className="mt-2 text-sm text-fg/60">This pathway has no roles: every Editor can complete every step.</p>
       </section>
     );
   }
   return (
-    <section className="rounded-2xl surface-panel p-6 shadow-panel">
+    <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel">
       <h2 className="text-lg font-semibold text-fg">Roles on this project</h2>
       <p className="mt-1 text-sm text-fg/60">
         A role decides which steps someone completes. Managers can record a step on behalf of a role.
@@ -376,7 +376,7 @@ function RoleItem({ role, holders }: { role: ProjectRole; holders: ProjectMember
 
 function LevelsSection({ data }: { data: ProjectMembers }) {
   return (
-    <section className="rounded-2xl surface-panel p-6 shadow-panel">
+    <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel">
       <h2 className="flex items-center gap-2 text-lg font-semibold text-fg">
         <ShieldCheck className="h-5 w-5 text-accent-300" aria-hidden="true" />
         Access levels
@@ -398,7 +398,7 @@ function LevelsSection({ data }: { data: ProjectMembers }) {
 function HistorySection({ caseId }: { caseId: CaseId }) {
   const { data: history = [], isPending } = useAccessHistory(caseId, true);
   return (
-    <section className="rounded-2xl surface-panel p-6 shadow-panel">
+    <section className="rounded-2xl surface-panel p-4 sm:p-6 shadow-panel">
       <h2 className="flex items-center gap-2 text-lg font-semibold text-fg">
         <History className="h-5 w-5 text-accent-300" aria-hidden="true" />
         Access history

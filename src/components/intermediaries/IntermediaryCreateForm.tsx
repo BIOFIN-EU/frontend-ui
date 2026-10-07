@@ -121,7 +121,7 @@ export function IntermediaryCreateForm() {
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6"
+        className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-4 sm:p-6"
       >
         {error && (
           <Alert tone="danger" className="mb-5">

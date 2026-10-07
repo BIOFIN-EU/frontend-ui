@@ -14,7 +14,7 @@ import { Alert } from "@/components/ui/Alert";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="break-inside-avoid rounded-2xl surface-card p-5">
+    <section className="break-inside-avoid rounded-2xl surface-card p-4 sm:p-5">
       <h2 className="text-base font-semibold text-fg">{title}</h2>
       <div className="mt-3 text-sm text-fg/80">{children}</div>
     </section>

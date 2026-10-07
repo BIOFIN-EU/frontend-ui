@@ -70,7 +70,7 @@ function ThresholdScale({
   };
 
   return (
-    <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+    <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-eyebrow tracking-[0.2em]">
@@ -217,7 +217,7 @@ export default function BiodiversityLossAssessmentPanel({
         )}
 
         {/* Additional Assessment Info */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Assessment Criteria
           </h3>
@@ -247,7 +247,7 @@ export default function BiodiversityLossAssessmentPanel({
         </div>
 
         {/* Risk Interpretation */}
-        <div className="rounded-2xl surface-card p-5 ring-1 ring-fg/5">
+        <div className="rounded-2xl surface-card p-4 sm:p-5 ring-1 ring-fg/5">
           <h3 className="text-lg font-semibold text-accent-200 mb-3">
             Risk Interpretation
           </h3>

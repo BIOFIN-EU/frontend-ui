@@ -93,7 +93,7 @@ export function PathwayFileStep({
   // dashboard.
   if (mode === "edit") {
     return (
-      <div className="rounded-2xl surface-card p-6">
+      <div className="rounded-2xl surface-card p-4 sm:p-6">
         <p className="text-xs font-semibold uppercase tracking-wider text-fg/40">
           Uploaded file
         </p>
