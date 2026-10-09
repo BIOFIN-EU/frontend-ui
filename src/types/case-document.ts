@@ -7,6 +7,8 @@ export type CaseDocument = {
   upload_token: string;
   content_type: string;
   size_bytes: number;
+  // What the uploader wrote about the file (the step's document_notes).
+  notes: string | null;
   created_at: string;
 };
 

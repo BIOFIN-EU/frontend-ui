@@ -96,6 +96,11 @@ function getFieldValue(
     }
   }
 
+  // A file step's notes are saved with its document.
+  if (field.name === "document_notes" && Array.isArray(state.documents)) {
+    return state.documents.find((doc) => doc.step_code === stepCode)?.notes ?? null;
+  }
+
   return null;
 }
 
