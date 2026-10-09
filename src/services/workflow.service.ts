@@ -1,6 +1,6 @@
 import { apiFetch } from "@/lib/api";
 import { submitExtras } from "@/lib/submitExtras";
-import type { CaseDocument, DocumentDownloadUrlResponse } from "@/types/case-document";
+import type { CaseDocument } from "@/types/case-document";
 import type { DetectCountryRequest, DetectCountryResponse } from "@/types/case-location";
 import type {
   CreateWorkflowResponse,
@@ -115,13 +115,16 @@ export const workflowService = {
     );
   },
 
-  async getDocumentDownloadUrl(
+  // The file itself, through the API (which checks the user's access and
+  // records the view or download). "inline" is for the dashboard's viewer.
+  async getDocumentFile(
     caseId: number | string,
-    caseDocumentId: number | string
-  ): Promise<DocumentDownloadUrlResponse> {
-    return apiFetch(
-      `${BASE}/cases/${caseId}/documents/${caseDocumentId}/download-url`,
-      { method: "GET" }
+    caseDocumentId: number | string,
+    disposition: "inline" | "attachment"
+  ): Promise<Blob> {
+    return apiFetch<Blob>(
+      `${BASE}/cases/${caseId}/documents/${caseDocumentId}/content?disposition=${disposition}`,
+      { method: "GET", responseType: "blob", silent: true }
     );
   },
 

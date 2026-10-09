@@ -7,14 +7,10 @@ export type CaseDocument = {
   upload_token: string;
   content_type: string;
   size_bytes: number;
+  // A PDF or image, shown in the dashboard's viewer; anything else downloads.
+  viewable: boolean;
   // What the uploader wrote about the file (the step's document_notes).
   notes: string | null;
   created_at: string;
 };
 
-export type DocumentDownloadUrlResponse = {
-  case_document_id: number;
-  original_filename: string;
-  download_url: string;
-  expires_in_seconds: number;
-};
