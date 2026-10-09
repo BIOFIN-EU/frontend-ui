@@ -31,8 +31,9 @@ export function PathwayFileStep({
   const fileField = step.fields.find((f) => f.type === "file");
   const [error, setError] = useState("");
 
+  // A state from an older API response may come without documents.
   const matchingDoc = fileField
-    ? state.documents.find(
+    ? (state.documents ?? []).find(
         (doc) => doc.field_name === fileField.name && doc.step_code === stepCode
       )
     : undefined;
@@ -59,9 +60,13 @@ export function PathwayFileStep({
     step.fields.forEach((f) => {
       values[f.name] = f.type === "file" ? null : (f.default ?? "");
     });
+    // Replacing a file starts from the notes saved with it.
+    if (matchingDoc?.notes && "document_notes" in values) {
+      values.document_notes = matchingDoc.notes;
+    }
 
     return values;
-  }, [step]);
+  }, [step, matchingDoc]);
 
   async function handleNext(values: Record<string, any>) {
     if (!fileField) {
@@ -82,6 +87,8 @@ export function PathwayFileStep({
       caseId: state.case_id,
       fieldName: fileField.name,
       file,
+      notes:
+        typeof values.document_notes === "string" ? values.document_notes : undefined,
     });
 
     onStateUpdated(updated);

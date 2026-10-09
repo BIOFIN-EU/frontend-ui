@@ -48,9 +48,13 @@ export const workflowService = {
     caseId: number | string;
     fieldName: string;
     file: File;
+    notes?: string;
   }): Promise<WorkflowState> {
     const formData = new FormData();
     formData.append("file", args.file);
+    if (args.notes?.trim()) {
+      formData.append("document_notes", args.notes.trim());
+    }
 
     const query = new URLSearchParams({ field_name: args.fieldName }).toString();
 
