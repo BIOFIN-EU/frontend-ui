@@ -48,6 +48,10 @@ export type FieldSchema = {
   placeholder?: string;
   // Every option, to name a saved value that no longer fits.
   allOptions?: FieldOption[];
+  // file only: the file types the picker offers (its accept attribute), and a
+  // line under it saying what's allowed.
+  accept?: string;
+  hint?: string;
 };
 
 export type StepSchema = {

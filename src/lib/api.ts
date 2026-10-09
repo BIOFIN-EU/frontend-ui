@@ -33,6 +33,9 @@ export type GlobalApiErrorHandler = (message: string, status: number | null) => 
 export type ApiFetchOptions = RequestInit & {
   // Don't raise the global error toast for this request; the caller handles it.
   silent?: boolean;
+  // "blob" returns the response body as a Blob (a file), not parsed JSON.
+  // Errors are still read as JSON.
+  responseType?: "json" | "blob";
 };
 
 let globalErrorHandler: GlobalApiErrorHandler | null = null;
@@ -194,7 +197,7 @@ export async function apiFetch<T>(
   apiOptions: ApiFetchOptions = {},
   retry = true
 ): Promise<T> {
-  const { silent = false, ...options } = apiOptions;
+  const { silent = false, responseType = "json", ...options } = apiOptions;
   const token = getAccessToken();
   const url = `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
 
@@ -251,6 +254,10 @@ export async function apiFetch<T>(
       authFailureHandler?.();
       throw err;
     }
+  }
+
+  if (res.ok && responseType === "blob") {
+    return (await res.blob()) as T;
   }
 
   const data = await parseJsonSafe(res);

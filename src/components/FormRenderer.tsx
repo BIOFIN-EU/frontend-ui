@@ -231,16 +231,24 @@ function Field({
     case "checkbox":
       return (
         <div className="space-y-1">
-          <div className="flex items-center justify-between gap-2">
-            <label className="flex items-center gap-2 text-fg">
-              <input
-                type="checkbox"
-                {...register(field.id, { required: !!field.required })}
-              />
-              <span className="text-sm font-semibold">{field.label}</span>
-            </label>
-            <FieldHelp text={field.help} label={field.label} />
-            <RequirementBadge required={!!field.required} />
+          {/* The info button sits right after the label, as on every other
+              field (outside the <label>, so clicking it doesn't tick the box);
+              the badge stays on the right. */}
+          <div className="flex items-start justify-between gap-3">
+            <span className="flex min-w-0 items-start gap-1.5">
+              <label className="flex min-w-0 items-start gap-2 text-fg">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 shrink-0"
+                  {...register(field.id, { required: !!field.required })}
+                />
+                <span className="text-sm font-semibold">{field.label}</span>
+              </label>
+              <FieldHelp text={field.help} label={field.label} />
+            </span>
+            <span className="shrink-0">
+              <RequirementBadge required={!!field.required} />
+            </span>
           </div>
           {error && <p className="text-sm text-danger-300">{error}</p>}
         </div>
@@ -267,12 +275,19 @@ function Field({
             <input
               id={field.id}
               type="file"
+              accept={field.accept}
+              aria-describedby={field.hint ? `${field.id}-hint` : undefined}
               onChange={(e) => {
                 const file = e.target.files?.[0] ?? null;
                 setValue(field.id, file, { shouldValidate: true, shouldDirty: true });
               }}
               className="block w-full text-sm text-fg file:mr-4 file:rounded-xl file:border file:border-accent-300 file:bg-accent-400/15 file:px-4 file:py-2 file:font-semibold file:!text-fg hover:file:!text-on-solid hover:file:bg-accent-300"
             />
+            {field.hint && (
+              <p id={`${field.id}-hint`} className="mt-2 text-xs text-fg/50">
+                {field.hint}
+              </p>
+            )}
           </div>
 
           {error && <p className="text-sm text-danger-300">{error}</p>}

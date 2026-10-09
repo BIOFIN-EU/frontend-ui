@@ -5,6 +5,8 @@ import { workflowService } from "@/services/workflow.service";
 import type { WorkflowState, WorkflowStep } from "@/types/workflow";
 import { FormRenderer } from "@/components/FormRenderer";
 import { DocumentCard } from "@/components/documents/DocumentCard";
+import { ApiError } from "@/lib/api";
+import { UPLOAD_ACCEPT, UPLOAD_HINT, uploadProblem } from "@/lib/documents";
 import type { PathwayStepMode } from "./PathwayStepScreen";
 
 type Props = {
@@ -49,6 +51,7 @@ export function PathwayFileStep({
         type: f.type as any,
         required: !!f.required,
         options: Array.isArray(f.options) ? f.options : [],
+        ...(f.type === "file" ? { accept: UPLOAD_ACCEPT, hint: UPLOAD_HINT } : {}),
       })),
     }),
     [step]
@@ -81,17 +84,32 @@ export function PathwayFileStep({
       return;
     }
 
+    const problem = uploadProblem(file);
+    if (problem) {
+      setError(problem);
+      return;
+    }
+
     setError("");
 
-    const updated = await workflowService.submitFileStep({
-      caseId: state.case_id,
-      fieldName: fileField.name,
-      file,
-      notes:
-        typeof values.document_notes === "string" ? values.document_notes : undefined,
-    });
+    try {
+      const updated = await workflowService.submitFileStep({
+        caseId: state.case_id,
+        fieldName: fileField.name,
+        file,
+        notes:
+          typeof values.document_notes === "string" ? values.document_notes : undefined,
+      });
 
-    onStateUpdated(updated);
+      onStateUpdated(updated);
+    } catch (err) {
+      // A refused file (wrong type, too large) comes back as a field error.
+      if (err instanceof ApiError) {
+        setError(err.fieldErrors[fileField.name] ?? err.message);
+      } else {
+        setError("The upload failed. Please try again.");
+      }
+    }
   }
 
   // File uploads can't be edited via the PATCH edit endpoint (the backend
