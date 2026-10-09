@@ -276,21 +276,32 @@ export function PathwayAssignmentStep({
     setIsSubmitting(true);
 
     try {
-      const validRows = rows.filter((row) =>
-        rowFields.every((field) => {
-          if (!field.required) return true;
-          return row[field.name] !== undefined && row[field.name] !== "";
-        })
+      const isBlank = (value: unknown) => value === undefined || value === "";
+      // Rows left completely empty are ignored; a half-filled row is an error.
+      const filledRows = rows.filter((row) =>
+        rowFields.some((field) => !isBlank(row[field.name]))
       );
 
-      if (validRows.length === 0) {
+      if (
+        filledRows.some((row) =>
+          rowFields.some((field) => field.required && isBlank(row[field.name]))
+        )
+      ) {
+        setFieldErrors({
+          assignments: "Complete or remove the unfinished assignment.",
+        });
+        return;
+      }
+
+      // An optional table (required: false) may be saved empty.
+      if (filledRows.length === 0 && assignmentField?.required !== false) {
         setFieldErrors({
           assignments: "Please add at least one assignment.",
         });
         return;
       }
 
-      const assignments = validRows.map((row) => {
+      const assignments = filledRows.map((row) => {
         return rowFields.reduce<Record<string, number | string>>((item, field) => {
           const value = row[field.name];
 

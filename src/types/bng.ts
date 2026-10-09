@@ -172,7 +172,13 @@ export function formatUnits(value: number | null | undefined): string {
 
 // ---------- Phase 3: roles, sign-offs, monitoring ----------
 
-export type BngRole = "landowner" | "investor" | "developer" | "ecologist" | "lpa";
+export type BngRole =
+  | "landowner"
+  | "investor"
+  | "developer"
+  | "ecologist"
+  | "lpa"
+  | "responsible_body";
 
 // How the user may act for something owned by `roles` (from the API):
 // as their own role, on behalf of it (a project manager, who confirms each
