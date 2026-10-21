@@ -8,7 +8,7 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import * as auth from "@/services/auth.service";
 import type { MeResponse } from "@/types/auth";
@@ -19,8 +19,10 @@ type User = MeResponse;
 type AuthCtx = {
   isAuthed: boolean;
   isInitializing: boolean;
-  // True after the user chose to log out, so RequireAuth doesn't send them
-  // to the login page instead of where logout() is taking them.
+  // True on the page the user just logged out from, so RequireAuth doesn't
+  // send them to the login page instead of where logout() is taking them.
+  // Anywhere else it's false again: a page that needs an account then sends
+  // a signed-out visitor to log in, as usual.
   signedOut: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
@@ -35,7 +37,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthed, setIsAuthed] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [signedOut, setSignedOut] = useState(false);
+  // The page the user logged out from, until they've left it.
+  const [signedOutFrom, setSignedOutFrom] = useState<string | null>(null);
+  const pathname = usePathname();
+  const signedOut = signedOutFrom !== null && signedOutFrom === pathname;
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -58,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const me = await auth.me();
       setUser(me);
       setIsAuthed(true);
-      setSignedOut(false);
+      setSignedOutFrom(null);
     } catch {
       await auth.logout();
       clearAuthState();
@@ -69,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(
     async (redirectTo = "/") => {
-      setSignedOut(true);
+      setSignedOutFrom(window.location.pathname);
       await auth.logout();
       clearAuthState();
       router.replace(redirectTo);
@@ -93,6 +98,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, [refreshUser, clearAuthState]);
+
+  // Once logout has taken them elsewhere, forget it: before, the flag stayed
+  // set for the whole visit, so every page needing an account showed blank.
+  useEffect(() => {
+    if (signedOutFrom !== null && pathname !== signedOutFrom) setSignedOutFrom(null);
+  }, [pathname, signedOutFrom]);
 
   const value = useMemo<AuthCtx>(
     () => ({

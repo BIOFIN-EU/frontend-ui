@@ -8,6 +8,9 @@ import { ProjectListScreen } from "@/components/projects/ProjectListScreen";
 import { WaitingBanner } from "@/components/projects/WaitingBanner";
 import { AllProjectsPanel } from "@/components/projects/AllProjectsPanel";
 import { Alert } from "@/components/ui/Alert";
+import { PageBackdrop } from "@/components/PageBackdrop";
+import { photoCredits } from "@/lib/photo-credits";
+import womanTouchingTree from "../../../../public/images/woman-touching-tree.jpg";
 
 // useSearchParams needs a Suspense boundary for the production build.
 export default function CasesPage() {
@@ -29,7 +32,16 @@ function CasesPageInner() {
   const { data: cases, isPending, error } = useCases();
 
   return (
-    <div className="space-y-8">
+    <div className="relative isolate space-y-8">
+      {/* A short photo band behind the heading only; the list below stays
+          on the plain page background. */}
+      <PageBackdrop
+        image={womanTouchingTree}
+        credit={photoCredits.womanTouchingTree}
+        heightClassName="h-[340px] lg:h-[380px]"
+        objectPositionClassName="object-[40%_40%]"
+      />
+
       {deletedCaseId && (
         <Alert tone="success" className="flex items-center justify-between gap-4">
           <span>Project #{deletedCaseId} deleted.</span>

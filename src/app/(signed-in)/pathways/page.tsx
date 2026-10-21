@@ -1,5 +1,8 @@
 "use client";
 
+import { PageBackdrop } from "@/components/PageBackdrop";
+import { photoCredits } from "@/lib/photo-credits";
+import haifoss from "../../../../public/images/haifoss-waterfall-iceland.jpg";
 import { Suspense, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -244,13 +247,21 @@ function PathwaysPageInner() {
   }
 
   return (
-    <div className="space-y-8 pb-10">
-      <header className="relative overflow-hidden rounded-3xl border border-fg/10 bg-deep px-4 py-6 shadow-panel-soft sm:px-8">
+    <div className="relative isolate space-y-8 pb-10">
+      <PageBackdrop
+        image={haifoss}
+        credit={photoCredits.haifoss}
+        heightClassName="h-[420px] lg:h-[480px]"
+        objectPositionClassName="object-[50%_45%]"
+        scrim="light"
+      />
+
+      <header className="relative overflow-hidden rounded-3xl border border-fg/10 bg-deep/55 px-4 py-6 shadow-panel-soft backdrop-blur-sm sm:px-8">
         <div className="pointer-events-none absolute inset-0 bg-hero-glow" />
         <PageHeader
           className="relative"
           eyebrow="Pathways"
-          title="Project Pathways"
+          title="Pathways"
           subtitle="Attract funding for Nature-based Solution projects by selecting a pathway."
         />
       </header>
