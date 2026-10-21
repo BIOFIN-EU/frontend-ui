@@ -37,7 +37,7 @@ export function HomeHero() {
         </h1>
         <p className="max-w-xl text-base leading-7 text-fg/85 sm:text-lg sm:leading-8">
           BIOFIN-EU enables landowners, borrowers, funders and intermediaries to assess biodiversity risks and
-          opportunities, prepare investment-ready projects, and simplify biodiversity reporting.
+          opportunities, prepare investment-ready projects, and simplify reporting.
         </p>
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row">
