@@ -45,6 +45,8 @@ export function useAccessHistory(caseId: CaseId, enabled: boolean) {
     queryKey: accessKeys.history(caseId),
     queryFn: () => projectAccessService.getHistory(caseId),
     enabled,
+    // A refusal means you're no longer a manager: asking again won't help.
+    retry: false,
   });
 }
 

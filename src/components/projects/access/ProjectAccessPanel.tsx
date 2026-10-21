@@ -107,7 +107,9 @@ function MemberRow({
   const roleLabel = Object.fromEntries(data.roles.map((r) => [r.code, r.label]));
   const name = personName(member);
   const canEditRow = data.can_manage;
-  const canChangeLevel = data.can_manage && !member.is_owner;
+  // Nobody changes their own level (a manager who lowered it couldn't undo
+  // it); the API refuses it too.
+  const canChangeLevel = data.can_manage && !member.is_owner && !member.is_me;
 
   async function save(body: { level?: AssignableLevel; roles?: string[] }) {
     setError("");
@@ -138,6 +140,11 @@ function MemberRow({
             )}
           </p>
           {member.display_name && member.email && <p className="mt-0.5 text-xs text-fg/55">{member.email}</p>}
+          {data.can_manage && member.is_me && !member.is_owner && (
+            <p className="mt-1 text-xs text-fg/50">
+              To change your own access, ask the project owner or another manager.
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
