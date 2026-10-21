@@ -17,10 +17,28 @@ export default function LoginPage() {
   );
 }
 
+// Names of the pages that need an account, for "Log in to continue to …".
+const PAGE_NAMES: [string, string][] = [
+  ["/pathways", "Pathways"],
+  ["/projects", "Projects"],
+  ["/intermediaries", "Intermediaries"],
+  ["/bng", "Biodiversity Net Gain"],
+  ["/profile", "your profile"],
+];
+
+function pageName(next: string | null): string | null {
+  if (!next?.startsWith("/") || next.startsWith("//")) return null;
+  const match = PAGE_NAMES.find(([path]) => next === path || next.startsWith(`${path}/`) || next.startsWith(`${path}?`));
+  return match ? match[1] : "that page";
+}
+
 function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams(); // ✅ HERE
   const reason = searchParams.get("reason"); // ✅ HERE
+  // Sent here from a page that needs an account (RequireAuth, or a locked
+  // link in the header): say where they're going.
+  const nextPage = pageName(searchParams.get("next"));
 
   const { login } = useAuth();
 
@@ -68,6 +86,11 @@ function LoginPageInner() {
         {reason === "password-changed" && (
           <Alert tone="success" className="mb-4">
             Password updated. Please log in again.
+          </Alert>
+        )}
+        {reason !== "password-changed" && nextPage && (
+          <Alert tone="info" className="mb-4">
+            Log in to continue to {nextPage}. You&apos;ll go straight there afterwards.
           </Alert>
         )}
 
