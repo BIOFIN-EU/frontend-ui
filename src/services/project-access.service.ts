@@ -48,7 +48,9 @@ export const projectAccessService = {
   },
 
   getHistory(caseId: CaseId): Promise<AccessHistoryEntry[]> {
-    return apiFetch<AccessHistoryEntry[]>(`${BASE}/cases/${caseId}/access-history`);
+    // Silent: managers only, and refetched after access changes, so it can be
+    // refused just after someone lowers your access. No error toast for that.
+    return apiFetch<AccessHistoryEntry[]>(`${BASE}/cases/${caseId}/access-history`, { silent: true });
   },
 
   getMyAccess(caseId: CaseId): Promise<MyProjectAccess> {
