@@ -14,12 +14,14 @@ import type { CaseDocument } from "@/types/case-document";
 import type { WorkflowField, WorkflowStep } from "@/types/workflow";
 import { Badge } from "@/components/ui/Badge";
 
-type OrderedStep = {
+// The step and field helpers are also used by the printable project summary
+// (app/(signed-in)/summary), so both show a project's answers the same way.
+export type OrderedStep = {
   code: string;
   step: WorkflowStep;
 };
 
-function getOrderedSteps(state: CaseDashboardState): OrderedStep[] {
+export function getOrderedSteps(state: CaseDashboardState): OrderedStep[] {
   const workflow = state.workflow_config;
   const ordered: OrderedStep[] = [];
   const visited = new Set<string>();
@@ -39,7 +41,7 @@ function getOrderedSteps(state: CaseDashboardState): OrderedStep[] {
   return ordered;
 }
 
-function getStepData(
+export function getStepData(
   state: CaseDashboardState,
   stepCode: string
 ): Record<string, unknown> | null {
@@ -52,7 +54,7 @@ function getStepData(
   return value as Record<string, unknown>;
 }
 
-function getFieldValue(
+export function getFieldValue(
   state: CaseDashboardState,
   stepData: Record<string, unknown> | null,
   field: WorkflowField,
@@ -104,7 +106,7 @@ function getFieldValue(
   return null;
 }
 
-function formatValue(value: unknown): string {
+export function formatValue(value: unknown): string {
   if (value === null || value === undefined || value === "") {
     return "—";
   }
@@ -163,7 +165,7 @@ function isStepComplete(
   );
 }
 
-function locationMapWkt(location: CaseLocationEntry): string {
+export function locationMapWkt(location: CaseLocationEntry): string {
   if (location.location_type === "polygon") {
     return location.geometry_wkt ?? "";
   }
@@ -175,7 +177,7 @@ function locationMapWkt(location: CaseLocationEntry): string {
   return "";
 }
 
-function formatLocationArea(location: CaseLocationEntry): string {
+export function formatLocationArea(location: CaseLocationEntry): string {
   if (location.area_hectares == null) return "—";
 
   const ha = location.area_hectares.toLocaleString(undefined, {
@@ -191,7 +193,7 @@ function formatLocationArea(location: CaseLocationEntry): string {
   return `${ha} ha (${sqm} sqm)`;
 }
 
-function formatLocationValue(location: CaseLocationEntry): string {
+export function formatLocationValue(location: CaseLocationEntry): string {
   if (location.location_type === "point") {
     if (location.latitude == null || location.longitude == null) return "—";
     return `Lat: ${location.latitude}, Long: ${location.longitude}`;
@@ -355,7 +357,7 @@ function StandardFieldCard({
   );
 }
 
-function getObjectLabel(value: unknown): string {
+export function getObjectLabel(value: unknown): string {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return "—";
   }

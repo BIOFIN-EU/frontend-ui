@@ -327,7 +327,7 @@ export default function ManagementActionsMap({
 
   return (
     <div className="relative h-[460px] w-full overflow-hidden rounded-2xl border border-fg/10">
-      <div className="absolute left-8 top-4 flex gap-2 rounded-xl z-10 bg-shade/50 p-1 backdrop-blur-sm border border-fg/10">
+      <div className="absolute left-8 top-4 flex gap-2 rounded-xl z-10 bg-shade/50 p-1 backdrop-blur-sm border border-fg/10 print:hidden">
         <button
           onClick={() => setActiveMode("recommendations")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
