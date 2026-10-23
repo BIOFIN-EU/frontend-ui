@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Download, FileCode2, FileJson, Network, Plus } from "lucide-react";
+import { Download, FileCode2, FileJson, FileText, Network, Plus, Printer } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { semanticService } from "@/services/semantic.service";
@@ -11,7 +12,8 @@ import { Alert } from "@/components/ui/Alert";
 
 // The files a user can download for a project. To add one, add an entry:
 // a title, a short description and its files (each with a fetch that returns
-// the file's content). An entry without files is shown as "coming soon".
+// the file's content), or a page to open (`page`). An entry with neither is
+// shown as "coming soon".
 type DownloadFile = {
   label: string;
   filename: (caseId: string) => string;
@@ -26,6 +28,8 @@ type DownloadEntry = {
   icon: LucideIcon;
   description: string;
   files?: DownloadFile[];
+  // A page to open instead of a file, e.g. the printable summary.
+  page?: { label: string; href: (caseId: string) => string };
 };
 
 // The BIOFIN-EU ontology, from its public repository.
@@ -39,6 +43,15 @@ async function fetchText(url: string): Promise<string> {
 }
 
 const DOWNLOADS: DownloadEntry[] = [
+  {
+    key: "summary",
+    title: "Project summary",
+    format: "PDF",
+    icon: FileText,
+    description:
+      "A readable summary for funders and partners: the project's details, finance and nature-based solution, a map of each site with its Vulnerability Index results and recommended management actions, intermediaries and supporting documents. Opens a printable page; use “Print or save as PDF”.",
+    page: { label: "Open summary", href: (caseId) => `/summary/${caseId}` },
+  },
   {
     key: "project-jsonld",
     title: "Project data",
@@ -113,7 +126,7 @@ function DownloadCard({ entry, caseId }: { entry: DownloadEntry; caseId: string 
   const Icon = entry.icon;
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const comingSoon = !entry.files?.length;
+  const comingSoon = !entry.files?.length && !entry.page;
 
   async function download(file: DownloadFile) {
     setBusy(file.label);
@@ -151,9 +164,18 @@ function DownloadCard({ entry, caseId }: { entry: DownloadEntry; caseId: string 
         </p>
       )}
 
-      {!comingSoon && (
+      {entry.page && (
         <div className="mt-auto flex flex-wrap gap-3 pt-5">
-          {entry.files!.map((file, index) => (
+          <Link href={entry.page.href(caseId)} className={`${buttonClass("primary", "sm")} gap-2`}>
+            <Printer className="h-4 w-4" aria-hidden="true" />
+            {entry.page.label}
+          </Link>
+        </div>
+      )}
+
+      {!comingSoon && entry.files && (
+        <div className="mt-auto flex flex-wrap gap-3 pt-5">
+          {entry.files.map((file, index) => (
             <button
               key={file.label}
               type="button"

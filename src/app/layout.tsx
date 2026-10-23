@@ -37,7 +37,7 @@ export default function RootLayout({
 
           <div className="relative flex min-h-screen flex-col overflow-x-clip bg-app">
             {/* Background glow */}
-            <div className="pointer-events-none absolute inset-0">
+            <div className="pointer-events-none absolute inset-0 print:hidden">
               <div className="absolute inset-0 bg-app-glow" />
             </div>
 
@@ -45,7 +45,8 @@ export default function RootLayout({
             {/* Sticky: stays at the top while the page scrolls. Works because the
                 wrapper uses overflow-x-clip, which (unlike overflow-hidden) does
                 not create a scroll container. */}
-            <header className="sticky top-0 z-20 border-b border-fg/10 bg-header/80 backdrop-blur-xl">
+            {/* Printing (e.g. a project summary) leaves out the site's chrome. */}
+            <header className="sticky top-0 z-20 border-b border-fg/10 bg-header/80 backdrop-blur-xl print:hidden">
               <NavClient brand={
                 <Link href="/" className="navLink headerBrand" aria-label="BIOFIN-EU home">
                   <Image
@@ -68,7 +69,7 @@ export default function RootLayout({
             </main>
 
             {/* FOOTER */}
-            <footer className="relative z-10 border-t border-fg/10 bg-shade/20 backdrop-blur-md">
+            <footer className="relative z-10 border-t border-fg/10 bg-shade/20 backdrop-blur-md print:hidden">
               <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 text-sm">
                 <div className="flex items-start gap-4">
                   <Image
