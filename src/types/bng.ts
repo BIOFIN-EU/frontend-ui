@@ -1,5 +1,7 @@
 // Biodiversity Net Gain prototype (physical-api /api/bng and bng_* workflows).
 
+import type { Person } from "@/types/project-access";
+
 export type BngCategory = "area" | "hedgerow" | "watercourse";
 
 export const BNG_CATEGORIES: BngCategory[] = ["area", "hedgerow", "watercourse"];
@@ -266,7 +268,8 @@ export type BngReport = {
   allocations: BngAllocation[];
   transactions: BngTransaction[];
   signoffs: BngSignoff[];
-  roles: Record<string, BngRole[]>;
+  // Everyone with a role, with their email as the Access tab shows it.
+  people: (Person & { roles: BngRole[] })[];
   step_titles: Record<string, string>;
   financials?: BngFinancials;
   monitoring?: BngMonitoring;

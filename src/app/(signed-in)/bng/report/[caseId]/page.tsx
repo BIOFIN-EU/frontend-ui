@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { Printer } from "lucide-react";
 import { useBngLabels, useBngReport } from "@/queries/bng";
 import { formatDay, formatMoney, type BngRevenueParty } from "@/types/bng";
+import type { Person } from "@/types/project-access";
 import { BngMetricPanel } from "@/components/bng/BngMetricPanel";
 import { BngSignoffsCard } from "@/components/bng/BngSignoffsCard";
 import { unitsLine } from "@/components/bng/BngDashboardCards";
@@ -19,6 +20,13 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
       <div className="mt-3 text-sm text-fg/80">{children}</div>
     </section>
   );
+}
+
+// As on the Access tab: "Jane Smith (jane@lpa.gov.uk)", the email alone, or a fallback.
+function personLabel(person: Person): string {
+  if (person.display_name && person.email) return `${person.display_name} (${person.email})`;
+  if (person.display_name || person.email) return (person.display_name || person.email) as string;
+  return person.known ? "Unknown user" : "Closed account";
 }
 
 // Diagram step 32: one printable summary of a BNG project.
@@ -36,7 +44,6 @@ export default function BngReportPage() {
   if (!report) return <p className="text-sm text-fg/60">Loading report…</p>;
 
   const isBank = report.role === "habitat_bank";
-  const roleRows = Object.entries(report.roles);
 
   return (
     <div className="space-y-5 pb-10">
@@ -65,13 +72,14 @@ export default function BngReportPage() {
       <BngMetricPanel summary={report.metric} />
 
       <Section title="People and roles">
-        {roleRows.length === 0 ? (
+        {report.people.length === 0 ? (
           <p className="text-fg/60">No roles given yet.</p>
         ) : (
           <ul className="space-y-1">
-            {roleRows.map(([userId, roles]) => (
-              <li key={userId}>
-                <span className="break-all text-fg/60">{userId}</span>: {roles.map((r) => labels.role(r)).join(", ")}
+            {report.people.map((person) => (
+              <li key={person.user_id}>
+                <span className="break-all text-fg/60">{personLabel(person)}</span>:{" "}
+                {person.roles.map((r) => labels.role(r)).join(", ")}
               </li>
             ))}
           </ul>
